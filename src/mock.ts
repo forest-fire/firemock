@@ -3,6 +3,9 @@ import * as faker from 'faker';
 import { set, get, first } from 'lodash';
 import * as fbKey from 'firebase-key';
 import Chance = require('chance');
+import SnapShot from './snapshot';
+import Reference from './reference';
+import { normalizeRef, leafNode } from './util';
 
 function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -163,7 +166,7 @@ export default class Mock {
   }
 
   public ref = (dbPath: string) => {
-    return this.queryAPI(dbPath);
+    return new Reference(dbPath, this._db, this._delay);
   }
 
   public addPluralizeException = (singular: string) => (plural: string) => {
@@ -474,22 +477,16 @@ export default class Mock {
     throw new Error('Delay property is of unknown format: ' + delay);
   }
 
-  private once = (reference: string) => (eventType?: 'value') => {
-    const clean = (r: string) => {
-      r = r.replace('/', '.');
-      r = r.slice(0, 1) === '.'
-        ? r.slice(1)
-        : r;
-      return r.split('.');
-    };
-    const response = get(this.db, clean(reference), undefined);
+  private once = (reference: string) => <T = IDictionary>(eventType?: 'value') => {
+    const response = get(this.db, normalizeRef(reference), undefined);
+    const snapshot = new SnapShot<T>(leafNode(reference), response);
 
     if (this._delay) {
       return new Promise( resolve => {
-        setTimeout(() => resolve(response), this.delay());
+        setTimeout(() => resolve(snapshot), this.delay());
       });
     }
 
-    return response;
+    return snapshot;
   }
 }

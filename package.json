@@ -26,6 +26,8 @@
     "cli": "ts-node cli/index.ts --"
   },
   "dependencies": {
+    "common-types": "^1.1.0",
+    "firebase-admin": "^5.0.0",
     "firebase-key": "^1.0.4",
     "moment": "^2.0.0"
   },
