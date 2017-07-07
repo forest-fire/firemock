@@ -5,21 +5,12 @@ import * as fbKey from 'firebase-key';
 import Chance = require('chance');
 import SnapShot from './snapshot';
 import Reference from './reference';
-import { normalizeRef, leafNode } from './util';
+import { getRandomInt, normalizeRef, leafNode } from './util';
 
-function getRandomInt(min: number, max: number) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function objectIndex(obj: IDictionary, index: number) {
-  console.log(obj);
-  const keys = Object.keys(obj);
-  return keys ? obj[keys[index - 1]] : undefined;
-}
 export class SchemaHelper {
   private _db: any;
-  constructor(lazyDb: any) {
-    this._db = lazyDb;
+  constructor(raw: any) {
+    this._db = raw;
   }
   public get faker() {
     return faker;
@@ -100,6 +91,16 @@ export default class Mock {
     company: 'companies'
   };
 
+  constructor(raw?: IDictionary) {
+    if (raw) {
+      this.raw(raw);
+    }
+  }
+
+  public raw(state: IDictionary) {
+    Object.keys(state).forEach(k => this._db[k] = state[k]);
+  }
+
   public get db() {
     return this._db;
   }
@@ -173,6 +174,14 @@ export default class Mock {
     this._exceptions[singular] = plural;
     return this.schemaAPI(singular);
   }
+
+  private singularExceptions = () => {
+    const pluralize = this._exceptions;
+    return Object.keys(pluralize).reduce(
+      (agg: IDictionary, k: string) => agg[pluralize[k]] = k,
+      new Object()
+    );
+  };
 
   /**
    * Add a mocking function to be used to generate the schema in mock DB

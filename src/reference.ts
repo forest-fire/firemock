@@ -15,9 +15,18 @@ export type AsyncOrSync<T> = Promise<SnapShot<T>> | SnapShot<T>;
 export type DelayType = number | number[] | IDictionary<number> | Delays;
 export type Query = (snap: SnapShot) => SnapShot;
 export type QueryStack = Query[];
-
+export enum OrderingType {
+  byChild = 'child',
+  byKey = 'key',
+  byValue = 'value'
+};
+export interface IOrdering {
+  type: OrderingType;
+  value: any;
+}
 export default class Reference<T = IDictionary>{
   private _query: QueryStack = [];
+  private _order: IOrdering;
 
   constructor(
     public ref: string,
@@ -85,6 +94,28 @@ export default class Reference<T = IDictionary>{
 
     return this;
   }
+
+  public orderByChild(path: string) {
+    this._order = {
+      type: OrderingType.byChild,
+      value: path
+    };
+  }
+
+  public orderByValue() {
+    this._order = {
+      type: OrderingType.byValue,
+      value: null
+    };
+  }
+
+  public orderByKey() {
+    this._order = {
+      type: OrderingType.byKey,
+      value: null
+    };
+  }
+
 
   private _once(): SnapShot<T> {
     const response = get(this._state, normalizeRef(this.ref), undefined);

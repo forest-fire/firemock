@@ -35,6 +35,12 @@ export function lastProp<T = IDictionary>(listOf: IDictionary<any>) {
   return listOf[lastKey(listOf)] as T;
 };
 
+export function objectIndex(obj: IDictionary, index: number) {
+  console.log(obj);
+  const keys = Object.keys(obj);
+  return keys ? obj[keys[index - 1]] : null;
+}
+
 export function firstKey<T = any>(listOf: IDictionary<T>) {
   return first(Object.keys(listOf));
 }
