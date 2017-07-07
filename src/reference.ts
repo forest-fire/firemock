@@ -77,8 +77,10 @@ export default class Reference<T = IDictionary>{
 
   public equalTo(value: any, key: string) {
     this._query.push((snap: SnapShot<T>) => {
-      const js: any = snap.val() as T;
-      return new SnapShot(snap.key, js.filter((r: any) => r[key] === value));
+      let js: any = snap.val() as T;
+      const remove = Object.keys(js).filter(k => js[k][key] !== value);
+      js = removeKeys(js, remove);
+      return new SnapShot(snap.key, js);
     });
 
     return this;

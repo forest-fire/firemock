@@ -429,6 +429,37 @@ describe('Mock class()', () => {
         });
     });
 
+    it('equalTo() reduces query to only those equal to child property', done => {
+      const m = new Mock();
+      const young = (h: SchemaHelper) => () => ({
+        first: h.faker.name.firstName,
+        age: 12
+      });
+      const old = (h: SchemaHelper) => () => ({
+        first: h.faker.name.firstName,
+        age: 75
+      });
+      m.addSchema('oldPerson')
+        .mock(old)
+        .modelName('person');
+      m.addSchema('youngPerson')
+        .mock(young)
+        .modelName('person');
+      m
+        .queueSchema('oldPerson', 10)
+        .queueSchema('youngPerson', 10)
+        .generate();
+      m.ref('/people')
+        .equalTo(12, 'age')
+        .once('value')
+        .then(snap => {
+          const listOf = snap.val();
+          expect(snap.numChildren()).to.equal(10);
+
+          done();
+        });
+    });
+
   }); // End Querying Describe
 
 });
