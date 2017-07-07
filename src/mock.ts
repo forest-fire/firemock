@@ -165,8 +165,8 @@ export default class Mock {
     };
   }
 
-  public ref = (dbPath: string) => {
-    return new Reference(dbPath, this._db, this._delay);
+  public ref = <T = IDictionary>(dbPath: string) => {
+    return new Reference<T>(dbPath, this._db as T, this._delay);
   }
 
   public addPluralizeException = (singular: string) => (plural: string) => {

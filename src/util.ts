@@ -1,3 +1,5 @@
+import { first, last } from 'lodash';
+import { IDictionary } from 'common-types';
 
 export function normalizeRef(r: string) {
   r = r.replace('/', '.');
@@ -23,4 +25,29 @@ export function leafNode(r: string) {
 
 export function getRandomInt(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+export function firstProp<T = IDictionary>(listOf: IDictionary<any>) {
+  return listOf[firstKey(listOf)] as T;
+};
+
+export function lastProp<T = IDictionary>(listOf: IDictionary<any>) {
+  return listOf[lastKey(listOf)] as T;
+};
+
+export function firstKey<T = any>(listOf: IDictionary<T>) {
+  return first(Object.keys(listOf));
+}
+
+export function lastKey<T = any>(listOf: IDictionary<T>) {
+  return last(Object.keys(listOf));
+}
+
+export function removeKeys(obj: IDictionary, remove: string[]) {
+  return Object.keys(obj).reduce((agg: IDictionary, v: any) => {
+    if (remove.indexOf(v) === -1) {
+      agg[v] = obj[v];
+    }
+    return agg;
+  }, {});
 }

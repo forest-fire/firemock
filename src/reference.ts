@@ -1,7 +1,7 @@
 import { IDictionary } from 'common-types';
 import SnapShot from './snapshot';
 import { get } from 'lodash';
-import { parts, normalizeRef, leafNode, getRandomInt } from './util';
+import { parts, normalizeRef, leafNode, getRandomInt, removeKeys } from './util';
 
 /** named network delays */
 export enum Delays {
@@ -13,8 +13,11 @@ export enum Delays {
 
 export type AsyncOrSync<T> = Promise<SnapShot<T>> | SnapShot<T>;
 export type DelayType = number | number[] | IDictionary<number> | Delays;
+export type Query = (snap: SnapShot) => SnapShot;
+export type QueryStack = Query[];
 
 export default class Reference<T = IDictionary>{
+  private _query: QueryStack = [];
 
   constructor(
     public ref: string,
@@ -32,17 +35,61 @@ export default class Reference<T = IDictionary>{
     return new Reference(r, get(this._state, r));
   }
 
-  public once(eventType?: 'value'): AsyncOrSync<T> {
+  public once(eventType: 'value'): Promise<SnapShot<T>> {
+    const snapshot = this._once();
+    return new Promise( resolve => {
+      setTimeout(() => resolve(snapshot), this.delay());
+    });
+  }
+
+  public onceSync(eventType: 'value'): SnapShot<T> {
+    return this._once();
+  }
+
+  public limitToFirst(num: number) {
+    this._query.push((snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      if (typeof js === 'object') {
+        const remove = Object.keys(js).slice(num);
+        js = removeKeys(js, remove);
+      }
+      
+      return new SnapShot(snap.key, js);
+    });
+
+    return this;
+  }
+
+  public limitToLast(num: number) {
+    this._query.push((snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      const size: number = Object.keys(js).length;
+      if (typeof js === 'object') {
+        const remove = Object.keys(js).slice(0, size - num);
+        js = removeKeys(js, remove);
+      }
+      
+      return new SnapShot(snap.key, js);
+    });
+
+    return this;
+  }
+
+  public equalTo(value: any, key: string) {
+    this._query.push((snap: SnapShot<T>) => {
+      const js: any = snap.val() as T;
+      return new SnapShot(snap.key, js.filter((r: any) => r[key] === value));
+    });
+
+    return this;
+  }
+
+  private _once(): SnapShot<T> {
     const response = get(this._state, normalizeRef(this.ref), undefined);
-    const snapshot = new SnapShot<T>(leafNode(this.ref), response);
+    let snapshot: any = new SnapShot<T>(leafNode(this.ref), response);
+    this._query.forEach(q => snapshot = q(snapshot))
 
-    if (this._delay) {
-      return new Promise( resolve => {
-        setTimeout(() => resolve(snapshot), this.delay());
-      });
-    }
-
-    return snapshot;
+    return snapshot as SnapShot<T>;
   }
 
   private delay() {

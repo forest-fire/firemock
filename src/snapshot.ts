@@ -7,7 +7,7 @@ import * as firebase from 'firebase-admin';
  * a snapshot synchronously; if you wish to exit early
  * return a TRUE value
  */
-export type Action = (action: SnapShot) => boolean;
+export type Action = (action: SnapShot) => boolean | void;
 
 export default class SnapShot<T = IDictionary> {
   constructor(
@@ -44,7 +44,7 @@ export default class SnapShot<T = IDictionary> {
     return false;
   }
 
-  public numChildren(path: string): number {
+  public numChildren(): number {
     if (typeof this._value === 'object') {
       return Object.keys(this._value).length;
     }

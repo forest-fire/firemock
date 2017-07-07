@@ -5,16 +5,12 @@ import * as helpers from './testing/helpers';
 import Mock, { Delays, SchemaHelper } from '../src/mock';
 import { first, last } from 'lodash';
 import SnapShot from '../src/snapshot';
-
-const firstProp = (obj: IDictionary) => {
-  const key = first(Object.keys(obj));
-  return obj[key];
-};
-
-const lastProp = (obj: IDictionary) => {
-  const key = last(Object.keys(obj));
-  return obj[key];
-};
+import { 
+  firstProp, 
+  lastProp, 
+  firstKey, 
+  lastKey 
+} from '../src/util';
 
 const expect = chai.expect;
 
@@ -316,13 +312,12 @@ describe('Mock class()', () => {
   describe('Basic DB Querying', () => {
     const mocker = (h: SchemaHelper) => () => 'result';
 
-    it('with no delay, querying returns a synchronous result', () => {
+    it('using onceSync(), querying returns a synchronous result', () => {
       const m = new Mock();
-      m.setDelay(null);
       m.addSchema('foo').mock(mocker);
       m.addSchema('bar').mock(mocker);
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
-      const results = m.ref('/foos').once('value') as SnapShot;
+      const results = m.ref('/foos').onceSync('value') as SnapShot;
       expect(results.val).to.be.a('function');
       expect(results.child).to.be.a('function');
       expect(results.hasChild).to.be.a('function');
@@ -331,56 +326,109 @@ describe('Mock class()', () => {
       expect(firstProp(results.val())).to.equal('result');
     });
 
-    it.skip('with default 5ms delay, querying returns a synchronous result', done => {
+    it('with default 5ms delay, querying returns an asynchronous result', done => {
       const m = new Mock();
       m.addSchema('foo').mock(mocker);
       m.addSchema('bar').mock(mocker);
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
-      m.ref('/foos').once('value').then((results: any) => {
-        expect(Object.keys(results).length).is.equal(5);
-        expect(firstProp(results)).is.equal('result');
+      m.ref('/foos').once('value').then((results) => {
+        expect(results.numChildren()).is.equal(5);
+        expect(firstProp<string>(results.val())).to.equal('result');
         done();
       });
     });
 
-    it.skip('with numeric delay, querying returns an asynchronous result', done => {
+    it('with numeric delay, querying returns an asynchronous result', done => {
       const m = new Mock();
       m.addSchema('foo').mock(mocker);
       m.addSchema('bar').mock(mocker);
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(100);
       m.ref('/foos').once('value').then((results: any) => {
-        expect(Object.keys(results).length).is.equal(5);
-        expect(firstProp(results)).is.equal('result');
+        expect(results.numChildren()).is.equal(5);
+        expect(firstProp(results.val())).is.equal('result');
         done();
       });
     });
 
-    it.skip('with named delay, querying returns an asynchronous result', done => {
+    it('with named delay, querying returns an asynchronous result', done => {
       const m = new Mock();
       m.addSchema('foo').mock(mocker);
       m.addSchema('bar').mock(mocker);
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(Delays.mobile);
-      m.ref('/foos').once('value').then((results: any) => {
-        expect(Object.keys(results).length).is.equal(5);
-        expect(firstProp(results)).is.equal('result');
+      m.ref('/foos').once('value').then(results => {
+        expect(results.numChildren()).is.equal(5);
+        expect(firstProp<string>(results.val())).is.equal('result');
         done();
       });
     });
 
-    it.skip('with delay range, querying returns an asynchronous result', done => {
+    it('with delay range, querying returns an asynchronous result', done => {
       const m = new Mock();
       m.addSchema('foo').mock(mocker);
       m.addSchema('bar').mock(mocker);
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay([50, 80]);
       m.ref('/foos').once('value').then((results: any) => {
-        expect(Object.keys(results).length).is.equal(5);
-        expect(firstProp(results)).is.equal('result');
+        expect(results.numChildren()).is.equal(5);
+        expect(firstProp(results.val())).is.equal('result');
         done();
       });
     });
-  });
+
+    it('querying results can be iterated over with forEach()', done => {
+      const m = new Mock();
+      m.addSchema('foo').mock(mocker);
+      m.addSchema('bar').mock(mocker);
+      m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
+      m.setDelay([50, 80]);
+      m.ref('/foos').once('value').then(snap => {
+        snap.forEach(r => {
+          expect(r.val()).to.equal('result');
+        });
+        done();
+      });
+    });
+
+    it('query list with limitToFirst() set', done => {
+      const m = new Mock();
+      m.addSchema('monkey').mock(mocker);
+      m.queueSchema('monkey', 15).generate();
+      m.ref('/monkeys')
+        .limitToFirst(10)
+        .once('value')
+        .then(snap => {
+          const listOf = snap.val();
+          expect(snap.numChildren()).to.equal(10);
+          expect(Object.keys(m.db.monkeys).length).to.equal(15);
+          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
+
+          done();
+        });
+    });
+
+    it('query list with limitToLast() set', done => {
+      const m = new Mock();
+      m.addSchema('monkey').mock(mocker);
+      m.queueSchema('monkey', 15).generate();
+      m.ref('/monkeys')
+        .limitToLast(10)
+        .once('value')
+        .then(snap => {
+          const listOf = snap.val();
+          expect(snap.numChildren()).to.equal(10);
+          expect(Object.keys(m.db.monkeys).length).to.equal(15);
+          expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(listOf).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
+
+          done();
+        });
+    });
+
+  }); // End Querying Describe
 
 });
