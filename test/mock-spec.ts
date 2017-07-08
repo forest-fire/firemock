@@ -2,7 +2,8 @@ import 'mocha';
 import '../src/base-defs';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
-import Mock, { Delays, SchemaHelper } from '../src/mock';
+import Mock, { Delays } from '../src/mock';
+import SchemaHelper from '../src/schema-helper';
 import { first, last } from 'lodash';
 import SnapShot from '../src/snapshot';
 import { 
@@ -25,20 +26,12 @@ describe('Mock class()', () => {
     // expect(schemaApi.databasePrefix).is.a('function');
   });
 
-  it('Mock → Deployment API starts minimally', () => {
-    const m = new Mock();
-    const deployApi = m.build;
-
-    expect(deployApi.queueSchema).is.a('function');
-    expect(Object.keys(deployApi).length).is.equal(1);
-  });
-
-  it('Mock → Deployment API expands once a schema is queued', () => {
+  it('Mock → Deployment API structured correctly', () => {
     const m = new Mock();
     m
       .addSchema('foo')
       .mock((h: SchemaHelper) => () => 'testing')
-    const deployApi = m.queueSchema('foo');
+    const deployApi = m.deploy.queueSchema('foo');
 
     expect(deployApi.queueSchema).is.a('function');
     expect(deployApi.quantifyHasMany).is.a('function');
@@ -67,7 +60,8 @@ describe('Mock class()', () => {
         .mock((h) => () => ({
           name: h.faker.name.firstName()
         }));
-      m.queueSchema('owner', 10).generate();
+      m.deploy
+        .queueSchema('owner', 10).generate();
       m.raw({
         monkeys: {
           a: { name: 'abbey' },
@@ -93,7 +87,7 @@ describe('Mock class()', () => {
             last: h.faker.name.lastName()
           };
         });
-      m
+      m.deploy
         .queueSchema('foo', 5)
         .generate();
 
@@ -136,7 +130,7 @@ describe('Mock class()', () => {
         .addSchema('foo')
         .mock((h: SchemaHelper) => () => 'result')
         .modelName('car');
-      m
+      m.deploy
         .queueSchema('foo')
         .generate();
 
@@ -156,7 +150,7 @@ describe('Mock class()', () => {
             return { name: h.faker.name.firstName() };
           })
           .belongsTo('company');
-        m.build
+        m.deploy
           .queueSchema('user')
           .generate();
         
@@ -172,7 +166,7 @@ describe('Mock class()', () => {
           return { name: h.faker.name.firstName() };
         })
         .belongsTo('company');
-      m.build
+      m.deploy
         .queueSchema('user', 2).fulfillBelongsTo('company')
         .generate();
 
@@ -195,7 +189,7 @@ describe('Mock class()', () => {
         .mock((h: SchemaHelper) => () => {
           return { companyName: h.faker.company.companyName() };
         });
-      m.build
+      m.deploy
         .queueSchema('user', 2)
           .fulfillBelongsTo('company')
         .generate();
@@ -220,7 +214,7 @@ describe('Mock class()', () => {
         .mock((h: SchemaHelper) => () => {
           return { companyName: h.faker.company.companyName() };
         });
-      m.build
+      m.deploy
         .queueSchema('user', 2)
           .fulfillBelongsTo('company')
         .queueSchema('company', 10)
@@ -242,7 +236,7 @@ describe('Mock class()', () => {
             return { name: h.faker.company.companyName() };
           })
           .hasMany('employee');
-        m.queueSchema('company').generate();
+        m.deploy.queueSchema('company').generate();
         
         expect(firstProp(m.db.companies).employees).is.equal(undefined);
       }
@@ -256,9 +250,9 @@ describe('Mock class()', () => {
             return { name: h.faker.company.companyName() };
           })
           .hasMany('employee');
-        m.queueSchema('company')
-          .quantifyHasMany('employee', 10);
-        m.generate();
+        m.deploy
+          .queueSchema('company').quantifyHasMany('employee', 10)
+          .generate();
         
         expect(firstProp(m.db.companies).employees).is.an('object');
         expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
@@ -281,9 +275,9 @@ describe('Mock class()', () => {
             last: h.faker.name.lastName(),
           };
         });
-      m.queueSchema('company')
-        .quantifyHasMany('employee', 10);
-      m.generate();
+      m.deploy.queueSchema('company')
+        .quantifyHasMany('employee', 10)
+        .generate();
       
       expect(firstProp(m.db.companies).employees).is.an('object');
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
@@ -304,14 +298,15 @@ describe('Mock class()', () => {
             last: h.faker.name.lastName(),
           };
         });
-      m
+      m.deploy
         .queueSchema('employee', 25)
         .queueSchema('company')
           .quantifyHasMany('employee', 10);
-      m.generate();
+      m.deploy.generate();
       
-      expect(firstProp(m.db.companies).employees).is.an('object');
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
+      const company = firstProp(m.db.companies);
+      expect(company.employees).is.an('object');
+      expect(Object.keys(company.employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
       expect(Object.keys(m.db.employees).length).to.equal(25);
     });
@@ -330,11 +325,11 @@ describe('Mock class()', () => {
             last: h.faker.name.lastName(),
           };
         });
-      m
+      m.deploy
         .queueSchema('employee', 5)
         .queueSchema('company')
-          .quantifyHasMany('employee', 10);
-      m.generate();
+          .quantifyHasMany('employee', 10)
+        .generate();
       
       expect(firstProp(m.db.companies).employees).is.an('object');
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);

@@ -1,24 +1,10 @@
-import './base-defs';
-import * as faker from 'faker';
 import { set, get, first } from 'lodash';
 import * as fbKey from 'firebase-key';
-import Chance = require('chance');
 import SnapShot from './snapshot';
 import Reference from './reference';
+import Deployment from './deployment';
+import SchemaHelper from './schema-helper';
 import { getRandomInt, normalizeRef, leafNode } from './util';
-
-export class SchemaHelper {
-  private _db: any;
-  constructor(raw: any) {
-    this._db = raw;
-  }
-  public get faker() {
-    return faker;
-  }
-  public get chance() {
-    return Chance.Chance();
-  }
-}
 
 export interface ISchema {
   /** path to the database which is the root for given schema list */
@@ -120,50 +106,13 @@ export default class Mock {
     };
   }
 
-  public generate() {
-    this._queue.map(q => {
-      for (let i = q.quantity; i > 0; i--) {
-        this.insertMockIntoDB(q.schema);
-      }
-    });
-
-    this._queue.map(q => {
-      for (let i = q.quantity; i > 0; i--) {
-        this.insertRelationshipLinks(q);
-      }    
-    });
-  }
-
   /** Set the network delay for queries with "once" */
   public setDelay(d: DelayType) {
     this._delay = d;
   }
-  
-  public queueSchema(name: string, quantity: number = 1) {
-    const schemas = Object.keys(this._schemas);
-    let queueId: string; 
 
-    if (schemas.indexOf(name) === -1) {
-      console.log(`Schema "${name}" does not exist; will SKIP.`);
-      queueId = '';
-    } else {
-      const newQueueItem = { id: fbKey.key(), schema: name, quantity };
-      this._queue = [newQueueItem].concat(this._queue);
-      queueId = newQueueItem.id;
-    }
-
-    return this.deploymentAPI(name, queueId);
-  }
-
-  /** Add data to the database from the configured schemas */
-  public get build() {
-    const queueSchema = this.queueSchema.bind(this);
-    // to start, we MUST define a schema to queue
-    // afterward, more options will open up
-    return {
-      /** Queue a schema for insertion to the database */
-      queueSchema
-    };
+  public get deploy() {
+    return new Deployment(this._schemas, this._relationships, this._queue, this._db);
   }
 
   public ref = <T = IDictionary>(dbPath: string) => {
@@ -198,102 +147,6 @@ export default class Mock {
     return this.schemaAPI(schema);
   }
 
-  private insertMockIntoDB(schema: string) {
-    const mock = this._schemas[schema].fn();
-    const path = this._schemas[schema].path();
-    const key = fbKey.key();
-    const pathAndKey = path + '.' + key;
-    set(this._db, pathAndKey, mock);
-
-    return key;
-  }
-
-  private insertRelationshipLinks(queue: IQueue) {
-    const relationships = this._relationships.filter(r => r.source === queue.schema);
-    const belongsTo = relationships.filter(r => r.type === 'belongsTo');
-    const hasMany = relationships.filter(r => r.type === 'hasMany');
-    belongsTo.forEach(r => {
-      const fulfill = Object.keys(queue.belongsTo || {})
-        .filter(v => queue.belongsTo[v] === true)
-        .indexOf( r.sourceProperty ) !== -1;
-      const source = this._schemas[r.source];
-      const target = this._schemas[r.target];
-      let getID: () => string;
-      
-      if (fulfill) {
-        const mockAvailable = this._schemas[r.target] ? true : false;
-        const available = Object.keys(this.db[this.pluralize(r.target)] || {});
-        const generatedAvailable = available.length > 0;
-        
-        const numChoices = (this._db[r.target] || []).length;
-        const choice = () => generatedAvailable 
-          ? available[getRandomInt(0, available.length - 1)]
-          : this.insertMockIntoDB(r.target);
-        
-        getID = () => mockAvailable 
-          ? generatedAvailable 
-            ? choice()
-            : this.insertMockIntoDB(r.target)
-          : fbKey.key();
-      } else {
-        getID = () => '';
-      }
-
-      const property = r.sourceProperty;
-      const path = source.path();
-      const recordList: IDictionary = get(this._db, source.path(), {});
-
-      Object.keys(recordList).forEach(key => {
-        set(this._db, `${source.path()}.${key}.${property}`, getID());
-      });
-    });
-
-    hasMany.forEach(r => {
-      const fulfill = Object.keys(queue.hasMany || {})
-        .indexOf( r.sourceProperty ) !== -1;
-      const howMany = fulfill 
-        ? queue.hasMany[r.sourceProperty] 
-        : 0;
-      const source = this._schemas[r.source];
-      const target = this._schemas[r.target];
-      let getID: () => string;
-      
-      if (fulfill) {
-        const mockAvailable = this._schemas[r.target] ? true : false;
-        const available = Object.keys(this.db[this.pluralize(r.target)] || {});
-        const used: string[] = [];
-        const generatedAvailable = available.length > 0;
-        const numChoices = (this._db[this.pluralize(r.target)] || []).length;
-
-        const choice = (pool: string[]) => {
-          if (pool.length > 0) {
-            const chosen = pool[getRandomInt(0, pool.length - 1)];
-            used.push(chosen);
-            return chosen;
-          }
-          
-          return this.insertMockIntoDB(r.target);
-        };
-        
-        getID = () => mockAvailable
-          ? choice(available.filter(a => used.indexOf(a) === -1))
-          : fbKey.key();
-      } else {
-        getID = () => undefined;
-      }
-
-      const property = r.sourceProperty;
-      const path = source.path();
-      const sourceRecords: IDictionary = get(this._db, source.path(), {});
-
-      Object.keys(sourceRecords).forEach(key => {
-        for ( let i = 1; i <= howMany; i++ ) {
-          set(this._db, `${source.path()}.${key}.${property}.${getID()}`, true);
-        }
-      });
-    });
-  }
-
   private pluralize(thingy: string) {
     const rules = [
       { find: /(.*)(ch|sh|ax|ss)$/, replace: '$1$2es' },
@@ -307,66 +160,6 @@ export default class Mock {
     }
 
     return this._exceptions[thingy] ? this._exceptions[thingy] : `${thingy}s`;
-  }
-
-  private fulfillBelongsTo = (sourceSchema: string, queueId?: string) => (
-    targetSchema: string
-  ) => {
-    const schema = this._schemas[sourceSchema];
-    const relationship = first(this._relationships
-      .filter(r => r.source === sourceSchema)
-      .filter(r => r.target === targetSchema)
-    );
-    
-    const sourceProperty = schema.path();
-    this._queue = this._queue.map(q => q.id === queueId
-      ? { 
-          ...q, 
-          ...{ 
-            belongsTo: {
-              ...q.belongsTo,
-              ...{ [relationship.sourceProperty]: true } 
-            }
-          }
-        }
-      : q
-    );
-    
-    return this.deploymentAPI(sourceSchema);
-  }
-
-  private quantifyHasMany = (sourceSchema: string, queueId?: string) => (
-    targetSchema: string,
-    quantity: number
-  ) => {
-    const hasMany = this._relationships.filter(
-      r => r.type === 'hasMany' && r.source === sourceSchema
-    );
-    const targetted = hasMany.filter(r => r.target === targetSchema);
-
-    if (hasMany.length === 0) {
-      console.log(
-        `Attempt to quantify "hasMany" relationships with schema "${sourceSchema}" is not possible; no such relationships exist`
-      );
-    } else if (targetted.length === 0) {
-      console.log(
-        `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${sourceSchema}" model`
-      );
-    } else {
-      this._queue = this._queue.map(q => {
-        return q.id === queueId
-          ? { 
-              ...q, 
-              ...{ hasMany: { 
-                ...q.hasMany,
-                ...{[this.pluralize(targetSchema)]: quantity } 
-              }}
-            }
-          : q;
-      });
-    }
-
-    return this.deploymentAPI(sourceSchema);
   }
 
   private modelName = (schema: string) => (model: string) => {
@@ -408,7 +201,7 @@ export default class Mock {
       /**
        * Finish the schema configuration and move onto generation of schemas
        */
-      build: this.build
+      build: this.deploy
     };
   }
 
@@ -438,21 +231,6 @@ export default class Mock {
     });
 
     return this.schemaAPI(source);
-  }
-
-  private deploymentAPI(schema: string, queueKey?: string) {
-    return {
-      /** Queue a schema for generation */
-      queueSchema: this.queueSchema.bind(this),
-      /** 
-       * Provides specificity around how many of a given 
-       * "hasMany" relationship should be fulfilled of 
-       * the schema currently being queued.
-       */
-      quantifyHasMany: this.quantifyHasMany(schema, queueKey),
-      fulfillBelongsTo: this.fulfillBelongsTo(schema, queueKey),
-      generate: this.generate.bind(this)
-    };
   }
 
   private queryAPI(reference: string) {

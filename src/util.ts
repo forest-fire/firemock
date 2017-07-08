@@ -28,7 +28,7 @@ export function getRandomInt(min: number, max: number) {
 }
 
 export function firstProp<T = IDictionary>(listOf: IDictionary<any>) {
-  return listOf[firstKey(listOf)] as T;
+  return listOf ? listOf[firstKey(listOf)] : {};
 };
 
 export function lastProp<T = IDictionary>(listOf: IDictionary<any>) {
