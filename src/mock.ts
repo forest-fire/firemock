@@ -32,15 +32,6 @@ export interface IRelationship {
   target: string;
 }
 
-export interface IQueue {
-  id: string;
-  schema: string;
-  quantity: number;
-  hasMany?: IDictionary<number>;
-  /** the key refers to the property name, the value true means "fulfill" */
-  belongsTo?: IDictionary<boolean>;
-}
-
 export type MockGeneratorCallback = (helper: SchemaHelper) => any;
 
 /**
@@ -62,7 +53,6 @@ export type DelayType = number | number[] | IDictionary<number> | Delays;
 export default class Mock {
   private _db: IDictionary = {};
   private _schemas: IDictionary<ISchema> = {};
-  private _queue: IQueue[] = [];
   private _relationships: IRelationship[] = [];
   private _delay?: DelayType = 5;
   /** allows non-standard pluralizations to be stated explicitly */

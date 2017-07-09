@@ -4,10 +4,17 @@ import * as fbKey from 'firebase-key';
 import { get, set, first } from 'lodash';
 import { IRelationship, ISchema, IQueue } from './mock';
 import { getRandomInt } from './util';
+import Queue from './queue';
 import pluralize from './pluralize';
 
-console.log(pluralize('foo'));
-
+export interface IQueue {
+  id: string;
+  schema: string;
+  quantity: number;
+  hasMany?: IDictionary<number>;
+  /** the key refers to the property name, the value true means "fulfill" */
+  belongsTo?: IDictionary<boolean>;
+}
 export default class Deployment {
   private schemaId: string;
   private queueId: string;
@@ -15,24 +22,23 @@ export default class Deployment {
   constructor(
     private _schemas: IDictionary<ISchema>, 
     private _relationships: IRelationship[], 
-    private _queue: IQueue[],
+    private _queue = new Queue<IQueue>('queue'),
     private _db: IDictionary
   ) {}
 
   /**
    * Queue a schema for deployment to the mock DB
    */
-  public queueSchema(name: string, quantity: number = 1) {
+  public queueSchema(schema: string, quantity: number = 1) {
     const schemas = Object.keys(this._schemas);
     this.queueId = fbKey.key();
 
-
-    if (schemas.indexOf(name) === -1) {
-      console.log(`Schema "${name}" does not exist; will SKIP.`);
+    if (schemas.indexOf(schema) === -1) {
+      console.log(`Schema "${schema}" does not exist; will SKIP.`);
     } else {
-      const newQueueItem = { id: this.queueId, schema: name, quantity };
-      this._queue = [newQueueItem].concat(this._queue);
-      this.schemaId = name;
+      const newQueueItem = { id: this.queueId, schema, quantity };
+      this._queue.enqueue(newQueueItem);
+      this.schemaId = schema;
     }
 
     return this;
