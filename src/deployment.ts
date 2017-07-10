@@ -1,11 +1,11 @@
-import './base-defs';
 import { IDictionary } from 'common-types';
 import * as fbKey from 'firebase-key';
 import { get, set, first } from 'lodash';
-import { IRelationship, ISchema, IQueue } from './mock';
+import { IRelationship, ISchema } from './mock';
 import { getRandomInt } from './util';
 import Queue from './queue';
 import pluralize from './pluralize';
+import { db } from './database';
 
 export interface IQueue {
   id: string;
@@ -18,27 +18,23 @@ export interface IQueue {
 export default class Deployment {
   private schemaId: string;
   private queueId: string;
-
-  constructor(
-    private _schemas: IDictionary<ISchema>, 
-    private _relationships: IRelationship[], 
-    private _queue = new Queue<IQueue>('queue'),
-    private _db: IDictionary
-  ) {}
+  private _queue = new Queue<IQueue>('queue');
+  private _schemas = new Queue<ISchema>('schemas'); 
+  private _relationships = new Queue<IRelationship>('relationships'); 
 
   /**
    * Queue a schema for deployment to the mock DB
    */
-  public queueSchema(schema: string, quantity: number = 1) {
-    const schemas = Object.keys(this._schemas);
+  public queueSchema(schemaId: string, quantity: number = 1) {
+    this.schemaId = schemaId;
     this.queueId = fbKey.key();
+    const schema = this._schemas.find(schemaId);
 
-    if (schemas.indexOf(schema) === -1) {
+    if (!schema) {
       console.log(`Schema "${schema}" does not exist; will SKIP.`);
     } else {
-      const newQueueItem = { id: this.queueId, schema, quantity };
+      const newQueueItem = { id: this.queueId, schema: schemaId, quantity };
       this._queue.enqueue(newQueueItem);
-      this.schemaId = schema;
     }
 
     return this;
@@ -64,16 +60,12 @@ export default class Deployment {
         `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${this.schemaId}" model`
       );
     } else {
-      this._queue = this._queue.map(q => {
-        return q.id === this.queueId
-          ? { 
-              ...q, 
-              ...{ hasMany: { 
-                ...q.hasMany,
-                ...{[pluralize(targetSchema)]: quantity } 
-              }}
-            }
-          : q;
+      const queue = this._queue.find(this.queueId);
+      this._queue.update(this.queueId, {
+       hasMany: { 
+          ...queue.hasMany,
+          ...{[pluralize(targetSchema)]: quantity } 
+        }
       });
     }
 
@@ -85,25 +77,20 @@ export default class Deployment {
    * valid FK reference when this queue is generated.
    */
   public fulfillBelongsTo(targetSchema: string) {
-    const schema = this._schemas[this.schemaId];
+    const schema = this._schemas.find(this.schemaId);
     const relationship = first(this._relationships
       .filter(r => r.source === this.schemaId)
       .filter(r => r.target === targetSchema)
     );
     
     const sourceProperty = schema.path();
-    this._queue = this._queue.map(q => q.id === this.queueId
-      ? { 
-          ...q, 
-          ...{ 
-            belongsTo: {
-              ...q.belongsTo,
-              ...{ [relationship.sourceProperty]: true } 
-            }
-          }
-        }
-      : q
-    );
+    const queue = this._queue.find(this.queueId);
+    this._queue.update(this.queueId, {
+      belongsTo: { 
+        ...queue.belongsTo,
+        ...{[`${targetSchema}Id`]: true } 
+      }
+    });
     
     return this;  
   }
@@ -123,11 +110,11 @@ export default class Deployment {
   }
 
   private insertMockIntoDB(schema: string) {
-    const mock = this._schemas[schema].fn();
-    const path = this._schemas[schema].path();
+    const mock = this._schemas.find(schema).fn();
+    const path = this._schemas.find(schema).path();
     const key = fbKey.key();
     const pathAndKey = path + '.' + key;
-    set(this._db, pathAndKey, mock);
+    set(db, pathAndKey, mock);
 
     return key;
   }
@@ -141,16 +128,16 @@ export default class Deployment {
       const fulfill = Object.keys(queue.belongsTo || {})
         .filter(v => queue.belongsTo[v] === true)
         .indexOf( r.sourceProperty ) !== -1;
-      const source = this._schemas[r.source];
-      const target = this._schemas[r.target];
+      const source = this._schemas.find(r.source);
+      const target = this._schemas.find(r.target);
       let getID: () => string;
       
       if (fulfill) {
-        const mockAvailable = this._schemas[r.target] ? true : false;
-        const available = Object.keys(this._db[pluralize(r.target)] || {});
+        const mockAvailable = this._schemas.find(r.target) ? true : false;
+        const available = Object.keys(db[pluralize(r.target)] || {});
         const generatedAvailable = available.length > 0;
         
-        const numChoices = (this._db[r.target] || []).length;
+        const numChoices = (db[r.target] || []).length;
         const choice = () => generatedAvailable 
           ? available[getRandomInt(0, available.length - 1)]
           : this.insertMockIntoDB(r.target);
@@ -166,10 +153,10 @@ export default class Deployment {
 
       const property = r.sourceProperty;
       const path = source.path();
-      const recordList: IDictionary = get(this._db, source.path(), {});
+      const recordList: IDictionary = get(db, source.path(), {});
 
       Object.keys(recordList).forEach(key => {
-        set(this._db, `${source.path()}.${key}.${property}`, getID());
+        set(db, `${source.path()}.${key}.${property}`, getID());
       });
     });
 
@@ -179,16 +166,17 @@ export default class Deployment {
       const howMany = fulfill 
         ? queue.hasMany[r.sourceProperty] 
         : 0;
-      const source = this._schemas[r.source];
-      const target = this._schemas[r.target];
+      
+      const source = this._schemas.find(r.source);
+      const target = this._schemas.find(r.target);
       let getID: () => string;
       
       if (fulfill) {
-        const mockAvailable = this._schemas[r.target] ? true : false;
-        const available = Object.keys(this._db[pluralize(r.target)] || {});
+        const mockAvailable = this._schemas.find(r.target) ? true : false;
+        const available = Object.keys(db[pluralize(r.target)] || {});
         const used: string[] = [];
         const generatedAvailable = available.length > 0;
-        const numChoices = (this._db[pluralize(r.target)] || []).length;
+        const numChoices = (db[pluralize(r.target)] || []).length;
 
         const choice = (pool: string[]) => {
           if (pool.length > 0) {
@@ -208,12 +196,13 @@ export default class Deployment {
       }
 
       const property = r.sourceProperty;
+      
       const path = source.path();
-      const sourceRecords: IDictionary = get(this._db, source.path(), {});
+      const sourceRecords: IDictionary = get(db, source.path(), {});
 
       Object.keys(sourceRecords).forEach(key => {
         for ( let i = 1; i <= howMany; i++ ) {
-          set(this._db, `${source.path()}.${key}.${property}.${getID()}`, true);
+          set(db, `${source.path()}.${key}.${property}.${getID()}`, true);
         }
       });
     });

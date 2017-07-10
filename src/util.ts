@@ -36,7 +36,6 @@ export function lastProp<T = IDictionary>(listOf: IDictionary<any>) {
 };
 
 export function objectIndex(obj: IDictionary, index: number) {
-  console.log(obj);
   const keys = Object.keys(obj);
   return keys ? obj[keys[index - 1]] : null;
 }

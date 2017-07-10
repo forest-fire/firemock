@@ -1,5 +1,5 @@
 import 'mocha';
-import '../src/base-defs';
+import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import Queue from '../src/queue';
 import { first, last } from 'lodash';
@@ -27,6 +27,16 @@ describe('Queue Class', () => {
     expect(q.includes('bar')).to.equal(false);
   });
 
+  it('simple queue can NOT use the push() method', () => {
+    const q = new Queue('no-push').clear();
+    try {
+      q.push('foo');
+      expect(false).to.equal(true);
+    } catch(e) {
+      expect(true).to.equal(true);
+    }
+  });
+
    it('object queue can add items', () => {
     const q = new Queue('testing');
     q.clear()
@@ -34,6 +44,12 @@ describe('Queue Class', () => {
       .enqueue({id: 2, value: 'bar'})
       .enqueue({id: 3, value: 'baz'});
     expect(q.length).to.equal(3);
+  });
+
+  it('object queue can push() items onto the queue', () => {
+    const q = new Queue('no-push').clear();
+    const key = q.push({ value: 123, foo: 'bar' });
+    expect(q.find(key).value).to.equal(123);
   });
 
   it('object queue can enqueue and dequeue items', () => {
@@ -45,8 +61,6 @@ describe('Queue Class', () => {
     q.dequeue(2);
     expect(q.length).to.equal(2);
     expect(q.includes(1)).to.equal(true);
-    console.log(q.toArray());
-    
     expect(q.includes(2)).to.equal(false);
   });
   
@@ -95,6 +109,22 @@ describe('Queue Class', () => {
 
     expect(newQ.find('foo').value).to.equal(6);
     expect(newQ.find('bar').value).to.equal(11);
+  });
+
+  it('can filter() queue items, returning a JS array', () => {
+    const q = new Queue('testing');
+    const newQ = new Queue('newbie').clear();
+    newQ.fromArray(q.clear()
+      .enqueue({id: 'bear', type: 'animal', value: 5})
+      .enqueue({id: 'dog', type: 'animal',value: 10})
+      .enqueue({id: 'carrot', type: 'produce',value: 20})
+      .filter(i => {
+        return i.type === 'animal';
+      }));
+
+    expect(newQ.length).to.equal(2);
+    expect(newQ.find('bear').value).to.equal(5);
+    expect(newQ.indexOf('carrot')).to.equal(-1);
   });
 
   it('toHash() on empty queue returns empty object', () => {

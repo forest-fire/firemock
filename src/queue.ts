@@ -1,9 +1,13 @@
 import { IDictionary } from 'common-types';
 import { first } from 'lodash';
+import * as fbKey from 'firebase-key';
 
 export type Key = string | number;
 
 export default class Queue<T = any> {
+  public static clearAll() {
+    Queue._queues = {};
+  }
   private static _queues: IDictionary = {};
   public pkProperty = 'id';
 
@@ -21,11 +25,34 @@ export default class Queue<T = any> {
     return this._name;
   }
 
+  /**
+   * Allows adding another item to the queue. It is expected
+   * that this item WILL have the primary key included ('id' by
+   * default)
+   */
   public enqueue(queueItem: T) {
     Queue._queues[this._name].push(queueItem);
     return this;
   }
 
+  /**
+   * Similar to enqueue but the primary key is generated and passed
+   * back to the caller.
+   */
+  public push(queueItem: any) {
+    const id = fbKey.key();
+    if (typeof queueItem !== 'object') {
+      throw new Error('Using push() requires that the payload is an object');
+    }
+    queueItem[this.pkProperty] = id;
+    this.enqueue(queueItem);
+
+    return id;
+  }
+
+  /**
+   * By passing in the key you will remove the given item from the queue
+   */
   public dequeue(key: string | number) {
     const queue = Queue._queues[this._name];
     if (queue.length === 0 ) {
@@ -122,7 +149,14 @@ export default class Queue<T = any> {
     const queue = Queue._queues[this._name];
     return queue
       ? queue.map(fn) as T[]
-      : undefined;
+      : [];
+  }
+
+  public filter(fn: (f: any) => any) {
+    const queue = Queue._queues[this._name];
+    return queue
+      ? queue.filter(fn) as T[]
+      : [];
   }
 
   private _find(key: string | number) {
@@ -130,7 +164,7 @@ export default class Queue<T = any> {
     const objectPayload = typeof first(queue) === 'object';
 
     let index = 0;
-    let result = [null, null];
+    let result: any[] = [null, -1];
     for(const item of queue) {
       const condition = objectPayload
         ? item[this.pkProperty] === key

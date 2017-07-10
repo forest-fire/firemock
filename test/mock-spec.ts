@@ -1,5 +1,5 @@
 import 'mocha';
-import '../src/base-defs';
+import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
 import Mock, { Delays } from '../src/mock';
@@ -62,6 +62,7 @@ describe('Mock class()', () => {
         }));
       m.deploy
         .queueSchema('owner', 10).generate();
+      
       m.raw({
         monkeys: {
           a: { name: 'abbey' },
@@ -111,10 +112,10 @@ describe('Mock class()', () => {
           .mock((h: SchemaHelper) => () => 'ignored')
         .addSchema('fungus') // rule trigger
           .mock((h: SchemaHelper) => () => 'ignored')
-        .build
+      m.deploy
           .queueSchema('foo')
           .queueSchema('company')
-          .queueSchema('fungus')
+          .queueSchema('fungus') 
           .generate();
 
       expect(m.db.foos).is.equal(undefined);
@@ -133,7 +134,7 @@ describe('Mock class()', () => {
       m.deploy
         .queueSchema('foo')
         .generate();
-
+      
       expect(m.db.foos).is.equal(undefined);
       expect(m.db.cars).is.an('object');
       expect(firstProp(m.db.cars)).is.equal('result');

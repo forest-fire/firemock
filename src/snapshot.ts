@@ -1,4 +1,4 @@
-import './base-defs';
+import { IDictionary } from 'common-types';
 import { get } from 'lodash';
 import * as firebase from 'firebase-admin';
 

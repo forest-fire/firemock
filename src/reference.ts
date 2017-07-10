@@ -1,6 +1,7 @@
 import { IDictionary } from 'common-types';
 import SnapShot from './snapshot';
 import { get } from 'lodash';
+import {db} from './database';
 import { parts, normalizeRef, leafNode, getRandomInt, removeKeys } from './util';
 
 /** named network delays */
@@ -28,20 +29,20 @@ export default class Reference<T = IDictionary>{
   private _query: QueryStack = [];
   private _order: IOrdering;
 
+
   constructor(
     public ref: string,
-    private _state: T,
     private _delay: DelayType = 5
   ) {}
 
   public get parent() {
     const r = parts(this.ref).slice(-1).join('.');
-    return new Reference(r, get(this._state, r));
+    return new Reference(r, get(db, r));
   }
 
   public child(path: string) {
     const r = parts(this.ref).concat([path]).join('.');
-    return new Reference(r, get(this._state, r));
+    return new Reference(r, get(db, r));
   }
 
   public once(eventType: 'value'): Promise<SnapShot<T>> {
@@ -118,7 +119,7 @@ export default class Reference<T = IDictionary>{
 
 
   private _once(): SnapShot<T> {
-    const response = get(this._state, normalizeRef(this.ref), undefined);
+    const response = get(db, normalizeRef(this.ref), undefined);
     let snapshot: any = new SnapShot<T>(leafNode(this.ref), response);
     this._query.forEach(q => snapshot = q(snapshot))
 
