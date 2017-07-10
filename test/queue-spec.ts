@@ -45,6 +45,8 @@ describe('Queue Class', () => {
     q.dequeue(2);
     expect(q.length).to.equal(2);
     expect(q.includes(1)).to.equal(true);
+    console.log(q.toArray());
+    
     expect(q.includes(2)).to.equal(false);
   });
   
@@ -121,6 +123,51 @@ describe('Queue Class', () => {
     expect(q.toHash().uno).to.equal(undefined);
   });
 
+  it('find() and indexOf() find an known id in the queue', () => {
+    const q = new Queue('from-array').fromArray([
+      {id: 'foo', value: 5},
+      {id: 'bar', value: 10},
+      {id: 'baz', value: 20}
+    ]);
 
+    expect(q.find('foo').value).is.equal(5);
+    expect(q.find('baz').value).is.equal(20);
+    expect(q.indexOf('foo')).is.equal(0);
+    expect(q.indexOf('baz')).is.equal(2);
+  });
+
+  it('replace() replaces an existing item in the queue', () => {
+    const q = new Queue('replace').clear().fromArray([
+      {id: 'foo', value: 5},
+      {id: 'bar', value: 10},
+      {id: 'baz', value: 20}
+    ]);
+    q.replace('foo', { value: 16, foo: 'bar' });
+
+    expect(q.find('foo').value).is.equal(16);
+    expect(q.find('foo').foo).is.equal('bar');
+  });
+
+  it('update() updates an existing item in the queue', () => {
+    const q = new Queue('replace').clear().fromArray([
+      {id: 'foo', value: 5},
+      {id: 'bar', value: 10},
+      {id: 'baz', value: 20}
+    ]);
+    q.update('foo', { foo: 'bar' });
+
+    expect(q.find('foo').value).is.equal(5);
+    expect(q.find('foo').foo).is.equal('bar');
+  });
+
+  it('update() on a non-existing item results in the new item being added', () => {
+    const q = new Queue('replace').clear().fromArray([
+      {id: 'foo', value: 5},
+      {id: 'baz', value: 20}
+    ]);
+    q.update('bar', { value: 50 });
+
+    expect(q.find('bar').value).is.equal(50);
+  });
 
 });

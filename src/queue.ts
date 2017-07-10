@@ -1,6 +1,8 @@
 import { IDictionary } from 'common-types';
 import { first } from 'lodash';
 
+export type Key = string | number;
+
 export default class Queue<T = any> {
   private static _queues: IDictionary = {};
   public pkProperty = 'id';
@@ -47,22 +49,43 @@ export default class Queue<T = any> {
     return this;
   }
 
-  public find(key: string | number) {
+  public find(key: Key) {
     const [ obj, index ] = this._find(key);
     return obj;
   }
 
-  public indexOf(key: string | number) {
+  public indexOf(key: Key) {
     const [ obj, index ] = this._find(key);
     return index;
   }
 
-  public includes(key: string | number) {
-    return this._find(key) ? true : false;
+  public includes(key: Key) {
+    return this.find(key) ? true : false;
   }
 
-  public replace(key: string | number, value: T) {
-    //
+  public replace(key: Key, value: any) {
+    value[this.pkProperty] = key;
+    this
+      .dequeue(key)
+      .enqueue(value as T);
+
+    return this;
+  }
+
+  public update(key: Key, value: any) {
+    const currently: any = this.find(key);
+    if (currently) {
+      this.dequeue(key);
+    }
+    if (typeof currently === 'object' && typeof value === 'object') {
+      value[this.pkProperty] = key;
+      const updated = { ...currently as object, ...value as object };
+      this.enqueue(updated as T);
+    } else {
+      throw new Error(`Current and updated values must be objects!`);
+    }
+
+    return this;
   }
 
   public get length() {
@@ -83,8 +106,8 @@ export default class Queue<T = any> {
 
     return (typeof first(queue) === 'object')
       ? queue.reduce(
-          (obj, item) => {
-            const pk = item[this.pkProperty];
+          (obj: IDictionary, item: any) => {
+            const pk: string = item[this.pkProperty];
             // tslint:disable-next-line
             const o = Object.assign({}, item);
             delete o[this.pkProperty];
@@ -107,7 +130,7 @@ export default class Queue<T = any> {
     const objectPayload = typeof first(queue) === 'object';
 
     let index = 0;
-    let result;
+    let result = [null, null];
     for(const item of queue) {
       const condition = objectPayload
         ? item[this.pkProperty] === key
