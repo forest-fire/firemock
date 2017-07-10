@@ -95,4 +95,32 @@ describe('Queue Class', () => {
     expect(newQ.find('bar').value).to.equal(11);
   });
 
+  it('toHash() on empty queue returns empty object', () => {
+    const q = new Queue('empty').clear();
+    expect(q.toHash()).to.be.an('object');
+    expect(Object.keys(q.toHash()).length).to.equal(0);
+  })
+
+  it('toHash() for simple queue returns keys set to "true"', () => {
+    const q = new Queue('from-array').fromArray([
+      {id: 'foo', value: 5},
+      {id: 'bar', value: 10},
+      {id: 'baz', value: 20}
+    ]);
+    expect(q.toHash()).to.be.an('object');
+    expect(q.toHash().foo).to.be.an('object');
+    expect(q.toHash().foo.value).to.equal(5);
+    expect(q.toHash().foo.id).to.equal(undefined);
+    expect(q.toHash().uno).to.equal(undefined);
+  });
+
+  it('toHash() for object queue returns hash keyed on pkProperty', () => {
+    const q = new Queue('from-array').fromArray(['foo', 'bar', 'baz']);
+    expect(q.toHash()).to.be.an('object');
+    expect(q.toHash().foo).to.equal(true);
+    expect(q.toHash().uno).to.equal(undefined);
+  });
+
+
+
 });

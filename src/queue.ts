@@ -69,8 +69,30 @@ export default class Queue<T = any> {
     return Queue._queues[this._name].length;
   }
 
-  public get list() {
+  /** returns the Queue as a JS array */
+  public toArray() {
     return Queue._queues[this._name];
+  }
+
+  /** returns the Queue as a JS Object */
+  public toHash() {
+    const queue = Queue._queues[this._name];
+    if(queue.length === 0) {
+      return new Object();
+    }
+
+    return (typeof first(queue) === 'object')
+      ? queue.reduce(
+          (obj, item) => {
+            const pk = item[this.pkProperty];
+            // tslint:disable-next-line
+            const o = Object.assign({}, item);
+            delete o[this.pkProperty];
+            return { ...obj, ...{ [pk]: o } };
+          }, 
+          new Object()
+        )
+      : queue.reduce((obj: IDictionary, item: any) => obj = { ...obj, ...{[item]: true} }, new Object());
   }
 
   public map(fn: (f: any) => any) {
