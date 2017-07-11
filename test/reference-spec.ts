@@ -175,7 +175,8 @@ describe('Reference functions', () => {
       const m = new Mock();
       m.addSchema('dog', (h) => () => ({
         name: h.faker.name.firstName,
-        age: 3
+        age: 3,
+        desc: h.faker.random.words()
       }));
       m.queueSchema('dog', 10);
       m.queueSchema('dog', 10, { age: 5 });

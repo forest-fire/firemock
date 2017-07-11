@@ -81,7 +81,7 @@ m.queueSchema('pet', 1, { name: 'Flopsy' })
 
 This additional configuration has made a few notable changes:
 
-- There are now 11 pet records in the database
+- There are now 11 pet records queued for inclusion in the database
 - The first 10 of these pets will receive a random name and be associated with 5 appointments
 - The last pet -- Flopsy -- has her name set statically and because Flopsy is so damn healthy we have associated zero appointments.
 - Finally, you may have noticed that while the `pet` schema has a _belongsTo_ relationship to `customer` we have not made reference to this in our deployment configuration (as opposed to what we did with `appointment`). This means that each pet will have a `customerId` record on it but it will be set to a blank string value.
@@ -131,3 +131,65 @@ it('appointments in the next week should exist', done => {
 ````
 
 Cooler. So now you start to see that filters like `startAt`, `endAt`, and `equalTo` are usable in exactly the same way you use them when going back to the Firebase DB. This is no accident of course. The goal is to provide a drop-in replace for the `ref()` operator which allows for your tests to be isolated to the mocked test environment you've created. 
+
+## Other Features
+
+### Firebase IDs
+Rather than putting in some random push-id string we use the very useful `firebase-key` library to create _time appropriate_ id's which very closely resemble the same ID you'd get with the Firebase DB.
+
+### Network delay
+
+By default the Firebase events return with a delay of 5ms but this number can be set by adjusting the `delay()` method:
+
+````js
+import Mock from 'firemock';
+const m = new Mock();
+m.delay(200);
+````
+
+From this point forward all requests will have a 200ms delay. You can also configure with a tuple which indicates the min/max delays. For example the following config will result in random delays between 10 and 100ms:
+
+````js
+m.delay([10,100]);
+````
+
+### Synchronous Querying
+In general you'll want to use the asynchronous events that Firebase provides for changes but in some cases it might be useful to do synchronous queries. Firemock supports that through the following syntax:
+
+````js
+import Mock from 'firemock';
+const m = new Mock();
+m
+  .addSchema('cat', fooMock)
+  .queueSchema('cat', 50)
+  .generate();
+const results = m.ref('/cats').onceSync('value');
+````
+
+### Direct views into database
+Querying as described above is the right way to test code since that's the way that you'll code against the actual Firebase DB but occationally it's useful to just look into the database and you can do this by utilizing the `db` property off of Mock class:
+
+````js
+import Mock from 'firemock';
+const m = new Mock();
+m
+  .addSchema('cat', fooMock)
+  .queueSchema('cat', 50)
+  .generate();
+
+console.log(m.db.cats);
+````
+
+The logging statement at the bottom will print out a JS hash of cats (who doesn't want that).
+
+### Generic Type Goodness
+Because this library is fully written in Typescript you can explore the API with the super useful intellisense popups from the comfort of your favorite editor. Stop pretending this isn't exciting. Ok, but beyond that there's an attempt to provide generic types throughout so that you can provide additional type safety if you wish to. For example, you can specify your typing for a schema like so:
+
+````js
+import Mock from 'firemock';
+const m = new Mock();
+m
+  .addSchema<IAnimal>('cat', fooMock)
+````
+
+Now firemock will ensure that all generated cat's conform to the `IAnimal` interface. This can be useful to make sure your tests are indeed compliant with the types you've defined.
