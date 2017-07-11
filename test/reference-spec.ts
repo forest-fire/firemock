@@ -232,7 +232,29 @@ describe('Reference functions', () => {
       expect(pups.numChildren()).to.equal(10);
     });    
     it.skip('endAt() filters sort by value when using value sort');
-    it.skip('startAt() combined with endAt() filters correctly');
+    it('startAt() combined with endAt() filters correctly', () => {
+      const m = new Mock();
+      m.addSchema('dog', (h) => () => ({
+        name: h.faker.name.firstName,
+        age: 1,
+      }));
+      m.queueSchema('dog', 10);
+      m.queueSchema('dog', 10, { age: 5 });
+      m.queueSchema('dog', 10, { age: 10 });
+      m.generate();
+      
+      const results = m.ref('/dogs').onceSync('value');
+      const middling = m.ref('/dogs')
+        .startAt(3, 'age')
+        .endAt(9, 'age')
+        .onceSync('value');
+
+      expect(results.numChildren()).to.equal(30);
+      expect(middling.numChildren()).to.equal(10);
+      expect(firstProp(middling.val()).age).to.equal(5);
+      expect(lastProp(middling.val()).age).to.equal(5);
+      
+    });
     it.skip('startAt(), endAt(), orderByValue() filters correctly');
 
   }); // End Filtered Querying
