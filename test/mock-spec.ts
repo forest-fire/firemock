@@ -54,7 +54,7 @@ describe('Mock class()', () => {
       expect(m.ref('/monkeys').onceSync('value').numChildren()).to.equal(3);
     });
 
-    it('Adding a call to raw() allows additional state in conjunction with API additions', () => {
+    it('Adding a call to updateDB() allows additional state in conjunction with API additions', () => {
       const m = new Mock();
       m.addSchema('owner')
         .mock((h) => () => ({
@@ -63,7 +63,7 @@ describe('Mock class()', () => {
       m.deploy
         .queueSchema('owner', 10).generate();
       
-      m.raw({
+      m.updateDB({
         monkeys: {
           a: { name: 'abbey' },
           b: { name: 'bobby' },
@@ -151,7 +151,7 @@ describe('Mock class()', () => {
             return { name: h.faker.name.firstName() };
           })
           .belongsTo('company');
-        m.deploy
+        m
           .queueSchema('user')
           .generate();
         
@@ -167,7 +167,7 @@ describe('Mock class()', () => {
           return { name: h.faker.name.firstName() };
         })
         .belongsTo('company');
-      m.deploy
+      m
         .queueSchema('user', 2).fulfillBelongsTo('company')
         .generate();
 

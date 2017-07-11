@@ -12,6 +12,7 @@ export interface IQueue {
   schema: string;
   quantity: number;
   hasMany?: IDictionary<number>;
+  overrides?: IDictionary;
   /** the key refers to the property name, the value true means "fulfill" */
   belongsTo?: IDictionary<boolean>;
 }
@@ -25,7 +26,7 @@ export default class Deployment {
   /**
    * Queue a schema for deployment to the mock DB
    */
-  public queueSchema(schemaId: string, quantity: number = 1) {
+  public queueSchema<T = any>(schemaId: string, quantity: number = 1, overrides: IDictionary<Partial<T>> = {}) {
     this.schemaId = schemaId;
     this.queueId = fbKey.key();
     const schema = this._schemas.find(schemaId);
@@ -33,7 +34,7 @@ export default class Deployment {
     if (!schema) {
       console.log(`Schema "${schema}" does not exist; will SKIP.`);
     } else {
-      const newQueueItem = { id: this.queueId, schema: schemaId, quantity };
+      const newQueueItem = { id: this.queueId, schema: schemaId, quantity, overrides };
       this._queue.enqueue(newQueueItem);
     }
 
@@ -98,7 +99,7 @@ export default class Deployment {
   public generate() {
     this._queue.map(q => {
       for (let i = q.quantity; i > 0; i--) {
-        this.insertMockIntoDB(q.schema);
+        this.insertMockIntoDB(q.schema, q.overrides);
       }
     });
 
@@ -109,12 +110,12 @@ export default class Deployment {
     });
   }
 
-  private insertMockIntoDB(schema: string) {
+  private insertMockIntoDB(schema: string, overrides: IDictionary) {
     const mock = this._schemas.find(schema).fn();
     const path = this._schemas.find(schema).path();
     const key = fbKey.key();
     const pathAndKey = path + '.' + key;
-    set(db, pathAndKey, mock);
+    set(db, pathAndKey, { ...mock, ...overrides });
 
     return key;
   }
@@ -140,12 +141,12 @@ export default class Deployment {
         const numChoices = (db[r.target] || []).length;
         const choice = () => generatedAvailable 
           ? available[getRandomInt(0, available.length - 1)]
-          : this.insertMockIntoDB(r.target);
+          : this.insertMockIntoDB(r.target, {});
         
         getID = () => mockAvailable 
           ? generatedAvailable 
             ? choice()
-            : this.insertMockIntoDB(r.target)
+            : this.insertMockIntoDB(r.target, {})
           : fbKey.key();
       } else {
         getID = () => '';
@@ -185,7 +186,7 @@ export default class Deployment {
             return chosen;
           }
           
-          return this.insertMockIntoDB(r.target);
+          return this.insertMockIntoDB(r.target, {});
         };
         
         getID = () => mockAvailable

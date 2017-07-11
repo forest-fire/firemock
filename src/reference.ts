@@ -1,7 +1,7 @@
 import { IDictionary } from 'common-types';
 import SnapShot from './snapshot';
 import { get } from 'lodash';
-import {db} from './database';
+import { db } from './database';
 import { parts, normalizeRef, leafNode, getRandomInt, removeKeys } from './util';
 
 /** named network delays */
@@ -96,6 +96,28 @@ export default class Reference<T = IDictionary>{
     return this;
   }
 
+  public startAt(value: any, key: string) {
+    this._query.push((snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      const remove = Object.keys(js).filter(k => js[k][key] < value);
+      js = removeKeys(js, remove);
+      return new SnapShot(snap.key, js);
+    });
+
+    return this;
+  }
+
+  public endAt(value: any, key: string) {
+    this._query.push((snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      const remove = Object.keys(js).filter(k => js[k][key] > value);
+      js = removeKeys(js, remove);
+      return new SnapShot(snap.key, js);
+    });
+
+    return this;
+  }  
+
   public orderByChild(path: string) {
     this._order = {
       type: OrderingType.byChild,
@@ -116,7 +138,6 @@ export default class Reference<T = IDictionary>{
       value: null
     };
   }
-
 
   private _once(): SnapShot<T> {
     const response = get(db, normalizeRef(this.ref), undefined);

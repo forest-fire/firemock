@@ -60,19 +60,26 @@ export default class Mock {
     Queue.clearAll();
     clearDatabase();
     if (raw) {
-      this.raw(raw);
+      this.updateDB(raw);
     } 
   }
 
-  public raw(state: IDictionary) {
+  /**
+   * Update the mock DB with a raw JS object/hash
+   */
+  public updateDB(state: IDictionary) {
     updateDatabase(state);
   }
 
   public get db() {
     return db;
   }
-
-  public addSchema<S = any>(schema: string) {
+  
+  public addSchema<S = any>(schema: string, mock?: MockGeneratorCallback) {
+    const s = new Schema<S>(schema);
+    if (mock) {
+      s.mock(mock);
+    }
     return new Schema<S>(schema);
   }
 
@@ -83,6 +90,16 @@ export default class Mock {
 
   public get deploy() {
     return new Deployment();
+  }
+
+  public queueSchema<T = any>(schemaId: string, quantity: number = 1, overrides: IDictionary<Partial<T>> = {}) {
+    const d = new Deployment();
+    d.queueSchema(schemaId, quantity, overrides);
+    return d;
+  };
+
+  public generate() {
+    return new Deployment().generate();
   }
 
   public ref = <T = IDictionary>(dbPath: string) => {

@@ -103,7 +103,11 @@ export default class Schema<T = any> {
   }
 
   /** Add another schema */
-  public addSchema<D>(schema: string) {
+  public addSchema<D>(schema: string, mock?: MockGeneratorCallback) {
+    const s = new Schema<D>(schema);
+    if (mock) {
+      s.mock(mock);
+    }
     return new Schema<D>(schema);
   }
   
