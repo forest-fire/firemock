@@ -135,7 +135,7 @@ Cooler. So now you start to see that filters like `startAt`, `endAt`, and `equal
 ## Other Features
 
 ### Firebase IDs
-Rather than putting in some random push-id string we use the very useful `firebase-key` library to create _time appropriate_ id's which very closely resemble the same ID you'd get with the Firebase DB.
+Rather than putting in some random push-id string we use the very useful `firebase-key` library to create _time appropriate_ id's which very closely resemble the ID you'd get with the Firebase DB.
 
 ### Network delay
 

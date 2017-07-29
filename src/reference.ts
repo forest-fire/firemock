@@ -1,8 +1,17 @@
 import { IDictionary } from 'common-types';
+import Query from './query';
 import SnapShot from './snapshot';
+import Disconnected from './disconnected';
 import { get } from 'lodash';
 import { db } from './database';
-import { parts, normalizeRef, leafNode, getRandomInt, removeKeys } from './util';
+import {
+  parts,
+  normalizeRef,
+  leafNode,
+  getRandomInt,
+  removeKeys
+} from './util';
+import * as firebase from 'firebase-admin';
 
 /** named network delays */
 export enum Delays {
@@ -12,6 +21,8 @@ export enum Delays {
   WiFi = 'WIFI'
 }
 
+export type QueryValue = number|string|boolean|null;
+
 export type AsyncOrSync<T> = Promise<SnapShot<T>> | SnapShot<T>;
 export type DelayType = number | number[] | IDictionary<number> | Delays;
 export type Query = (snap: SnapShot) => SnapShot;
@@ -20,34 +31,105 @@ export enum OrderingType {
   byChild = 'child',
   byKey = 'key',
   byValue = 'value'
-};
+}
 export interface IOrdering {
   type: OrderingType;
   value: any;
 }
-export default class Reference<T = IDictionary>{
+export default class Reference<T = any>
+  extends Query
+  implements firebase.database.Reference {
   private _query: QueryStack = [];
   private _order: IOrdering;
 
-
-  constructor(
-    public ref: string,
-    private _delay: DelayType = 5
-  ) {}
-
-  public get parent() {
-    const r = parts(this.ref).slice(-1).join('.');
+  public get parent(): Reference {
+    const r = parts(this.path).slice(-1).join('.');
     return new Reference(r, get(db, r));
   }
 
-  public child(path: string) {
-    const r = parts(this.ref).concat([path]).join('.');
+  public child(path: string): Reference {
+    const r = parts(this.path).concat([path]).join('.');
     return new Reference(r, get(db, r));
+  }
+
+  public on(
+    eventType: firebase.database.EventType,
+    callback: (a: SnapShot | null, b?: string) => any,
+    cancelCallbackOrContext?: object | null,
+    context?: object | null
+  ): (a: SnapShot | null, b?: string) => any {
+    console.log('on() not implemented yet');
+    return null;
+  }
+
+  public off() {
+    console.log('on() not implemented yet');
+  }
+
+  public get root(): firebase.database.Reference {
+    return null;
+  }
+
+  // TODO: this needs implementing
+  public push(value?: any, onComplete?: (a: Error | null) => any) {
+    return Promise.resolve(this) as firebase.database.ThenableReference;
+  }
+
+  public remove(onComplete?: (a: Error | null) => any): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public set(value: any, onComplete?: (a: Error | null) => any): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public update(
+    values: IDictionary,
+    onComplete?: (a: Error | null) => any
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public setPriority(
+    priority: string | number | null,
+    onComplete: (a: Error | null) => any
+  ): Promise<void> {
+    return Promise.resolve();
+  }
+
+  public setWithPriority(
+    newVal: any,
+    newPriority: string | number | null,
+    onComplete: (a: Error | null) => any
+  ) {
+    return Promise.resolve();
+  }
+
+  public transaction(
+    transactionUpdate: (a: any) => any,
+    onComplete?: (
+      a: Error | null,
+      b: boolean,
+      c: admin.database.DataSnapshot | null
+    ) => any,
+    applyLocally?: boolean
+  ): Promise<{
+    committed: boolean;
+    snapshot: admin.database.DataSnapshot | null;
+  }> {
+    return Promise.resolve({
+      committed: true,
+      snapshot: null
+    });
+  }
+
+  public onDisconnect(): firebase.database.OnDisconnect {
+    return new Disconnected();
   }
 
   public once(eventType: 'value'): Promise<SnapShot<T>> {
     const snapshot = this._once();
-    return new Promise( resolve => {
+    return new Promise(resolve => {
       setTimeout(() => resolve(snapshot), this.delay());
     });
   }
@@ -63,7 +145,7 @@ export default class Reference<T = IDictionary>{
         const remove = Object.keys(js).slice(num);
         js = removeKeys(js, remove);
       }
-      
+
       return new SnapShot(snap.key, js);
     });
 
@@ -78,14 +160,14 @@ export default class Reference<T = IDictionary>{
         const remove = Object.keys(js).slice(0, size - num);
         js = removeKeys(js, remove);
       }
-      
+
       return new SnapShot(snap.key, js);
     });
 
     return this;
   }
 
-  public equalTo(value: any, key: string) {
+  public equalTo(value: QueryValue, key?: string) {
     this._query.push((snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const remove = Object.keys(js).filter(k => js[k][key] !== value);
@@ -96,7 +178,7 @@ export default class Reference<T = IDictionary>{
     return this;
   }
 
-  public startAt(value: any, key: string) {
+  public startAt(value: QueryValue, key?: string) {
     this._query.push((snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const remove = Object.keys(js).filter(k => js[k][key] < value);
@@ -107,7 +189,7 @@ export default class Reference<T = IDictionary>{
     return this;
   }
 
-  public endAt(value: any, key: string) {
+  public endAt(value: QueryValue, key?: string) {
     this._query.push((snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const remove = Object.keys(js).filter(k => js[k][key] > value);
@@ -116,7 +198,7 @@ export default class Reference<T = IDictionary>{
     });
 
     return this;
-  }  
+  }
 
   public orderByChild(path: string) {
     this._order = {
@@ -140,9 +222,9 @@ export default class Reference<T = IDictionary>{
   }
 
   private _once(): SnapShot<T> {
-    const response = get(db, normalizeRef(this.ref), undefined);
-    let snapshot: any = new SnapShot<T>(leafNode(this.ref), response);
-    this._query.forEach(q => snapshot = q(snapshot))
+    const response = get(db, normalizeRef(this.path), undefined);
+    let snapshot: any = new SnapShot<T>(leafNode(this.path), response);
+    this._query.forEach(q => (snapshot = q(snapshot)));
 
     return snapshot as SnapShot<T>;
   }
@@ -154,7 +236,7 @@ export default class Reference<T = IDictionary>{
     }
 
     if (Array.isArray(delay)) {
-      const [ min, max ] = delay;
+      const [min, max] = delay;
       return getRandomInt(min, max);
     }
 
@@ -164,12 +246,19 @@ export default class Reference<T = IDictionary>{
     }
 
     // these numbers need some reviewing
-    if (delay === 'random') { return getRandomInt(10, 300); }
-    if (delay === 'weak') { return getRandomInt(400, 900); }
-    if (delay === 'mobile') { return getRandomInt(300, 500); }
-    if (delay === 'WIFI') { return getRandomInt(10, 100); }
-    
+    if (delay === 'random') {
+      return getRandomInt(10, 300);
+    }
+    if (delay === 'weak') {
+      return getRandomInt(400, 900);
+    }
+    if (delay === 'mobile') {
+      return getRandomInt(300, 500);
+    }
+    if (delay === 'WIFI') {
+      return getRandomInt(10, 100);
+    }
+
     throw new Error('Delay property is of unknown format: ' + delay);
   }
-
 }
