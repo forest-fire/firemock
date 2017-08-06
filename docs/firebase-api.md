@@ -1,4 +1,5 @@
-![header](images/firemock-header.jpg) {#top}
+###### &nbsp; {#top}
+![header](images/firemock-header.jpg) 
 # Firebase API 
 
 Where the Deployment API was primarily concerned with _seeding_ you mock database with a proper set of test data, the **Firebase API** focuses on _interacting_ with your data exactly as you're used to when using a Firebase backend.
