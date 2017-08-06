@@ -25,7 +25,7 @@ yarn add --dev firemock
 
 ## Documentation
 
-The documentation is hosted on Gitbook, point your browser to: [documentation](https://forest-fire.gitbooks.io/firemock/content)
+The documentation is hosted on Gitbook, point your browser to: [firemock documentation](https://forest-fire.gitbooks.io/firemock/content)
 
 ## Contribution: PRs and Issues
 
