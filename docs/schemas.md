@@ -1,6 +1,8 @@
+![header](images/firemock-header.jpg)
+
 # Schema Declaration
 
-If you want to seed your mocked database with reasonable mock data but not hand code it all in, you'll want to take advantage of "schemas" in **firemock**. In a nutshell, a schema, is a way of describing a Javascript hash/dictionary which leverages the popular [faker]() and [chance]() libraries.
+If you want to seed your mocked database with reasonable mock data but not hand code it all in, you'll want to take advantage of "schemas" in **firemock**. In a nutshell, a schema is a way of describing a Javascript hash/dictionary which leverages the popular [faker](https://github.com/marak/Faker.js/) and [chance](http://chancejs.com/) libraries.
 
 ### An Example
 
