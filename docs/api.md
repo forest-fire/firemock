@@ -60,6 +60,36 @@ So now you start to see that filters like startAt, endAt, and equalTo are usable
 
 ## Writing to the Database {#writing}
 
+When we started talking about _schemas_ and _generation_, this was in essence a bulk way of writing data to the database. While this is typically done for initializing "state" into a desireable starting point it is not useful for testing Firebase code as this is not represented in Firebase's API. 
+
+For those of you Firebase ace's the API endpoints we are concerned about when writing to the database include operations such as: `set()`, `update()`, `push()`, and `remove()`. A simple example of this might fall along these lines:
+
+```js
+const m = new Mock();
+
+before(async () => {
+  m.addSchema('customer', (h) => () => {
+    first: h.faker.name.firstName(),
+    last: h.faker.name.firstName(),
+    email: h.chance.email(),
+    address: h.chance.address()
+  });
+  m.queueSchema('customer', 10);
+  m.generate();
+});
+
+it('pushing a new customer works', async () => {
+  await m.ref('customers').push({
+    first: 'John',
+    last: 'Smith',
+    email: 'john.smith@acme.com'
+  });
+  const customers = await m.ref('customers').once('value');
+  expect(customers.numChildren).to.equal(11);
+}
+```
+
+This test isn't the best but hopefully it illustrates the use of the write-based `push` API used to push a new customer record into the mock database.
 
 ## Other Features {#other}
 
