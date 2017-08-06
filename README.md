@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/forest-fire/firemock.svg?branch=master)](https://travis-ci.org/forest-fire/firemock.svg?branch=master) [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
 
-# Firemock
+# firemock
 > Firebase, Typescript, and mocking ... what more could you ask for?
 
 ## Overview
@@ -12,57 +12,48 @@ This Typescript library is meant to serve as a type-aware solution for node deve
 3. Provide a Firebase [API surface](https://firebase.google.com/docs/reference/js/firebase.database.Reference) for querying the in-memory database
 
 It's worth pointing out that this library _does not_ do the typical mock/spy types of tracking that you get with frameworks like _sinon_ or _test-double_ in JS and/or _ts-mokito_ or _typemoq_ in TS. If that's what you want then use one of these already existing solutions.
-## Example
+## Installation
 
-Imagine we are building an app for a vetrinary clinic and the key attributes are customers, pets, and appointments. Let's assume you're using mocha/chai for testing (although it matters not which runner or testing framework you choose):
+To start using, simply type one of the following into your terminal window at the root of the project:
 
-### Setting up `schemas` and `relationships`
-````js
-import Mock from 'firemock';
-const m = new Mock();
-m
-  .addSchema('customer', (h) => () => {
-    first: h.faker.name.firstName(),
-    last: h.faker.name.firstName(),
-    email: h.chance.email(),
-    address: h.chance.address()
-  })
-  .hasMany('pet');
+```sh
+# npm
+npm install --save-dev firemock
+# yarn
+yarn add --dev firemock
+```
 
-m
-  .addSchema('pet', (h) => () => {
-    name: h.faker.name.firstName(),
-    age: chance.integer({min: 1, max: 15}),
-    gender: chance.gender()
-  })
-  .hasMany('appointment')
-  .belongsTo('customer');
+## Documentation
 
-m
-  .addSchema('appointment', (h) => () => {
-    when: h.faker.date.future(),
-    description: h.faker.random.words(),
-  })
-  .belongsTo('pet')
-  .belongsTo('customer');
-````
+The documentation is hosted on Gitbook, point your browser to: [documentation](https://forest-fire.gitbooks.io/firemock/content)
 
-With this definition we can now very easily create useful mock data for our three main entities including recognizing linked relationships between entities.
+## Contribution: PRs and Issues
 
-### Deploying data to the mock database
-Above we created the structure of data, let's imagine in this example that we have a test which centers around the appointment data. To deploy some useful data we might do the following:
+I have developed this for my own needs but as with all my other open-source work I'd be happy to recieve PR's and issues. Not surprisingly, PR's are my preference but sometimes people don't feel they have the right skills or time to fix something they feel is broken so raising issues is a nice way to communicate something you've noticed. I can't promise issues will always get immediate attention but I will get back as soon as I can. 
 
-````js
-m.queueSchema('appointment', 25);
-````
+## License
 
-This creates 25 appointments for us. That's good but we this test may also want ensure that the _belongsTo_ relationship that exists between "pet" and "customer" is established as well. That's easily accomplished with:
+Copyright (c) 2017 LifeGadget Ltd
 
-````js
-m.queueSchema('appointment', 25)
-  .fulfillBelongsTo('pet')
-  .fulfillBelongsTo('customer');
-````
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+----
 
 Now in the database we have not only 25 appointments but each appointment has a valid Firebase pushId reference to the `pet` and `customer` associated. Because we've also told Firemock how to represent these two external entities, not only are the push-key ID's included in the appointment but the `pet` and `customer` records with that push-key are also in the database.
 
