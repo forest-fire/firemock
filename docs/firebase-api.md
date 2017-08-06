@@ -1,17 +1,19 @@
-![header](images/firemock-header.jpg)
-# Firebase API {#top}
+![header](images/firemock-header.jpg) {#top}
+# Firebase API 
 
-Up to now we've talk about the process of generating data for our mock database but just having a pile of data isn't that great. You'll want to **use** that data and how you'll want to use it is typically going to be using the existing Firebase API surface. Well fine sir/madame, that's exactly what we're providing.
+Where the Deployment API was primarily concerned with _seeding_ you mock database with a proper set of test data, the **Firebase API** focuses on _interacting_ with your data exactly as you're used to when using a Firebase backend.
 
 ## API Overview
 
-Here's a pictorial diagram of the interfaces that Firebase exposes:
+Here's a pictorial diagram of the interfaces that **Firebase** _and_ **firemock** expose:
 
 ![api](images/firebase-api.jpg)
 
 ## Querying Firebase {#querying}
 
-If you know how to query Firebase, then you largely know how to query the **firemock** API. Here's a simple example (we're putting this into a test where we're using the _mocha_ test runner and _chai_ grammer):
+If you know how to query Firebase, then you know how to query the **firemock** API. In a "realtime database" like Firebase we use either the traditional "request/reply" interaction used in most other databases or we can instead have the database notify us of changes we are interested in real time using an event model. In this section we'll cover the more standard interaction model but we'll get to event-driven interaction in the [real-time](#realtime) section later.
+
+Here's a simple example :
 
 ```js
 it('test something about appointments', done => {
@@ -26,6 +28,8 @@ it('test something about appointments', done => {
     });
 });
 ```
+
+> Note: we're putting this into a test where we're using the _mocha_ test runner and _chai_ grammer ... these are popular choices but obviously it will work in any testing framework
 
 Let's walk through the example:
 

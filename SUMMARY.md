@@ -1,9 +1,10 @@
 # Table of Contents
 
 - [Getting Started](README.md)
-- [Defining Schemas](docs/schemas.md)
-- [Generating Mock Data](docs/generation.md)
-- [Firebase API](docs/api.md#top)
+- [Deployment API](docs/deployment-api.md)
+  - [Defining Schemas](docs/deployment-api.md#schemas)
+  - [Generating Mock Data](docs/deployment-api.md#generating)
+- [Firebase API](docs/firebase-api.md#top)
   - [Querying](docs/api.md#querying)
   - [Writing](docs/api.md#writing)
   - [Real-time Events](docs/api.md#realtime)

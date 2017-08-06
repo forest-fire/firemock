@@ -4,6 +4,13 @@ import * as fbKey from 'firebase-key';
 
 export type Key = string | number;
 
+/**
+ * Queue Class
+ * 
+ * A generic class for building singleton queues;
+ * this is used as a container for schemas, deployment queues, 
+ * and relationships
+ */
 export default class Queue<T = any> {
   public static clearAll() {
     Queue._queues = {};

@@ -22,6 +22,8 @@ export interface ISchema {
    */
   modelName?: string;
 }
+import { Delays, DelayType } from './query';
+export { Delays, DelayType } from './query';
 
 export interface IRelationship {
   id: string,
@@ -39,15 +41,6 @@ export interface IRelationship {
 }
 
 export type MockGeneratorCallback = (helper: SchemaHelper) => any;
-
-export enum Delays {
-  random = 'random',
-  weak = 'weak-mobile',
-  mobile = 'mobile',
-  WiFi = 'WIFI'
-}
-
-export type DelayType = number | number[] | IDictionary<number> | Delays;
 
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
