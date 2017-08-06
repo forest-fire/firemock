@@ -91,6 +91,35 @@ it('pushing a new customer works', async () => {
 
 This test isn't the best but hopefully it illustrates the use of the write-based `push` API used to push a new customer record into the mock database.
 
+## Realtime Events {#realtime}
+
+In the _querying_ section above we saw a traditional interaction between code and database ... the code queried for something in the database with the `once()` method and got back a result as a one time data snapshot. That's the way most databases work but as we know Firebase is different.
+
+Rather than relying on `once()` to do our bidding in the traditional request-response style we instead state our _interest_ in data paths and let Firebase tell us when they've changed. You know the drill. Here's an example of how this might appear in a test:
+
+```js
+const m = new Mock();
+
+before(async () => {
+  m.addSchema('customer', (h) => () => {
+    first: h.faker.name.firstName(),
+    last: h.faker.name.firstName(),
+    email: h.chance.email(),
+    address: h.chance.address()
+  });
+  m.queueSchema('customer', 10);
+  m.generate();
+});
+
+it('pushing a new customer works', (done) => {
+  const onChildAdded = (snap) => {
+    expect(customers.numChildren).to.equal(11);
+    done();
+  };
+  m.ref('customers').on('child_added', onChildAdded);
+}
+```
+
 ## Other Features {#other}
 
 ### Firebase IDs

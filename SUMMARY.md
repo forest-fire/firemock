@@ -6,6 +6,7 @@
 - [Firebase API](docs/api.md#top)
   - [Querying](docs/api.md#querying)
   - [Writing](docs/api.md#writing)
+  - [Real-time Events](docs/api.md#realtime)
   - [Other Features](docs/api.md#other)
 
 ---- 
