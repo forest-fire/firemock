@@ -5,10 +5,10 @@
   - [Defining Schemas](docs/deployment-api.md#schemas)
   - [Generating Mock Data](docs/deployment-api.md#generation)
 - [Firebase API](docs/firebase-api.md#top)
-  - [Querying](docs/api.md#querying)
-  - [Writing](docs/api.md#writing)
-  - [Real-time Events](docs/api.md#realtime)
-  - [Other Features](docs/api.md#other)
+  - [Querying](docs/firebase-api.md#querying)
+  - [Writing](docs/firebase-api.md#writing)
+  - [Real-time Events](docs/firebase-api.md#realtime)
+  - [Other Features](docs/firebase-api.md#other)
 
 ---- 
 - [Related Repos](docs/related.md)
