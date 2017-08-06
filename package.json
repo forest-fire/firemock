@@ -1,19 +1,22 @@
 {
   "name": "firemock",
-  "version": "0.9.1",
+  "version": "0.10.0",
   "description": "firemock",
   "license": "MIT",
   "repository": "",
-  "author": "",
+  "author": "Ken Snyder<ken@ken.net>",
   "keywords": [
     "serverless",
-    "typescript"
+    "typescript",
+    "firebase",
+    "mocking",
+    "testing"
   ],
   "files": [
     "lib"
   ],
-  "main": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "main": "lib/mock.js",
+  "typings": "lib/mock.d.ts",
   "scripts": {
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
@@ -48,7 +51,7 @@
     "coveralls": "^2.0.0",
     "faker": "^4.1.0",
     "js-yaml": "^3.0.0",
-    "lodash": "^4.0.0",
+    "lodash": "^4.17.4",
     "mocha": "^3.4.0",
     "nyc": "^11.0.0",
     "prettier": "^1.5.2",

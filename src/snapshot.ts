@@ -1,5 +1,6 @@
 import { IDictionary } from 'common-types';
 import { get } from 'lodash';
+import Reference from './reference';
 import * as firebase from 'firebase-admin';
 
 /**
@@ -7,13 +8,20 @@ import * as firebase from 'firebase-admin';
  * a snapshot synchronously; if you wish to exit early
  * return a TRUE value
  */
-export type Action = (action: SnapShot) => boolean | void;
+export type Action = (action: firebase.database.DataSnapshot) => boolean | void;
 
-export default class SnapShot<T = IDictionary> {
-  constructor(
-    public key: string,
-    private _value: T
-  ) {}
+export default class SnapShot<T = IDictionary>
+  implements firebase.database.DataSnapshot {
+  private _ref: Reference<T>;
+  constructor(public key: string, private _value: T) {}
+
+  public get ref() {
+    if (!this._ref) {
+      this._ref = new Reference<T>(this.key);
+    }
+
+    return this._ref as firebase.database.Reference;
+  }
 
   public val() {
     return this._value;
@@ -23,7 +31,7 @@ export default class SnapShot<T = IDictionary> {
     return JSON.stringify(this._value);
   }
 
-  public child<TC = IDictionary>(path: string) {
+  public child<TC = IDictionary>(path: string): firebase.database.DataSnapshot {
     const value = get(this._value, path, null);
     return value ? new SnapShot<TC>(path, value) : null;
   }
@@ -36,7 +44,7 @@ export default class SnapShot<T = IDictionary> {
     return false;
   }
 
-  public hasChildren(path: string): boolean {
+  public hasChildren(): boolean {
     if (typeof this._value === 'object') {
       return Object.keys(this._value).length > 0;
     }
@@ -66,5 +74,14 @@ export default class SnapShot<T = IDictionary> {
     });
 
     return false;
+  }
+
+  /** NOTE: mocking proxies this call through to val(), no use of "priority" */
+  public exportVal() {
+    return this.val();
+  }
+
+  public getPriority(): string | number | null {
+    return null;
   }
 }
