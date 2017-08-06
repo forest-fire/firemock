@@ -104,8 +104,6 @@ before(async () => {
   m.addSchema('customer', (h) => () => {
     first: h.faker.name.firstName(),
     last: h.faker.name.firstName(),
-    email: h.chance.email(),
-    address: h.chance.address()
   });
   m.queueSchema('customer', 10);
   m.generate();
@@ -117,6 +115,7 @@ it('pushing a new customer works', (done) => {
     done();
   };
   m.ref('customers').on('child_added', onChildAdded);
+  m.ref('customers').push({ first: 'John', last: 'Smith' });
 }
 ```
 
