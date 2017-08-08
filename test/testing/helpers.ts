@@ -1,3 +1,5 @@
+import { IDictionary } from 'common-types';
+import { first, last } from 'lodash';
 import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as process from 'process';
@@ -69,4 +71,24 @@ export function ignoreBoth() {
   };
 
   return restore;
+}
+
+export function firstKey<T = any>(listOf: IDictionary<T>) {
+  return first(Object.keys(listOf));
+}
+
+export function lastKey<T = any>(listOf: IDictionary<T>) {
+  return last(Object.keys(listOf));
+}
+
+export function valuesOf<T = any>(listOf: IDictionary<T>, property: string) {
+  const keys: any[] = Object.keys(listOf);
+  return keys.map((key: any) => {
+    const item: IDictionary = listOf[key];
+    return item[property];
+  });
+}
+
+export function length(listOf: IDictionary) {
+  return listOf ? Object.keys(listOf).length : 0;
 }

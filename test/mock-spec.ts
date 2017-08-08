@@ -106,7 +106,7 @@ describe('Mock class()', () => {
       const m = new Mock();
       m
         .addSchema('foo')
-          .mock((h: SchemaHelper) => () => 'result')
+          .mock((h: SchemaHelper) => () => ({result: 'result'}))
           .pluralName('fooie')
         .addSchema('company') // built-in exception
           .mock((h: SchemaHelper) => () => 'ignored')
@@ -120,16 +120,15 @@ describe('Mock class()', () => {
 
       expect(m.db.foos).is.equal(undefined);
       expect(m.db.fooie).is.an('object');
-      expect(firstProp(m.db.fooie)).is.equal('result');
+      expect(firstProp(m.db.fooie).result).is.equal('result');
       expect(m.db.companies).is.an('object');
       expect(m.db.fungi).is.an('object');
     });
 
     it('using modelName() modifier changes db path appropriately', () => {
       const m = new Mock();
-      m
-        .addSchema('foo')
-        .mock((h: SchemaHelper) => () => 'result')
+      m.addSchema('foo')
+        .mock((h: SchemaHelper) => () => ({result: 'result'}))
         .modelName('car');
       m.deploy
         .queueSchema('foo')
@@ -137,7 +136,8 @@ describe('Mock class()', () => {
       
       expect(m.db.foos).is.equal(undefined);
       expect(m.db.cars).is.an('object');
-      expect(firstProp(m.db.cars)).is.equal('result');
+      
+      expect(firstProp(m.db.cars).result).is.equal('result');
     });
   });
 

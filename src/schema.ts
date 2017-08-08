@@ -11,6 +11,7 @@ export interface ISchema {
   id: string;
   /** path to the database which is the root for given schema list */
   path: () => string;
+  prefix?: string;
   /** mock generator function */
   fn: () => IDictionary;
   /** 
@@ -34,9 +35,10 @@ export type SourceProperty = string;
 export default class Schema<T = any> {
   private _schemas = new Queue<ISchema>('schemas');
   private _relationships = new Queue<IRelationship>('relationships');
+  private _prefix: string = '';
 
   constructor(public schemaId: string) {}
-  
+
   /**
    * Add a mocking function to be used to generate the schema in mock DB
    */
@@ -45,9 +47,10 @@ export default class Schema<T = any> {
       id: this.schemaId,
       fn: cb(new SchemaHelper({})), // TODO: pass in support for DB lookups
       path: () =>
+        this._schemas.find(this.schemaId).prefix + 
         this._schemas.find(this.schemaId).modelName
-          ? pluralize(this._schemas.find(this.schemaId).modelName)
-          : pluralize(this.schemaId)
+            ? pluralize(this._schemas.find(this.schemaId).modelName)
+            : pluralize(this.schemaId)
     });
 
     return this;
@@ -64,13 +67,26 @@ export default class Schema<T = any> {
     return this;
   }
 
+  /** prefixes a static path to the beginning of the  */
+  public pathPrefix(prefix: string) {
+    prefix = prefix.slice(-1) === '/' ? prefix : prefix + '/';
+    this._schemas.update(this.schemaId, { prefix });
+    console.log(this._schemas.find(this.schemaId));
+
+    return this;
+  }
+
   /**
    * The default pluralizer is quite simple so if you find that
    * it is pluralizing incorrectly then you can manually state 
    * the plural name.
-   */  
+   */
+
   public pluralName(plural: string) {
-    addException(this.schemaId, plural);
+    const model = this._schemas.find(this.schemaId).modelName
+      ? this._schemas.find(this.schemaId).modelName
+      : this.schemaId;
+    addException(model, plural);
     return this;
   }
 
@@ -86,7 +102,7 @@ export default class Schema<T = any> {
     });
 
     return this;
-  }   
+  }
 
   /**
    * Configures a "hasMany" relationship with another schema/entity
@@ -110,6 +126,4 @@ export default class Schema<T = any> {
     }
     return new Schema<D>(schema);
   }
-  
-
 }

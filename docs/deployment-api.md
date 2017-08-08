@@ -49,21 +49,30 @@ m.addSchema('appointment', (h) => () => {
   .belongsTo('customer');
 ```
 
-The example here shows the definition of "attributes" of each schema as well as establishing relationships that exist between schema entities.
+The example here shows the definition of "attributes" of each schema as well as establishing relationships that exist between schema entities. 
+
+In the examples above, the mocking function is inline and as a result the variable `h` is known to be of type `SchemaHelper` which gives the super convenience intelisense for both faker and chance API's. However, it's often nice to define the mocking function externally to the `addSchema` call, here's an example of how you might do that: 
+
+```ts
+const personMock = (h: SchemaHelper) => () => ({
+  name: h.faker.name.firstName + ' ' + h.faker.name.lastName,
+  age: h.faker.random.number({min: 1, max: 80})
+});
+```
 
 ## Generating Mock Data {#generation}
 
-Now that we understand how to define _schemas_ we should turn our attention into leveraging these schemas to create data in our mock database. This is where generation comes in.
+Now that we understand how to define _schemas_ we should turn our attention into leveraging these schemas to create data in our mock database. This is where _queuing_ and _generation_ comes in.
 
 ### A simple example
 
-Before looking at the code, remember that we have now defined three schemas: pet, customer, and appointment.
+Let's assume that for our tests we need some appointments in the database, we can achieve that with:
 
 ```js
 m.queueSchema('appointment', 25);
 ```
 
-At this point we **still** don't have anything in the mock database but we have queued up what we want generated. The final step is:
+At this point we **still** don't have anything in the mock database but we have _queued up_ what we want generated. The final step is:
 
 ```js
 m.generate();
@@ -118,14 +127,35 @@ You may have noticed that in the examples so far when we generate a schema it ge
   | pet | /pets |
   | appointment | /appointments |
 
-This default makes sense for a lot of situations but clearly we will need some flexibilty to modify this in edge cases. This flexibility comes in several forms:
+This default makes sense for a lot of situations but we will need some flexibilty to modify this for edge cases. This flexibility is provided in several forms:
 
 
 - **Base Offset**
 
+  There are often cases where you want your schema to not reside directly off the root of the database. In these cases we can leverage the `pathPrefix()` configuration to ensure the offset is produced at "generation". An example might be that appointments are only available to authenticated users and to simplify your DB permissions you've decided that all schema/models which require authentication should be situated off the `/authorized` path:
+
+  ```js
+  m.addSchema('appointment', apptMock).pathPrefix('authorized');
+  ```
+
 - **Explicit Pluralization**
+
+  **firemock** has a simple pluralization engine which takes the singular name of your schema and pluralizes it. It does get it right more often than not but doesn't account for all exceptions so if you ever need to you can explicitly state the pluralization by:
+
+  ```js 
+  m.addSchema('covfefe', mock).pluralName('absurdities');
+  ```
 
 - **Models versus Schemas**
 
-  In our MVC upbringing we're quick to assign meaning to the term "model" and while the above _schemas_ that we've defined may seem quite similar they are slightly abstracted from the "model" nominclature. This is the _default_ behavior and means that the following schemas are place the given paths:
+  In `firemock` "schemas" are a formula that can generate model records. When we queue schemas and then run `generate`()` these schema definitions are converted to "models" in the database. Typically the schemas _name_ serves as a good name for the model too and if nothing is stated to the contrary then the DB's path will have the pluralised schema name as the terminal part of the DB path. If, however, you want to build two schema -- let's say "cats" and "dogs" -- and deploy them both to "animals" in the database, you could do that by:
 
+  ```js
+  m.addSchema('cat', catMock).modelName('animal');
+  m.addSchema('dog', dogMock).modelName('animal');
+  m.queueSchema('cat', 10);
+  m.queueSchema('dog', 10);
+  m.generate();
+  ```
+
+If you were to look into the database you'd see that there is no `/cats` or `/dogs` paths but there is an `/animals` path which has 20 records in it.

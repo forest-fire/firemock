@@ -128,13 +128,15 @@ export default class Queue<T = any> {
 
   /** returns the Queue as a JS array */
   public toArray() {
-    return Queue._queues[this._name];
+    return Queue._queues && Queue._queues[this._name]
+      ? Queue._queues[this._name]
+      : [];
   }
 
   /** returns the Queue as a JS Object */
   public toHash() {
     const queue = Queue._queues[this._name];
-    if(queue.length === 0) {
+    if(!queue || queue.length === 0) {
       return new Object();
     }
 
@@ -164,6 +166,10 @@ export default class Queue<T = any> {
     return queue
       ? queue.filter(fn) as T[]
       : [];
+  }
+
+  public toJSON() {
+    return JSON.stringify(Queue._queues);
   }
 
   private _find(key: string | number) {

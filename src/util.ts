@@ -56,3 +56,12 @@ export function removeKeys(obj: IDictionary, remove: string[]) {
     return agg;
   }, {});
 }
+
+export function join(...paths: string[]) {
+  return paths.map(p => {
+    p = p.replace(/[\/\\]/gm, '.');
+    return p.slice(-1) === '.'
+      ? p.slice(0, p.length - 1)
+      : p;
+  }).join('.')
+}

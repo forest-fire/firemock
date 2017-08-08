@@ -2,7 +2,7 @@ import { IDictionary } from 'common-types';
 import * as fbKey from 'firebase-key';
 import { get, set, first } from 'lodash';
 import { IRelationship, ISchema } from './mock';
-import { getRandomInt } from './util';
+import { getRandomInt, join } from './util';
 import Queue from './queue';
 import pluralize from './pluralize';
 import { db } from './database';
@@ -13,6 +13,7 @@ export interface IQueue {
   quantity: number;
   hasMany?: IDictionary<number>;
   overrides?: IDictionary;
+  prefix: string;
   /** the key refers to the property name, the value true means "fulfill" */
   belongsTo?: IDictionary<boolean>;
 }
@@ -44,6 +45,7 @@ export default class Deployment {
       const newQueueItem = {
         id: this.queueId,
         schema: schemaId,
+        prefix: schema.prefix,
         quantity,
         overrides
       };
@@ -125,12 +127,15 @@ export default class Deployment {
     });
   }
 
-  private insertMockIntoDB(schema: string, overrides: IDictionary) {
-    const mock = this._schemas.find(schema).fn();
-    const path = this._schemas.find(schema).path();
+  private insertMockIntoDB(schemaId: string, overrides: IDictionary) {
+    const schema: ISchema = this._schemas.find(schemaId);
+    const mock = schema.fn();
+    const path = schema.path();
+    const prefix = schema.prefix || '';
+    
     const key = fbKey.key();
-    const pathAndKey = path + '.' + key;
-    set(db, pathAndKey, { ...mock, ...overrides });
+    const prefixPathAndKey = join(prefix + path + '.' + key);
+    set(db, prefixPathAndKey, { ...mock, ...overrides });
 
     return key;
   }

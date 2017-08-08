@@ -14,15 +14,16 @@ import {
 } from '../src/util';
 
 const expect = chai.expect;
+
 describe('Reference functions', () => {
-  const mocker = (h: SchemaHelper) => () => 'result';
+  const mocker = (h: SchemaHelper) => () => ({result: 'result'});
 
   describe('Basic DB Querying', () => {
 
     it('using onceSync(), querying returns a synchronous result', () => {
       const m = new Mock();
-      m.addSchema('cat').mock(mocker);
-      m.addSchema('bar').mock(mocker);
+      m.addSchema('cat', mocker);
+      m.addSchema('bar', mocker);
       m.deploy.queueSchema('cat', 5).queueSchema('bar', 5).generate();
       const results = m.ref('/cats').onceSync('value') as SnapShot;
       expect(results.val).to.be.a('function');
@@ -30,56 +31,58 @@ describe('Reference functions', () => {
       expect(results.hasChild).to.be.a('function');
 
       expect(results.key).to.equal('cats');
-      // expect(firstProp(results.val())).to.equal('result');
+      expect(firstProp(results.val()).result).to.equal('result');
     });
 
     it('with default 5ms delay, querying returns an asynchronous result', done => {
       const m = new Mock();
-      m.addSchema('foo').mock(mocker);
-      m.addSchema('bar').mock(mocker);
-      m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
+      m.addSchema('foo', mocker);
+      m.addSchema('bar', mocker);
+      m.queueSchema('foo', 5)
+        .queueSchema('bar', 5)
+        .generate();
       m.ref('/foos').once('value').then((results) => {
         expect(results.numChildren()).is.equal(5);
-        // expect(firstProp<string>(results.val())).to.equal('result');
+        expect(firstProp<string>(results.val()).result).to.equal('result');
         done();
       });
     });
 
     it('with numeric delay, querying returns an asynchronous result', done => {
       const m = new Mock();
-      m.addSchema('foo').mock(mocker);
-      m.addSchema('bar').mock(mocker);
+      m.addSchema('foo', mocker);
+      m.addSchema('bar', mocker);
       m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(100);
       m.ref('/foos').once('value').then((results: any) => {
         expect(results.numChildren()).is.equal(5);
-        // expect(firstProp(results.val())).is.equal('result');
+        expect(firstProp(results.val()).result).is.equal('result');
         done();
       });
     });
 
     it('with named delay, querying returns an asynchronous result', done => {
       const m = new Mock();
-      m.addSchema('foo').mock(mocker);
-      m.addSchema('bar').mock(mocker);
+      m.addSchema('foo', mocker);
+      m.addSchema('bar', mocker);
       m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(Delays.mobile);
       m.ref('/foos').once('value').then(results => {
         expect(results.numChildren()).is.equal(5);
-        // expect(firstProp<string>(results.val())).is.equal('result');
+        expect(firstProp<string>(results.val()).result).is.equal('result');
         done();
       });
     });
 
     it('with delay range, querying returns an asynchronous result', done => {
       const m = new Mock();
-      m.addSchema('foo').mock(mocker);
-      m.addSchema('bar').mock(mocker);
+      m.addSchema('foo', mocker);
+      m.addSchema('bar', mocker);
       m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay([50, 80]);
       m.ref('/foos').once('value').then((results: any) => {
         expect(results.numChildren()).is.equal(5);
-        // expect(firstProp(results.val())).is.equal('result');
+        expect(firstProp(results.val()).result).is.equal('result');
         done();
       });
     });
@@ -256,13 +259,31 @@ describe('Reference functions', () => {
       expect(lastProp(middling.val()).age).to.equal(5);
       
     });
+
     it.skip('startAt(), endAt(), orderByValue() filters correctly');
 
   }); // End Filtered Querying
 
   describe('Sort Order', () => {
+    const personMock = (h: SchemaHelper) => () => ({
+      name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
+      age: h.faker.random.number({min: 1, max: 80})
+    });
 
-    it.skip('orderByChild() sorts correctly');
+    const numbers = [123, 456, 7878, 9999, 10491, 15000, 18345, 20000];
+    const strings = ['abc', 'def', 'fgh', '123', '999', 'ABC', 'DEF'];
+
+    it('orderByChild() -- where child is a string -- sorts correctly', async () => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 5);
+      m.generate();
+      console.log(m.db);
+      const results = m.ref('/people').orderByChild('name').onceSync('value');
+      console.log(results);
+      
+    });
+    it.skip('orderByChild() -- where child is a number -- sorts correctly');
     it.skip('orderByKey() sorts correctly');
     it.skip('orderByValue() sorts correctly');
 

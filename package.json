@@ -39,6 +39,7 @@
     "@types/chalk": "^0.4.31",
     "@types/chance": "^0.7.33",
     "@types/faker": "^4.1.0",
+    "@types/js-yaml": "^3.9.0",
     "@types/lodash": "^4.0.0",
     "@types/mocha": "^2.2.41",
     "@types/node": "^6.0.0",

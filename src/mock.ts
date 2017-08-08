@@ -21,6 +21,8 @@ export interface ISchema {
    * is assume to equal model name  
    */
   modelName?: string;
+  /** a static path that preceeds this schema's placement in the database */
+  prefix?: string;
 }
 import { Delays, DelayType } from './query';
 export { Delays, DelayType } from './query';

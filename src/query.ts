@@ -3,6 +3,7 @@ import * as firebase from 'firebase-admin';
 import { db } from './database';
 import { get } from 'lodash';
 import SnapShot from './snapshot';
+import Queue from './queue';
 import Reference from './reference';
 import {
   parts,
@@ -34,30 +35,31 @@ export interface IOrdering {
   value: any;
 }
 
+export interface IListener {
+  path: string,
+
+  eventType: firebase.database.EventType,
+  callback: (a: admin.database.DataSnapshot | null, b?: string) => any,
+  cancelCallbackOrContext?: object | null,
+  context?: object | null
+}
+
+export type IQueryFilter<T> = (snap: SnapShot<T>) => SnapShot<T>;
+
 export default class Query<T = any> 
   implements firebase.database.Query {
   protected _query: QueryStack = [];
   protected _order: IOrdering;
+  protected _listeners = new Queue<IListener>('listeners');
   
   constructor(public path: string, protected _delay: DelayType = 5) {}
 
   public get ref(): firebase.database.Reference {
     return new Reference<T>(this.path, this._delay);
   }
-
-  public endAt(value: QueryValue, key?: string) {
-    this._query.push((snap: SnapShot<T>) => {
-      let js: any = snap.val() as T;
-      const remove = Object.keys(js).filter(k => js[k][key] > value);
-      js = removeKeys(js, remove);
-      return new SnapShot(snap.key, js);
-    });
-
-    return this;
-  }
   
   public limitToLast(num: number) {
-    this._query.push((snap: SnapShot<T>) => {
+    const filter: IQueryFilter<T> = (snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const size: number = Object.keys(js).length;
       if (typeof js === 'object') {
@@ -66,36 +68,63 @@ export default class Query<T = any>
       }
 
       return new SnapShot(snap.key, js);
-    });
+    }
+    this._query.push(filter);
 
     return this;
   }
 
   public limitToFirst(num: number) {
-    this._query.push((snap: SnapShot<T>) => {
+    const filter: IQueryFilter<T> = (snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const size: number = Object.keys(js).length;
       if (typeof js === 'object') {
-        const remove = Object.keys(js).slice(size - num);
+        const remove = Object.keys(js).slice(num);
         js = removeKeys(js, remove);
       }
 
       return new SnapShot(snap.key, js);
-    });
+    }
+    this._query.push(filter);
 
     return this;
   }
 
   public equalTo(value: QueryValue, key?: string) {
-    this._query.push((snap: SnapShot<T>) => {
+    const filter: IQueryFilter<T> = (snap: SnapShot<T>) => {
       let js: any = snap.val() as T;
       const remove = Object.keys(js).filter(k => js[k][key] !== value);
       js = removeKeys(js, remove);
       return new SnapShot(snap.key, js);
-    });
+    }
+    this._query.push(filter);
 
     return this;
   }
+
+  public startAt(value: QueryValue, key?: string) {
+    const filter: IQueryFilter<T> = (snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      const remove = Object.keys(js).filter(k => js[k][key] < value);
+      js = removeKeys(js, remove);
+      return new SnapShot(snap.key, js);
+    };
+    this._query.push(filter);
+
+    return this;
+  }
+
+  public endAt(value: QueryValue, key?: string) {
+    const filter: IQueryFilter<T> = (snap: SnapShot<T>) => {
+      let js: any = snap.val() as T;
+      const remove = Object.keys(js).filter(k => js[k][key] > value);
+      js = removeKeys(js, remove);
+      return new SnapShot(snap.key, js);
+    };
+    this._query.push(filter);
+
+    return this;
+  } 
 
   public on(
     eventType: firebase.database.EventType,
@@ -103,19 +132,28 @@ export default class Query<T = any>
     cancelCallbackOrContext?: object | null,
     context?: object | null
   ): (a: admin.database.DataSnapshot | null, b?: string) => any {
-    console.log('on() not implemented yet');
+
+    this._listeners.push({
+      path: this.path,
+
+      eventType,
+      callback,
+      cancelCallbackOrContext,
+      context
+    })
+
     return null;
   }
 
   public once(eventType: 'value'): Promise<SnapShot<T>> {
-    const snapshot = this._once();
+    const snapshot = this.processQueriesAndSorts();
     return new Promise(resolve => {
       setTimeout(() => resolve(snapshot), this.delay());
     });
   }
 
   public onceSync(eventType: 'value'): SnapShot<T> {
-    return this._once();
+    return this.processQueriesAndSorts();
   }  
 
   public off() {
@@ -127,26 +165,24 @@ export default class Query<T = any>
     return false;
   }
 
-  public startAt(value: QueryValue, key?: string) {
-    this._query.push((snap: SnapShot<T>) => {
-      let js: any = snap.val() as T;
-      const remove = Object.keys(js).filter(k => js[k][key] < value);
-      js = removeKeys(js, remove);
-      return new SnapShot(snap.key, js);
-    });
-
-    return this;
-  }
-
-  public orderByChild(path: string) {
+  /**
+   * When the children of a query are all objects, then you can sort them by a
+   * specific property. Note: if this happens a lot then it's best to explicitly
+   * index on this property in the database's config.
+   */
+  public orderByChild(prop: string) {
     this._order = {
       type: OrderingType.byChild,
-      value: path
+      value: prop
     };
 
     return this;
   }
 
+  /**
+   * When the children of a query are all scalar values (string, number, boolean), you
+   * can order the results by their (ascending) values
+   */
   public orderByValue() {
     this._order = {
       type: OrderingType.byValue,
@@ -156,6 +192,9 @@ export default class Query<T = any>
     return this;
   }
 
+  /**
+   * This is the default sort
+   */
   public orderByKey() {
     this._order = {
       type: OrderingType.byKey,
@@ -178,9 +217,13 @@ export default class Query<T = any>
     return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
   }
   
-  private _once(): SnapShot<T> {
+  /**
+   * Processes all the queries and sorts that have been queued up
+   */
+  private processQueriesAndSorts(): SnapShot<T> {
     const response = get(db, normalizeRef(this.path), undefined);
     let snapshot: any = new SnapShot<T>(leafNode(this.path), response);
+    // TODO: sort 
     this._query.forEach(q => (snapshot = q(snapshot)));
 
     return snapshot as SnapShot<T>;
