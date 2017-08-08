@@ -8,12 +8,12 @@
   - [Querying](docs/firebase-api.md#querying)
   - [Writing](docs/firebase-api.md#writing)
   - [Real-time Events](docs/firebase-api.md#realtime)
-- [Other Features](docs/firebase-api.md#top)
-  - [Firebase IDs](docs/firebase-api.md#firebase-ids)
-  - [Network Delay](docs/firebase-api.md#network)
-  - [Synchronous Queries](docs/firebase-api.md#synchronous)
-  - [View DB](docs/firebase-api.md#view-db)
-  - [Typing](docs/firebase-api.md#typing)
+- [Other Features](docs/other-features.md#top)
+  - [Firebase IDs](docs/other-features.md#firebase-ids)
+  - [Network Delay](docs/other-features.md#network)
+  - [View DB](docs/other-features.md#view-db)
+  - [Synchronous Queries](docs/other-features.md#synchronous)
+  - [Typing](docs/other-features.md#typing)
 
 ---- 
 - [Related Repos](docs/related.md)

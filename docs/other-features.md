@@ -23,19 +23,6 @@ From this point forward all requests will have a 200ms delay. You can also confi
 m.delay([10,100]);
 ````
 
-### Synchronous Querying {#synchronous}
-In general you'll want to use the asynchronous events that Firebase provides for changes but in some cases it might be useful to do synchronous queries. Firemock supports that through the following syntax:
-
-````js
-import Mock from 'firemock';
-const m = new Mock();
-m
-  .addSchema('cat', fooMock)
-  .queueSchema('cat', 50)
-  .generate();
-const results = m.ref('/cats').onceSync('value');
-````
-
 ### Direct views into database {#view-db}
 Querying as described above is the right way to test code since that's the way that you'll code against the actual Firebase DB but occationally it's useful to just look into the database and you can do this by utilizing the `db` property off of Mock class:
 
@@ -51,6 +38,19 @@ console.log(m.db.cats);
 ````
 
 The logging statement at the bottom will print out a JS hash of cats (who doesn't want that).
+
+### Synchronous Querying {#synchronous}
+In general you'll want to use the asynchronous events that Firebase provides for changes but in some cases it might be useful to do synchronous queries. Firemock supports that through the following syntax:
+
+````js
+import Mock from 'firemock';
+const m = new Mock();
+m
+  .addSchema('cat', fooMock)
+  .queueSchema('cat', 50)
+  .generate();
+const results = m.ref('/cats').onceSync('value');
+````
 
 ### Generic Type Goodness {#typing}
 Because this library is fully written in Typescript you can explore the API with the super useful intellisense popups from the comfort of your favorite editor. Stop pretending this isn't exciting. Ok, but beyond that there's an attempt to provide generic types throughout so that you can provide additional type safety if you wish to. For example, you can specify your typing for a schema like so:
