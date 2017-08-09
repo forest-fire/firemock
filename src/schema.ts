@@ -14,21 +14,21 @@ export interface ISchema {
   prefix?: string;
   /** mock generator function */
   fn: () => IDictionary;
-  /** 
-   * the name of the entity being mocked, if not set then schema name 
-   * is assume to equal model name  
+  /**
+   * the name of the entity being mocked, if not set then schema name
+   * is assume to equal model name
    */
   modelName?: string;
 }
 
 /**
- * A higher level function which receives a schema-helper and then 
+ * A higher level function which receives a schema-helper and then
  * waits for lazy evaluation.
  */
 export type MockGeneratorCallback = (helper: SchemaHelper) => any;
 /**
  * The property that exists on the source scheme as a FK reference
- * to the external schema/entity. 
+ * to the external schema/entity.
  */
 export type SourceProperty = string;
 
@@ -47,7 +47,7 @@ export default class Schema<T = any> {
       id: this.schemaId,
       fn: cb(new SchemaHelper({})), // TODO: pass in support for DB lookups
       path: () =>
-        this._schemas.find(this.schemaId).prefix + 
+        this._schemas.find(this.schemaId).prefix +
         this._schemas.find(this.schemaId).modelName
             ? pluralize(this._schemas.find(this.schemaId).modelName)
             : pluralize(this.schemaId)
@@ -57,9 +57,9 @@ export default class Schema<T = any> {
   }
 
   /**
-   * There are times where it's appropriate to have multiple schemas for 
+   * There are times where it's appropriate to have multiple schemas for
    * the same entity/model, in this case you'll want to state what model
-   * your schema is emulating. If you don't state this property it assumes 
+   * your schema is emulating. If you don't state this property it assumes
    * the schema name IS the model name
    */
   public modelName(value: string) {
@@ -71,14 +71,13 @@ export default class Schema<T = any> {
   public pathPrefix(prefix: string) {
     prefix = prefix.slice(-1) === '/' ? prefix : prefix + '/';
     this._schemas.update(this.schemaId, { prefix });
-    console.log(this._schemas.find(this.schemaId));
 
     return this;
   }
 
   /**
    * The default pluralizer is quite simple so if you find that
-   * it is pluralizing incorrectly then you can manually state 
+   * it is pluralizing incorrectly then you can manually state
    * the plural name.
    */
 

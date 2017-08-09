@@ -1,5 +1,6 @@
 import { first, last } from 'lodash';
 import { IDictionary } from 'common-types';
+import * as firebase from 'firebase-admin';
 
 export function normalizeRef(r: string) {
   r = r.replace('/', '.');
@@ -64,4 +65,11 @@ export function join(...paths: string[]) {
       ? p.slice(0, p.length - 1)
       : p;
   }).join('.')
+}
+
+export function orderedSnapToJS<T = any>(snap: firebase.database.DataSnapshot) {
+  const jsObject: IDictionary<T> = {};
+  snap.forEach( record => jsObject[record.key] = record.val() );
+
+  return jsObject;
 }

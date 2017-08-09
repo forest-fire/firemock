@@ -559,6 +559,10 @@ common-types@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.1.0.tgz#e8cee9ce13f0a52e0ff4ec080ee2dd27b457872c"
 
+common-types@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.1.1.tgz#9e926e06841d0e758755b9b2b2ba60887078dfe7"
+
 commondir@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
@@ -2765,6 +2769,12 @@ type-detect@^3.0.0:
 type-detect@^4.0.0:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.3.tgz#0e3f2670b44099b0b46c284d136a7ef49c74c2ea"
+
+typed-conversions@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/typed-conversions/-/typed-conversions-0.5.1.tgz#01a02dace644d255ab79b2cf5d540deb4479577d"
+  dependencies:
+    common-types "^1.1.0"
 
 typedarray@^0.0.6:
   version "0.0.6"

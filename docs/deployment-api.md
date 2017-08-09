@@ -51,12 +51,12 @@ m.addSchema('appointment', (h) => () => {
 
 The example here shows the definition of "attributes" of each schema as well as establishing relationships that exist between schema entities. 
 
-In the examples above, the mocking function is inline and as a result the variable `h` is known to be of type `SchemaHelper` which gives the super convenience intelisense for both faker and chance API's. However, it's often nice to define the mocking function externally to the `addSchema` call, here's an example of how you might do that: 
+In the examples above, the mocking function is inline and as a result the variable `h` is known to be of type `SchemaHelper` which provides the  convenience intellisense for both faker and chance API's. However, it's often nice to define the mocking function externally to the `addSchema` call, here's an example of how you might do that and continue to get intellisense: 
 
 ```ts
 const personMock = (h: SchemaHelper) => () => ({
   name: h.faker.name.firstName + ' ' + h.faker.name.lastName,
-  age: h.faker.random.number({min: 1, max: 80})
+  age: h.faker.random.number( {min: 1, max: 80} )
 });
 ```
 

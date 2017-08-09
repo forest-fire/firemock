@@ -29,10 +29,11 @@
     "cli": "ts-node cli/index.ts --"
   },
   "dependencies": {
-    "common-types": "^1.1.0",
+    "common-types": "^1.1.1",
     "firebase-admin": "^5.0.0",
     "firebase-key": "^1.0.4",
-    "moment": "^2.0.0"
+    "moment": "^2.0.0",
+    "typed-conversions": "^0.5.1"
   },
   "devDependencies": {
     "@types/chai": "^3.0.0",

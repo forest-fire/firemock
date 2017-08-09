@@ -1,7 +1,8 @@
-import { IDictionary } from 'common-types';
+import { IDictionary, SortingFunction } from 'common-types';
 import { get } from 'lodash';
 import Reference from './reference';
 import * as firebase from 'firebase-admin';
+import * as convert from 'typed-conversions';
 
 /**
  * Each record in the forEach iteration will be passed
@@ -10,21 +11,17 @@ import * as firebase from 'firebase-admin';
  */
 export type Action = (action: firebase.database.DataSnapshot) => boolean | void;
 
-export default class SnapShot<T = IDictionary>
+export default class SnapShot<T = any>
   implements firebase.database.DataSnapshot {
-  private _ref: Reference<T>;
-  constructor(public key: string, private _value: T) {}
+  private _sortingFunction: SortingFunction;
+  constructor(public key: string, private _value: T[]) {}
 
   public get ref() {
-    if (!this._ref) {
-      this._ref = new Reference<T>(this.key);
-    }
-
-    return this._ref as firebase.database.Reference;
+    return new Reference<T>(this.key) as firebase.database.Reference;
   }
 
   public val() {
-    return this._value;
+    return convert.arrayToHash(this._value);
   }
 
   public toJSON() {
@@ -65,6 +62,8 @@ export default class SnapShot<T = IDictionary>
   }
 
   public forEach(action: Action) {
+    const records = convert.snapshotToArray(this);
+
     const keys = Object.keys(this._value);
     keys.forEach(key => {
       const halt = action(new SnapShot(key, get(this._value, key)));
@@ -83,5 +82,14 @@ export default class SnapShot<T = IDictionary>
 
   public getPriority(): string | number | null {
     return null;
+  }
+
+  /**
+   * Used by Query objects to instruct the snapshot the sorting function to use
+   */
+  public sortingFunction(fn: SortingFunction) {
+    this._sortingFunction = fn;
+
+    return this;
   }
 }
