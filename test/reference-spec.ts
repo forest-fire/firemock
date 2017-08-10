@@ -345,8 +345,6 @@ describe('Reference functions', () => {
         .onceSync('value');
 
       const orderedPeople = convert.snapshotToOrderedArray(results);
-      console.log(orderedPeople.map(p => p.inUSA));
-
 
       for(let i = 1; i <= 8; i++) {
         const current = orderedPeople[i].inUSA ? 1 : 0;
@@ -377,15 +375,53 @@ describe('Reference functions', () => {
 
     it('orderByValue() sorts correctly', async() => {
       const m = new Mock();
-      m.addSchema('person', (h) => () => h.faker.random.number({min: 0, max: 1000}));
-      m.queueSchema('person', 10);
+      m.addSchema('number', (h) => () => h.faker.random.number({min: 0, max: 1000}));
+      m.queueSchema('number', 10);
       m.generate();
-      console.log(m.db.people);
 
+      const snap = await m.ref('/numbers').orderByValue().once('value');
+      const orderedSnap = convert.snapshotToOrderedArray(snap);
+      const orderedKeys = orderedSnap.map(p => p.id);
+      const unorderedKeys = convert.snapshotToArray(snap).map(p => p.id);
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
+      for(let i = 1; i <= 8; i++) {
+        expect(orderedSnap[i] >= orderedSnap[i+1]).is.equal(true);
+      }
     });
 
-    it.skip('orderByChild() combines with limitToFirst() for "server-side" selection');
-    it.skip('orderByChild() combines with limitToLast() for "server-side" selection');
+    it('orderByChild() combines with limitToFirst() for "server-side" selection', async() => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.queueSchema('person', 10, { age: 99 });
+      m.generate();
+      const results = await m.ref('/people')
+        .orderByChild('age')
+        .limitToFirst(10)
+        .once('value');
+      const orderedPeople = convert.snapshotToOrderedArray(results);
+      expect(orderedPeople).to.have.length(10);
+      orderedPeople.map(person => {
+        expect(person.age).to.equal(99);
+      });
+    });
+    it('orderByChild() combines with limitToLast() for "server-side" selection', async() => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.queueSchema('person', 10, { age: 1 });
+      m.generate();
+      const results = await m.ref('/people')
+        .orderByChild('age')
+        .limitToLast(10)
+        .once('value');
+      const orderedPeople = convert.snapshotToOrderedArray(results);
+      expect(orderedPeople).to.have.length(10);
+      orderedPeople.map(person => {
+        expect(person.age).to.equal(1);
+      });
+    });
 
   });
 
