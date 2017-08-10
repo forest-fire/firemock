@@ -4,7 +4,7 @@ import * as chai from 'chai';
 import * as helpers from './testing/helpers';
 import Mock, { Delays } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
-import { first, last } from 'lodash';
+import { first, last, difference } from 'lodash';
 import SnapShot from '../src/snapshot';
 import {
   firstProp,
@@ -13,6 +13,7 @@ import {
   lastKey,
   orderedSnapToJS
 } from '../src/util';
+import * as convert from 'typed-conversions';
 
 const expect = chai.expect;
 
@@ -88,65 +89,73 @@ describe('Reference functions', () => {
       });
     });
 
-    // it('querying results can be iterated over with forEach()', done => {
-    //   const m = new Mock();
-    //   m.addSchema('user').mock((h) => () => ({
-    //     name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
-    //     gender: h.faker.helpers.randomize(['male', 'female'])
-    //   }));
-    //   m.deploy.queueSchema('user', 5).generate();
-    //   m.setDelay([50, 80]);
-    //   m.ref('/users').once('value').then(snap => {
-    //     snap.forEach(r => {
-    //       expect(r.val()).to.be.an('object');
-    //       expect(r.val().name).to.be.a('string');
-    //     });
-    //     done();
-    //   });
-    // });
+    it('querying results can be iterated over with forEach()', done => {
+      const m = new Mock();
+      m.addSchema('user').mock((h) => () => ({
+        name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
+        gender: h.faker.helpers.randomize(['male', 'female'])
+      }));
+      m.deploy.queueSchema('user', 5).generate();
+      m.setDelay([50, 80]);
+      m.ref('/users').once('value').then(snap => {
+        snap.forEach(r => {
+          expect(r.val()).to.be.an('object');
+          expect(r.val().name).to.be.a('string');
+        });
+        done();
+      });
+    });
 
   });
   describe('Filtered querying', () => {
 
-    it('query list with limitToFirst() set', done => {
+    /**
+     * Note: limitToFirst is cullening the key's which are biggest/newest which is
+     * the end of the list (wrt to natural sort order).
+     */
+    it('query list with limitToFirst() set', async() => {
+      const m = new Mock();
+      m.addSchema('monkey').mock(mocker);
+      m.deploy.queueSchema('monkey', 15).generate();
+      const snap = await m.ref('/monkeys')
+        .limitToFirst(10)
+        .once('value');
+
+      const filteredMonkeys = snap.val();
+      const allMonkeys = await m.ref('/monkeys').once('value');
+      const sortedMonkeys = convert.snapshotToOrderedHash(allMonkeys);
+      expect(snap.numChildren()).to.equal(10);
+      expect(Object.keys(m.db.monkeys).length).to.equal(15);
+      expect(Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))).to.not.equal(-1);
+      expect(Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))).to.not.equal(-1);
+      expect(Object.keys(filteredMonkeys)).to.include(lastKey(m.db.monkeys));
+      expect(Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
+      expect(Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))).to.equal(-1);
+    });
+
+    /**
+     * Note: limitToLast is cullening the key's which are smallest/oldest which is
+     * the start of the list.
+     */
+    it('query list with limitToLast() set', done => {
       const m = new Mock();
       m.addSchema('monkey').mock(mocker);
       m.deploy.queueSchema('monkey', 15).generate();
       m.ref('/monkeys')
-        .limitToFirst(10)
+        .limitToLast(10)
         .once('value')
         .then(snap => {
           const listOf = snap.val();
+
           expect(snap.numChildren()).to.equal(10);
           expect(Object.keys(m.db.monkeys).length).to.equal(15);
-          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
           expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
-          expect(Object.keys(listOf)).to.include(lastKey(m.db.monkeys));
-          // expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
+          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
 
           done();
         });
     });
-
-    // it('query list with limitToLast() set', done => {
-    //   const m = new Mock();
-    //   m.addSchema('monkey').mock(mocker);
-    //   m.deploy.queueSchema('monkey', 15).generate();
-    //   m.ref('/monkeys')
-    //     .limitToLast(10)
-    //     .once('value')
-    //     .then(snap => {
-    //       const listOf = snap.val();
-
-    //       expect(snap.numChildren()).to.equal(10);
-    //       expect(Object.keys(m.db.monkeys).length).to.equal(15);
-    //       expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
-    //       expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
-    //       expect(Object.keys(listOf).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
-
-    //       done();
-    //     });
-    // });
 
     it('equalTo() and orderByChild() work', done => {
       const m = new Mock();
@@ -270,7 +279,8 @@ describe('Reference functions', () => {
   describe('Sort Order', () => {
     const personMock = (h: SchemaHelper) => () => ({
       name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
-      age: h.faker.random.number({min: 1, max: 80})
+      age: h.faker.random.number({min: 1, max: 80}),
+      inUSA: h.chance.bool()
     });
 
     const numbers = [123, 456, 7878, 9999, 10491, 15000, 18345, 20000];
@@ -286,9 +296,93 @@ describe('Reference functions', () => {
         .onceSync('value');
 
     });
-    it.skip('orderByChild() -- where child is a number -- sorts correctly');
-    it.skip('orderByKey() sorts correctly');
-    it.skip('orderByValue() sorts correctly');
+    it('orderByChild() -- where child is a number -- sorts correctly', async () => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.generate();
+      const results = m.ref('/people')
+        .orderByChild('age')
+        .onceSync('value');
+
+      const orderedPeople = convert.snapshotToOrderedArray(results);
+      for(let i = 0; i <= 8; i++) {
+        expect(orderedPeople[i].age).is.gte(orderedPeople[i+1].age);
+      }
+      const orderedKeys = orderedPeople.map(p => p.id);
+      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
+    });
+
+    it('orderByChild() -- where child is a string -- sorts correctly', async () => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.generate();
+      const results = m.ref('/people')
+        .orderByChild('name')
+        .onceSync('value');
+
+      const orderedPeople = convert.snapshotToOrderedArray(results);
+      for(let i = 1; i <= 8; i++) {
+        expect(orderedPeople[i].name >= orderedPeople[i+1].name).is.equal(true);
+      }
+
+      const orderedKeys = orderedPeople.map(p => p.id);
+      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
+    });
+
+    it('orderByChild() -- where child is a boolean -- sorts correctly', async () => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.generate();
+      const results = m.ref('/people')
+        .orderByChild('inUSA')
+        .onceSync('value');
+
+      const orderedPeople = convert.snapshotToOrderedArray(results);
+      console.log(orderedPeople.map(p => p.inUSA));
+
+
+      for(let i = 1; i <= 8; i++) {
+        const current = orderedPeople[i].inUSA ? 1 : 0;
+        const next = orderedPeople[i+1].inUSA ? 1 : 0;
+        expect(current >= next).is.equal(true);
+      }
+
+      const orderedKeys = orderedPeople.map(p => p.id);
+      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
+    });
+
+    it('orderByKey() sorts correctly', async() => {
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.generate();
+      const people = await m.ref('/people').orderByKey().once('value');
+      const defaultPeople = await m.ref('/people').once('value');
+      expect(JSON.stringify(people)).to.equal(JSON.stringify(defaultPeople));
+      const orderedPeople = convert.snapshotToOrderedArray(people);
+      const orderedKeys = orderedPeople.map(p => p.id);
+      const unorderedKeys = convert.snapshotToArray(people).map(p => p.id);
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
+    });
+
+    it('orderByValue() sorts correctly', async() => {
+      const m = new Mock();
+      m.addSchema('person', (h) => () => h.faker.random.number({min: 0, max: 1000}));
+      m.queueSchema('person', 10);
+      m.generate();
+      console.log(m.db.people);
+
+    });
 
     it.skip('orderByChild() combines with limitToFirst() for "server-side" selection');
     it.skip('orderByChild() combines with limitToLast() for "server-side" selection');

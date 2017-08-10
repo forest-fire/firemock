@@ -7,6 +7,32 @@
 
 Rather than putting in some random push-id string we use the very useful `firebase-key` library to create _time appropriate_ id's which very closely resemble the ID you'd get with the Firebase DB.
 
+### Initializing Database State {#initialize-db}
+
+By default your mock database will start out empty and you're expected to create, queue, and generate schemas to get a good test data state. However, sometimes it's useful to start the database with a known state and that is possible when using the constructor of the Mock class:
+
+```js
+const m = new Mock({
+  monkeys: {
+    a: { name: 'abbey' },
+    b: { name: 'bobby' },
+    c: { name: 'cindy' }
+  }
+});
+```
+
+Furthermore, at any point you can also add in more state with:
+
+```js
+m.updateDB({
+  monkeys: {
+    a: { name: 'abbey' },
+    b: { name: 'bobby' },
+    c: { name: 'cindy' }
+  }
+});
+```
+
 ### Network Delay {#network}
 
 By default the Firebase events return with a delay of 5ms but this number can be set by adjusting the `delay()` method:

@@ -55,9 +55,9 @@ export default class Deployment {
     return this;
   }
 
-  /** 
-   * Provides specificity around how many of a given 
-   * "hasMany" relationship should be fulfilled of 
+  /**
+   * Provides specificity around how many of a given
+   * "hasMany" relationship should be fulfilled of
    * the schema currently being queued.
    */
   public quantifyHasMany(targetSchema: string, quantity: number) {
@@ -90,7 +90,7 @@ export default class Deployment {
   }
 
   /**
-   * Indicates the a given "belongsTo" should be fulfilled with a 
+   * Indicates the a given "belongsTo" should be fulfilled with a
    * valid FK reference when this queue is generated.
    */
   public fulfillBelongsTo(targetSchema: string) {
@@ -132,10 +132,15 @@ export default class Deployment {
     const mock = schema.fn();
     const path = schema.path();
     const prefix = schema.prefix || '';
-    
+
     const key = fbKey.key();
     const prefixPathAndKey = join(prefix + path + '.' + key);
-    set(db, prefixPathAndKey, { ...mock, ...overrides });
+    set(db, prefixPathAndKey, typeof mock === 'object'
+      ? { ...mock, ...overrides }
+      : overrides && typeof overrides !== 'object'
+        ? overrides
+        : mock
+    );
 
     return key;
   }

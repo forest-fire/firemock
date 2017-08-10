@@ -222,6 +222,10 @@ export default class Query<T = any>
     return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
   }
 
+  /**
+   * Reduce the dataset using filters (after sorts) but do not apply sort
+   * order to new SnapShot (so natural order is preserved)
+   */
   private process(): SnapShot<T> {
     const mockDatabaseResults: any[] = convert.hashToArray(
       get(db, normalizeRef(this.path), undefined)

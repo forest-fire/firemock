@@ -16,15 +16,15 @@ describe('Deployment', () => {
     home: h.chance.address
   });
 
-  it('Overriding the mock at deployment works', () => {
+  it('Overriding the mock at deployment works', async() => {
     const m = new Mock();
     m.addSchema('animal', animalMock);
     m.queueSchema('animal', 10);
     m.queueSchema('animal', 10, { age: 12 });
     m.generate();
 
-    const results = m.ref('/animals').onceSync('value');
-    const filtered = m.ref('/animals').equalTo(12, 'age').onceSync('value');
+    const results = await m.ref('/animals').once('value');
+    const filtered = await m.ref('/animals').orderByChild('age').equalTo(12, 'age').once('value');
 
     expect(results.numChildren()).to.equal(20);
     expect(filtered.numChildren()).to.equal(10);
@@ -56,9 +56,9 @@ describe('Deployment', () => {
     m.queueSchema('cat', 10);
     m.queueSchema('dog', 10);
     m.generate();
-    
+
     expect(length(m.db.dogs)).to.equal(0);
-    expect(length(m.db.cats)).to.equal(0); 
+    expect(length(m.db.cats)).to.equal(0);
     expect(length(m.db.animals)).to.equal(0);
     expect(length(m.db.auth)).to.equal(1);
     expect(length(m.db.auth.anonymous)).to.equal(1);

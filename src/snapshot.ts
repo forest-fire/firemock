@@ -9,7 +9,7 @@ import * as convert from 'typed-conversions';
  * a snapshot synchronously; if you wish to exit early
  * return a TRUE value
  */
-export type Action = (action: firebase.database.DataSnapshot) => boolean | void;
+export type Action = (record: SnapShot) => boolean | void;
 
 export default class SnapShot<T = any>
   implements firebase.database.DataSnapshot {
@@ -21,7 +21,9 @@ export default class SnapShot<T = any>
   }
 
   public val() {
-    return convert.arrayToHash(this._value);
+    return Array.isArray(this._value)
+      ? convert.arrayToHash(this._value)
+      : this._value;
   }
 
   public toJSON() {
@@ -61,12 +63,13 @@ export default class SnapShot<T = any>
     return this._value !== null;
   }
 
-  public forEach(action: Action) {
-    const records = convert.snapshotToArray(this);
-
-    const keys = Object.keys(this._value);
-    keys.forEach(key => {
-      const halt = action(new SnapShot(key, get(this._value, key)));
+  public forEach(actionCb: Action) {
+    const cloned: any = (this._value as any).slice(0);
+    const sorted = cloned.sort(this._sortingFunction);
+    sorted.map((item: any) => {
+      const noId = { ...{}, ...(item as any) };
+      delete noId.id;
+      const halt = actionCb(new SnapShot(item.id, noId));
       if (halt) {
         return true;
       }

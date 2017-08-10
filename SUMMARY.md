@@ -10,6 +10,7 @@
   - [Real-time Events](docs/firebase-api.md#realtime)
 - [Other Features](docs/other-features.md#top)
   - [Firebase IDs](docs/other-features.md#firebase-ids)
+  - [Initialize DB](docs/other-features.md#initialize-db)
   - [Network Delay](docs/other-features.md#network)
   - [View DB](docs/other-features.md#view-db)
   - [Synchronous Queries](docs/other-features.md#synchronous)

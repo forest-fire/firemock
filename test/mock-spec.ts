@@ -6,11 +6,11 @@ import Mock, { Delays } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last } from 'lodash';
 import SnapShot from '../src/snapshot';
-import { 
-  firstProp, 
-  lastProp, 
-  firstKey, 
-  lastKey 
+import {
+  firstProp,
+  lastProp,
+  firstKey,
+  lastKey
 } from '../src/util';
 
 const expect = chai.expect;
@@ -62,7 +62,7 @@ describe('Mock class()', () => {
         }));
       m.deploy
         .queueSchema('owner', 10).generate();
-      
+
       m.updateDB({
         monkeys: {
           a: { name: 'abbey' },
@@ -115,7 +115,7 @@ describe('Mock class()', () => {
       m.deploy
           .queueSchema('foo')
           .queueSchema('company')
-          .queueSchema('fungus') 
+          .queueSchema('fungus')
           .generate();
 
       expect(m.db.foos).is.equal(undefined);
@@ -133,12 +133,26 @@ describe('Mock class()', () => {
       m.deploy
         .queueSchema('foo')
         .generate();
-      
+
       expect(m.db.foos).is.equal(undefined);
       expect(m.db.cars).is.an('object');
-      
+
       expect(firstProp(m.db.cars).result).is.equal('result');
     });
+
+    it('Mocking function that returns a scalar works as intended', async() => {
+      const m = new Mock();
+      m.addSchema('number', (h) => () => h.faker.random.number({min: 0, max: 1000}));
+      m.addSchema('string', (h) => () => h.faker.random.words(3));
+      m.queueSchema('number', 10);
+      m.queueSchema('string', 10);
+      m.generate();
+
+      expect(firstProp(m.db.strings)).is.a('string');
+      expect(lastProp(m.db.strings)).is.a('string');
+      expect(firstProp(m.db.numbers)).is.a('number');
+      expect(lastProp(m.db.numbers)).is.a('number');
+    })
   });
 
   describe('Relationships', () => {
@@ -154,7 +168,7 @@ describe('Mock class()', () => {
         m
           .queueSchema('user')
           .generate();
-        
+
         expect(firstProp(m.db.users)).has.property('companyId');
         expect(firstProp(m.db.users).companyId).is.equal('');
       }
@@ -194,7 +208,7 @@ describe('Mock class()', () => {
         .queueSchema('user', 2)
           .fulfillBelongsTo('company')
         .generate();
-      
+
       expect(firstProp(m.db.users)).has.property('companyId');
       expect(firstProp(m.db.users).companyId).is.a('string');
       expect(firstProp(m.db.users).companyId.slice(0, 1)).is.equal('-');
@@ -220,7 +234,7 @@ describe('Mock class()', () => {
           .fulfillBelongsTo('company')
         .queueSchema('company', 10)
         .generate();
-      
+
       const firstCompanyId = firstProp(m.db.users).companyId;
       const companyIds = Object.keys(m.db.companies);
       expect(firstProp(m.db.users)).has.property('companyId');
@@ -238,7 +252,7 @@ describe('Mock class()', () => {
           })
           .hasMany('employee');
         m.deploy.queueSchema('company').generate();
-        
+
         expect(firstProp(m.db.companies).employees).is.equal(undefined);
       }
     );
@@ -254,7 +268,7 @@ describe('Mock class()', () => {
         m.deploy
           .queueSchema('company').quantifyHasMany('employee', 10)
           .generate();
-        
+
         expect(firstProp(m.db.companies).employees).is.an('object');
         expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
         expect(m.db.employees).to.not.be.an('object');
@@ -271,7 +285,7 @@ describe('Mock class()', () => {
         .hasMany('employee');
       m.addSchema('employee')
         .mock((h: SchemaHelper) => () => {
-          return { 
+          return {
             first: h.faker.name.firstName(),
             last: h.faker.name.lastName(),
           };
@@ -279,7 +293,7 @@ describe('Mock class()', () => {
       m.deploy.queueSchema('company')
         .quantifyHasMany('employee', 10)
         .generate();
-      
+
       expect(firstProp(m.db.companies).employees).is.an('object');
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
@@ -294,7 +308,7 @@ describe('Mock class()', () => {
         .hasMany('employee');
       m.addSchema('employee')
         .mock((h: SchemaHelper) => () => {
-          return { 
+          return {
             first: h.faker.name.firstName(),
             last: h.faker.name.lastName(),
           };
@@ -304,7 +318,7 @@ describe('Mock class()', () => {
         .queueSchema('company')
           .quantifyHasMany('employee', 10);
       m.deploy.generate();
-      
+
       const company = firstProp(m.db.companies);
       expect(company.employees).is.an('object');
       expect(Object.keys(company.employees).length).is.equal(10);
@@ -321,7 +335,7 @@ describe('Mock class()', () => {
         .hasMany('employee');
       m.addSchema('employee')
         .mock((h: SchemaHelper) => () => {
-          return { 
+          return {
             first: h.faker.name.firstName(),
             last: h.faker.name.lastName(),
           };
@@ -331,13 +345,12 @@ describe('Mock class()', () => {
         .queueSchema('company')
           .quantifyHasMany('employee', 10)
         .generate();
-      
+
       expect(firstProp(m.db.companies).employees).is.an('object');
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
       expect(Object.keys(m.db.employees).length).to.equal(10);
     });
-
   });
 
 
