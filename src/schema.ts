@@ -25,7 +25,7 @@ export interface ISchema {
  * A higher level function which receives a schema-helper and then
  * waits for lazy evaluation.
  */
-export type MockGeneratorCallback = (helper: SchemaHelper) => any;
+export type SchemaCallback = (helper: SchemaHelper) => any;
 /**
  * The property that exists on the source scheme as a FK reference
  * to the external schema/entity.
@@ -42,7 +42,7 @@ export default class Schema<T = any> {
   /**
    * Add a mocking function to be used to generate the schema in mock DB
    */
-  public mock(cb: MockGeneratorCallback) {
+  public mock(cb: SchemaCallback) {
     this._schemas.enqueue({
       id: this.schemaId,
       fn: cb(new SchemaHelper({})), // TODO: pass in support for DB lookups
@@ -118,7 +118,7 @@ export default class Schema<T = any> {
   }
 
   /** Add another schema */
-  public addSchema<D>(schema: string, mock?: MockGeneratorCallback) {
+  public addSchema<D>(schema: string, mock?: SchemaCallback) {
     const s = new Schema<D>(schema);
     if (mock) {
       s.mock(mock);

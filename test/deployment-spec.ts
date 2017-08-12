@@ -2,15 +2,16 @@ import 'mocha';
 import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
+// tslint:disable-next-line
 import { length } from './testing/helpers';
-import Mock, { MockGeneratorCallback } from '../src/mock';
+import Mock, { SchemaCallback } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last } from 'lodash';
 
 const expect = chai.expect;
 
 describe('Deployment', () => {
-  const animalMock: MockGeneratorCallback = h => () => ({
+  const animalMock: SchemaCallback = h => () => ({
     name: h.faker.name.firstName(),
     age: h.faker.helpers.randomize([1, 2, 4]),
     home: h.chance.address

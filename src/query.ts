@@ -1,6 +1,6 @@
 import { IDictionary } from 'common-types';
 import * as firebase from 'firebase-admin';
-import { db } from './database';
+import { db, addListener } from './database';
 import { get } from 'lodash';
 import SnapShot from './snapshot';
 import Queue from './queue';
@@ -13,6 +13,14 @@ import {
   getRandomInt,
   removeKeys
 } from './util';
+
+export type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
+export type GenericEventHandler = (snap: SnapShot, key?: string) => void;
+export type HandleValueEvent = (dataSnapShot: SnapShot) => void;
+export type HandleNewEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
+export type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
+export type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
+export type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 
 /** named network delays */
 export enum Delays {
@@ -29,6 +37,7 @@ export enum OrderingType {
   byKey = 'key',
   byValue = 'value'
 }
+
 export interface IOrdering {
   type: OrderingType;
   value: any;
@@ -95,7 +104,7 @@ export default class Query<T = any>
             break;
 
           default:
-            throw new Error('unknown ordering type: ' + this._order.type );
+            throw new Error('unknown ordering type: ' + this._order.type);
         }
       }
       return resultset.filter((item: any) => comparison(item) === value) as T[];
@@ -134,18 +143,17 @@ export default class Query<T = any>
   public on(
     eventType: firebase.database.EventType,
     callback: (a: admin.database.DataSnapshot | null, b?: string) => any,
-    cancelCallbackOrContext?: object | null,
+    cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
   ): (a: admin.database.DataSnapshot | null, b?: string) => any {
 
-    this._listeners.push({
-      path: this.path,
-
+    addListener(
+      this.path,
       eventType,
       callback,
       cancelCallbackOrContext,
       context
-    })
+    );
 
     return null;
   }

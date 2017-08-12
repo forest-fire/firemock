@@ -54,11 +54,31 @@ The example here shows the definition of "attributes" of each schema as well as 
 In the examples above, the mocking function is inline and as a result the variable `h` is known to be of type `SchemaHelper` which provides the  convenience intellisense for both faker and chance API's. However, it's often nice to define the mocking function externally to the `addSchema` call, here's an example of how you might do that and continue to get intellisense: 
 
 ```ts
-const personMock = (h: SchemaHelper) => () => ({
+import { Mock, SchemaCallback } from 'firemock';
+
+const personMock: SchemaCallback = (h) => () => ({
   name: h.faker.name.firstName + ' ' + h.faker.name.lastName,
   age: h.faker.random.number( {min: 1, max: 80} )
 });
 ```
+
+You can also go a step further and make explicit the data structure that your callback will produce with:
+
+```ts
+import { Mock, SchemaCallback } from 'firemock';
+
+export interface IPerson {
+  name: string;
+  age: number;
+}
+
+const personMock: SchemaCallback<IPerson> = (h) => () => ({
+  name: h.faker.name.firstName + ' ' + h.faker.name.lastName,
+  age: h.faker.random.number( {min: 1, max: 80} )
+});
+```
+
+Now if you add a property that doesn't belong, miss one that is required, put in as the wrong type, etc. ... you'll be immediately told that your generator callback is _not_ in line with the interface.
 
 ## Generating Mock Data {#generation}
 

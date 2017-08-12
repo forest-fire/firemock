@@ -2,7 +2,7 @@ import { first, last } from 'lodash';
 import { IDictionary } from 'common-types';
 import * as firebase from 'firebase-admin';
 
-export function normalizeRef(r: string) {
+export function normalizeRef(r: string): string {
   r = r.replace('/', '.');
   r = r.slice(0, 1) === '.'
     ? r.slice(1)
@@ -12,11 +12,11 @@ export function normalizeRef(r: string) {
 }
 
 export function parts(r: string) {
-  return normalizeRef(r).split('.');  
+  return normalizeRef(r).split('.');
 };
 
-/** 
- * return the last component of the path 
+/**
+ * return the last component of the path
  * which typically would represent the 'id'
  * of a list-node
  */
@@ -58,18 +58,45 @@ export function removeKeys(obj: IDictionary, remove: string[]) {
   }, {});
 }
 
+/**
+ * Joins a set of paths together and converts into
+ * correctly formatted "dot notation" directory path
+ */
 export function join(...paths: string[]) {
-  return paths.map(p => {
-    p = p.replace(/[\/\\]/gm, '.');
-    return p.slice(-1) === '.'
-      ? p.slice(0, p.length - 1)
-      : p;
-  }).join('.')
+  return paths
+    .map(p => {
+      return p.replace(/[\/\\]/gm, '.')
+    })
+    .map(p =>
+      p.slice(-1) === '.'
+        ? p.slice(0, p.length - 1)
+        : p
+    )
+    .map(p =>
+      p.slice(0,1) === '.'
+      ? p.slice(1)
+      : p
+    ).join('.')
+}
+
+export function pathDiff(longPath: string, pathSubset: string) {
+  const subset = pathSubset.split('.');
+  const long = longPath.split('.');
+  if(
+    subset.length > long.length ||
+    JSON.stringify(long.slice(0, subset.length)) !== JSON.stringify(subset)
+  ) {
+    throw new Error(`"${pathSubset}" is not a subset of ${longPath}`);
+  }
+
+  return long.length === subset.length
+    ? ''
+    : long.slice(subset.length - long.length).join('.');
 }
 
 export function orderedSnapToJS<T = any>(snap: firebase.database.DataSnapshot) {
   const jsObject: IDictionary<T> = {};
-  snap.forEach( record => jsObject[record.key] = record.val() );
+  snap.forEach(record => jsObject[record.key] = record.val());
 
   return jsObject;
 }

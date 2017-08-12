@@ -10,15 +10,17 @@ import Queue from './queue';
 import { db, clearDatabase, updateDatabase } from './database';
 import { getRandomInt, normalizeRef, leafNode } from './util';
 
+export {default as SchemaHelper} from './schema-helper';
+
 export interface ISchema {
   id: string;
   /** path to the database which is the root for given schema list */
   path: () => string;
   /** mock generator function */
   fn: () => IDictionary;
-  /** 
-   * the name of the entity being mocked, if not set then schema name 
-   * is assume to equal model name  
+  /**
+   * the name of the entity being mocked, if not set then schema name
+   * is assume to equal model name
    */
   modelName?: string;
   /** a static path that preceeds this schema's placement in the database */
@@ -33,8 +35,8 @@ export interface IRelationship {
   type: 'hasMany' | 'belongsTo';
   /** the source model */
   source: string;
-  /** 
-   * the property on the source model which is the FK 
+  /**
+   * the property on the source model which is the FK
    * (by default it will use standard naming conventions)
    */
   sourceProperty: string;
@@ -42,7 +44,8 @@ export interface IRelationship {
   target: string;
 }
 
-export type MockGeneratorCallback = (helper: SchemaHelper) => any;
+/** A Schema's mock callback generator must conform to this type signature */
+export type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
 
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
@@ -56,7 +59,7 @@ export default class Mock {
     clearDatabase();
     if (raw) {
       this.updateDB(raw);
-    } 
+    }
   }
 
   /**
@@ -69,8 +72,8 @@ export default class Mock {
   public get db() {
     return db;
   }
-  
-  public addSchema<S = any>(schema: string, mock?: MockGeneratorCallback) {
+
+  public addSchema<S = any>(schema: string, mock?: SchemaCallback) {
     const s = new Schema<S>(schema);
     if (mock) {
       s.mock(mock);
@@ -122,7 +125,7 @@ export default class Mock {
     if (delay === 'weak') { return getRandomInt(400, 900); }
     if (delay === 'mobile') { return getRandomInt(300, 500); }
     if (delay === 'WIFI') { return getRandomInt(10, 100); }
-    
+
     throw new Error('Delay property is of unknown format: ' + delay);
   }
 

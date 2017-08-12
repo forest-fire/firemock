@@ -1,8 +1,7 @@
-import 'mocha';
 import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
-import Mock, { Delays } from '../src/mock';
+import Mock, { Delays, SchemaCallback } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last, difference } from 'lodash';
 import SnapShot from '../src/snapshot';
@@ -14,11 +13,12 @@ import {
   orderedSnapToJS
 } from '../src/util';
 import * as convert from 'typed-conversions';
+import 'mocha';
 
 const expect = chai.expect;
 
 describe('Reference functions', () => {
-  const mocker = (h: SchemaHelper) => () => ({result: 'result'});
+  const mocker: SchemaCallback = (h) => () => ({result: 'result'});
 
   describe('Basic DB Querying', () => {
 

@@ -65,9 +65,7 @@ So now you start to see that filters like startAt, endAt, and equalTo are usable
 
 ## Writing to the Database {#writing}
 
-When we started talking about _schemas_ and _generation_, this was in essence a bulk way of writing data to the database. While this is typically done for initializing "state" into a desireable starting point it is not useful for testing Firebase code as this is not represented in Firebase's API. 
-
-For those of you Firebase ace's the API endpoints we are concerned about when writing to the database include operations such as: `set()`, `update()`, `push()`, and `remove()`. A simple example of this might fall along these lines:
+When we talked about the _Deployment API_, we were writing to the mock database but in an effort to "prepare" the starting state of the database. But in many of desired mock tests we will want to use Firebase API endpoints to write to the mock database. This includes: `set()`, `update()`, `push()`, and `remove()`. A simple example of this might fall along these lines:
 
 ```js
 const m = new Mock();
