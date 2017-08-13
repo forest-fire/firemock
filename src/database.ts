@@ -32,10 +32,10 @@ export function setDB(path: string, value: any) {
 export function updateDB(path: string, value: any) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
-  const newValue =
-    typeof oldValue === 'object' ? { ...oldValue, ...value } : value;
+  const newValue = typeof oldValue === 'object' ? { ...oldValue, ...value } : value;
 
   set(db, dotPath, newValue);
+  notify(dotPath, newValue, oldValue);
 }
 
 export function removeDB(path: string) {
@@ -144,13 +144,22 @@ export function listenerPaths(type?: firebase.database.EventType) {
 function notify(dotPath: string, newValue: any, oldValue: any) {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
     findValueListeners(dotPath).map(l => {
-      const result = {};
-      set(result, pathDiff(dotPath, l.path), newValue);
+      let result: IDictionary = {};
+      const listeningRoot = get(db, l.path);
+      if(typeof listeningRoot === 'object' && !newValue) {
+        result = get(db, l.path);
+        delete result[getKey(dotPath)];
+      } else {
+        set(result, pathDiff(dotPath, l.path), newValue);
+      }
       return l.callback(new SnapShot(join(l.path), result))
     });
-    // if (newValue === undefined) {
-    //   fireEvent('child_removed', dotPath, newValue, oldValue);
-    // }
+    if (newValue === undefined) {
+      const { parent, key } = keyAndParent(dotPath);
+      findChildListeners(parent, FirebaseEvent.child_removed).forEach(l => {
+        return l.callback(new SnapShot(key, newValue));
+      });
+    }
   }
 }
 
@@ -190,9 +199,25 @@ export function findValueListeners(path: string) {
 /**
  * Given a path, returns the parent path and child key
  */
-function parent(dotPath: string) {
+function keyAndParent(dotPath: string) {
   const parts = dotPath.split('.');
   const key = parts.pop();
-  const path = parts.join('.');
-  return { path, key };
+  const parent = parts.join('.');
+  return { parent, key };
+}
+
+/** Get the parent DB path */
+function getParent(dotPath: string) {
+  return keyAndParent(dotPath).parent;
+}
+
+/** Get the Key from the end of a path string */
+function getKey(dotPath: string) {
+  return keyAndParent(dotPath).key;
+}
+
+/** Clears the DB and removes all listeners */
+export function reset() {
+  removeAllListeners();
+  clearDatabase();
 }

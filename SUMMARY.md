@@ -13,8 +13,9 @@
   - [Initialize DB](docs/other-features.md#initialize-db)
   - [Network Delay](docs/other-features.md#network)
   - [View DB](docs/other-features.md#view-db)
+  - [Reset DB](docs/other-features.md#reset)
   - [Synchronous Queries](docs/other-features.md#synchronous)
-  - [Typing](docs/other-features.md#typing)
+  - [Advanced Typing](docs/other-features.md#typing)
 
 ---- 
 - [Related Repos](docs/related.md)

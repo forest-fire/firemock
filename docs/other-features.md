@@ -65,6 +65,22 @@ console.log(m.db.cats);
 
 The logging statement at the bottom will print out a JS hash of cats (who doesn't want that).
 
+### Resetting Mock Database {#reset}
+The mock database is a singleton which will continue to grow in records -- and listeners -- for the duration of your testing run. In many cases you may want to reset the database (this clears data and all listeners). Let's say you instead wanted each test to run with a fresh database, you could achieve that with:
+
+```ts
+describe('my tests', () => {
+  const m = new Mock();
+  beforeEach(() => {
+    m.resetDatabase();
+  });
+
+  it('test something');
+  it('test something else'); 
+});
+```
+
+
 ### Synchronous Querying {#synchronous}
 In general you'll want to use the asynchronous events that Firebase provides for changes but in some cases it might be useful to do synchronous queries. Firemock supports that through the following syntax:
 
@@ -78,7 +94,7 @@ m
 const results = m.ref('/cats').onceSync('value');
 ````
 
-### Generic Type Goodness {#typing}
+### Advanced Type Goodness {#typing}
 Because this library is fully written in Typescript you can explore the API with the super useful intellisense popups from the comfort of your favorite editor. Stop pretending this isn't exciting. Ok, but beyond that there's an attempt to provide generic types throughout so that you can provide additional type safety if you wish to. For example, you can specify your typing for a schema like so:
 
 ````js

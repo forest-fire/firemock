@@ -559,9 +559,9 @@ common-types@^1.1.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.1.1.tgz#9e926e06841d0e758755b9b2b2ba60887078dfe7"
 
-common-types@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.1.3.tgz#44fed1d4417cc1fdaa8b790bd2fd460159ee03d0"
+common-types@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.2.1.tgz#5c40e0d87b5ea4e54fd51d67910f9c0bfe8b2750"
 
 commondir@^1.0.1:
   version "1.0.1"

@@ -15,7 +15,8 @@ import {
   removeDB,
   updateDB,
   findChildListeners,
-  findValueListeners
+  findValueListeners,
+  reset
 } from '../src/database';
 import { GenericEventHandler, HandleValueEvent } from '../src/query';
 import 'mocha';
@@ -244,11 +245,10 @@ describe('Database', () => {
   });
 
   describe('Handle Events', () => {
-    it('listening to "value" responds to new child', (done) => {
-      removeAllListeners();
+    it('listening to "value" responds to NEW child', (done) => {
+      reset();
       const callback: HandleValueEvent = (snap) => {
         const record = helpers.firstRecord(snap.val());
-        console.log(record);
 
         expect(record.name).to.equal('Humpty Dumpty');
         expect(record.age).to.equal(5);
@@ -262,8 +262,31 @@ describe('Database', () => {
       });
     });
 
-    it('listening to "value" responds to deeply nested change', (done) => {
-      removeAllListeners();
+    it('listening to "value" responds to UPDATED child', (done) => {
+      reset();
+      const m = new Mock();
+      m.addSchema('person', personMock);
+      m.queueSchema('person', 10);
+      m.generate();
+      m.ref('/people').once('value')
+      .then(people => {
+        const firstKey = helpers.firstKey(people.val());
+        const firstRecord = helpers.firstRecord(people.val());
+        const callback: HandleValueEvent = (snap) => {
+          const list = snap.val();
+          const first = helpers.firstRecord(list);
+          expect(first.age).to.equal(firstRecord.age + 1);
+          done();
+        };
+        addListener('/people', FirebaseEvent.value, callback);
+        expect(listenerCount()).to.equal(1);
+        updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
+      });
+    });
+
+
+    it('listening to "value" responds to deeply nested CHANGE', (done) => {
+      reset();
       const callback: HandleValueEvent = (snap) => {
         const record = snap.val();
         expect(record.a.b.c.d.name).to.equal('Humpty Dumpty');
@@ -278,27 +301,37 @@ describe('Database', () => {
       });
     });
 
-    it('listening to "value" responds to removed child', async(done) => {
-      removeAllListeners();
-      let firstKey;
-      const callback: HandleValueEvent = (snap) => {
-        const list = snap.val();
-        expect(snap.numChildren()).to.equal(9);
-        done();
-      };
+    it('listening to "value" responds to REMOVED child', (done) => {
+      reset();
       const m = new Mock();
       m.addSchema('person', personMock);
       m.queueSchema('person', 10);
       m.generate();
-      addListener('/people', 'child_removed', callback);
-      expect(listenerCount()).to.equal(1);
-      const people = await m.ref('/people').once('value');
-      firstKey = helpers.firstKey(people.val());
-      removeDB(firstKey);
+      m.ref('/people').once('value')
+      .then(people => {
+        const firstKey = helpers.firstKey(people.val());
+        const callback: HandleValueEvent = (snap) => {
+          const list = snap.val();
+          expect(snap.numChildren()).to.equal(9);
+          expect(Object.keys(list)).to.not.include(firstKey);
+          done();
+        };
+        addListener('/people', FirebaseEvent.value, callback);
+        expect(listenerCount()).to.equal(1);
+        removeDB(`/people/${firstKey}`);
+      });
     });
-    it.skip('listening to "value" responds to updated child');
-    it.skip('listening to "value" responds to created leaf node');
-    it.skip('listening to "value" responds to removed leaf node');
+
+    it.skip('listening to "value" responds to scalar value set', (done) => {
+      reset();
+      const callback: HandleValueEvent = (snap) => {
+        const scalar = snap.val();
+        expect(scalar).to.not.equal(53);
+        done();
+      };
+      addListener('/scalar', FirebaseEvent.value, callback);
+      setDB('/scalar', 53);
+    });
     it.skip('"child_added" responds to new child');
     it.skip('"child_added" ignores changed child');
     it.skip('"child_added" ignores removed child');

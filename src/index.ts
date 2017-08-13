@@ -4,6 +4,7 @@ export { SchemaCallback } from './mock';
 export { default as Reference } from './reference';
 export { default as Query } from './query';
 export { default as SnapShot } from './snapshot';
+export { reset as resetDatabase } from './database';
 
 export {
   GenericEventHandler,
