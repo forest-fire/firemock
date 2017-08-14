@@ -5,6 +5,7 @@ import Mock, { Delays, SchemaCallback } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last, difference } from 'lodash';
 import SnapShot from '../src/snapshot';
+import { reset } from '../src/database';
 import {
   firstProp,
   lastProp,
@@ -20,76 +21,87 @@ const expect = chai.expect;
 describe('Reference functions', () => {
   const mocker: SchemaCallback = (h) => () => ({result: 'result'});
 
-  describe('Basic DB Querying', () => {
+  describe('Basic DB Querying: ', () => {
+    beforeEach(() => {
+      reset();
+    })
 
     it('using onceSync(), querying returns a synchronous result', () => {
       const m = new Mock();
       m.addSchema('cat', mocker);
       m.addSchema('bar', mocker);
       m.deploy.queueSchema('cat', 5).queueSchema('bar', 5).generate();
-      const results = m.ref('/cats').onceSync('value') as SnapShot;
-      expect(results.val).to.be.a('function');
-      expect(results.child).to.be.a('function');
-      expect(results.hasChild).to.be.a('function');
+      try {
+        const results = m.ref('/cats').onceSync('value') as SnapShot;
+        expect(results.val).to.be.a('function');
+        expect(results.child).to.be.a('function');
+        expect(results.hasChild).to.be.a('function');
 
-      expect(results.key).to.equal('cats');
-      expect(firstProp(results.val()).result).to.equal('result');
+        expect(results.key).to.equal('cats');
+        expect(firstProp(results.val()).result).to.equal('result');
+      } catch(e) {
+        throw new Error(e.message());
+      }
+
     });
 
-    it('with default 5ms delay, querying returns an asynchronous result', done => {
+    it('with default 5ms delay, querying returns an asynchronous result', () => {
       const m = new Mock();
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
       m.queueSchema('foo', 5)
         .queueSchema('bar', 5)
         .generate();
-      m.ref('/foos').once('value').then((results) => {
-        expect(results.numChildren()).is.equal(5);
-        expect(firstProp<string>(results.val()).result).to.equal('result');
-        done();
-      });
+      return m.ref('/foos').once('value')
+        .then((results) => {
+          expect(results.numChildren()).is.equal(5);
+          expect(firstProp<string>(results.val()).result).to.equal('result');
+        });
     });
 
-    it('with numeric delay, querying returns an asynchronous result', done => {
+    it('with numeric delay, querying returns an asynchronous result', async() => {
       const m = new Mock();
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
-      m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
+      m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(100);
-      m.ref('/foos').once('value').then((results: any) => {
-        expect(results.numChildren()).is.equal(5);
-        expect(firstProp(results.val()).result).is.equal('result');
-        done();
-      });
+      const results = await m.ref('/foos').once('value');
+
+      expect(results.numChildren()).is.equal(5);
+      expect(firstProp(results.val()).result).is.equal('result');
     });
 
-    it('with named delay, querying returns an asynchronous result', done => {
+    it('with named delay, querying returns an asynchronous result', () => {
       const m = new Mock();
+
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
-      m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
+      m.queueSchema('foo', 5);
+      m.queueSchema('bar', 5);
+      m.generate();
+
       m.setDelay(Delays.mobile);
-      m.ref('/foos').once('value').then(results => {
-        expect(results.numChildren()).is.equal(5);
-        expect(firstProp<string>(results.val()).result).is.equal('result');
-        done();
-      });
+      return m.ref('/foos').once('value')
+        .then(results => {
+          expect(results.numChildren()).is.equal(5);
+          expect(firstProp<string>(results.val()).result).is.equal('result');
+        });
     });
 
-    it('with delay range, querying returns an asynchronous result', done => {
+    it('with delay range, querying returns an asynchronous result', () => {
       const m = new Mock();
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
-      m.deploy.queueSchema('foo', 5).queueSchema('bar', 5).generate();
+      m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay([50, 80]);
-      m.ref('/foos').once('value').then((results: any) => {
-        expect(results.numChildren()).is.equal(5);
-        expect(firstProp(results.val()).result).is.equal('result');
-        done();
-      });
+      return m.ref('/foos').once('value')
+        .then((results: any) => {
+          expect(results.numChildren()).is.equal(5);
+          expect(firstProp(results.val()).result).is.equal('result');
+        });
     });
 
-    it('querying results can be iterated over with forEach()', done => {
+    it('querying results can be iterated over with forEach()', () => {
       const m = new Mock();
       m.addSchema('user').mock((h) => () => ({
         name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
@@ -97,17 +109,20 @@ describe('Reference functions', () => {
       }));
       m.deploy.queueSchema('user', 5).generate();
       m.setDelay([50, 80]);
-      m.ref('/users').once('value').then(snap => {
+      return m.ref('/users').once('value').then(snap => {
         snap.forEach(r => {
           expect(r.val()).to.be.an('object');
           expect(r.val().name).to.be.a('string');
         });
-        done();
       });
     });
 
   });
+
   describe('Filtered querying', () => {
+    beforeEach(() => {
+      reset();
+    })
 
     /**
      * Note: limitToFirst is cullening the key's which are biggest/newest which is
@@ -116,7 +131,7 @@ describe('Reference functions', () => {
     it('query list with limitToFirst() set', async() => {
       const m = new Mock();
       m.addSchema('monkey').mock(mocker);
-      m.deploy.queueSchema('monkey', 15).generate();
+      m.queueSchema('monkey', 15).generate();
       const snap = await m.ref('/monkeys')
         .limitToFirst(10)
         .once('value');
@@ -137,27 +152,24 @@ describe('Reference functions', () => {
      * Note: limitToLast is cullening the key's which are smallest/oldest which is
      * the start of the list.
      */
-    it('query list with limitToLast() set', done => {
+    it('query list with limitToLast() set', () => {
       const m = new Mock();
       m.addSchema('monkey').mock(mocker);
       m.deploy.queueSchema('monkey', 15).generate();
-      m.ref('/monkeys')
+      return m.ref('/monkeys')
         .limitToLast(10)
         .once('value')
         .then(snap => {
           const listOf = snap.val();
-
           expect(snap.numChildren()).to.equal(10);
           expect(Object.keys(m.db.monkeys).length).to.equal(15);
           expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
           expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
           expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
-
-          done();
         });
     });
 
-    it('equalTo() and orderByChild() work', done => {
+    it('equalTo() and orderByChild() work', () => {
       const m = new Mock();
       const young = (h: SchemaHelper) => () => ({
         first: h.faker.name.firstName(),
@@ -175,18 +187,17 @@ describe('Reference functions', () => {
         .queueSchema('oldPerson', 10)
         .queueSchema('youngPerson', 10)
         .generate();
-      m.ref('/people')
+      return m.ref('/people')
         .orderByChild('name')
         .equalTo(12, 'age')
         .once('value')
         .then(snap => {
           expect(Object.keys(m.db.people).length).to.equal(20);
           expect(snap.numChildren()).to.equal(10);
-          done();
         });
     });
 
-    it('startAt() filters a numeric property', () => {
+    it('startAt() filters a numeric property', async() => {
       const m = new Mock();
       m.addSchema('dog', (h) => () => ({
         name: h.faker.name.firstName,
@@ -198,9 +209,9 @@ describe('Reference functions', () => {
       m.queueSchema('dog', 10, { age: 10 });
       m.generate();
 
-      const results = m.ref('/dogs').onceSync('value');
-      const gettingMature = m.ref('/dogs').startAt(5, 'age').onceSync('value');
-      const mature = m.ref('/dogs').startAt(9, 'age').onceSync('value');
+      const results = await m.ref('/dogs').once('value');
+      const gettingMature = await m.ref('/dogs').startAt(5, 'age').once('value');
+      const mature = await m.ref('/dogs').startAt(9, 'age').once('value');
 
       expect(results.numChildren()).to.equal(30);
       expect(gettingMature.numChildren()).to.equal(20);
@@ -277,6 +288,10 @@ describe('Reference functions', () => {
   }); // End Filtered Querying
 
   describe('Sort Order', () => {
+    beforeEach(() => {
+      reset();
+    })
+
     const personMock = (h: SchemaHelper) => () => ({
       name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
       age: h.faker.random.number({min: 1, max: 80}),

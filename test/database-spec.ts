@@ -246,7 +246,7 @@ describe('Database', () => {
   });
 
   describe('Handle Events', () => {
-    it('listening to "value" responds to NEW child', (done) => {
+    it('"value" responds to NEW child', (done) => {
       reset();
       const callback: HandleValueEvent = (snap) => {
         const record = helpers.firstRecord(snap.val());
@@ -263,7 +263,7 @@ describe('Database', () => {
       });
     });
 
-    it('listening to "value" responds to UPDATED child', (done) => {
+    it('"value" responds to UPDATED child', (done) => {
       reset();
       const m = new Mock();
       m.addSchema('person', personMock);
@@ -286,7 +286,7 @@ describe('Database', () => {
     });
 
 
-    it('listening to "value" responds to deeply nested CHANGE', (done) => {
+    it('"value" responds to deeply nested CHANGE', (done) => {
       reset();
       const callback: HandleValueEvent = (snap) => {
         const record = snap.val();
@@ -302,7 +302,7 @@ describe('Database', () => {
       });
     });
 
-    it('listening to "value" responds to REMOVED child', (done) => {
+    it('"value" responds to REMOVED child', (done) => {
       reset();
       const m = new Mock();
       m.addSchema('person', personMock);
@@ -323,7 +323,7 @@ describe('Database', () => {
       });
     });
 
-    it('listening to "value" responds to scalar value set', (done) => {
+    it('"value" responds to scalar value set', (done) => {
       reset();
       const callback: HandleValueEvent = (snap) => {
         const scalar = snap.val();
@@ -349,14 +349,17 @@ describe('Database', () => {
       });
     });
     it('"child_added" ignores changed child', (done) => {
-      // note: picks up state from prior test
-      removeAllListeners();
+      reset();
+      set(db, 'people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
       const callback: HandleValueEvent = (snap) => {
         done('Should NOT have called callback!');
       };
       addListener('/people', FirebaseEvent.child_added, callback);
       const christy = helpers.firstKey(db.people);
-      updateDB(`/people/${christy}`, {
+      updateDB(`/people/abcd`, {
         age: 150
       });
       setTimeout(() => {
@@ -373,14 +376,89 @@ describe('Database', () => {
         done('Should NOT have called callback!');
       };
       addListener('/people', FirebaseEvent.child_added, callback);
-      const christy = helpers.firstKey(db.people);
-      removeDB(`/people/${christy}`);
+      removeDB(`/people/abcd`);
       setTimeout(() => {
         done();
       }, 50);
     });
 
-    it.skip('"child_added" ignores removed child');
-    it.skip('');
+    it('"child_removed" responds to removed child', done => {
+      reset();
+      set(db, 'people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
+      const callback: HandleValueEvent = (snap) => {
+        expect(db.people).to.be.an('object');
+        expect(Object.keys(db.people)).length(0);
+        done();
+      };
+      addListener('/people', FirebaseEvent.child_removed, callback);
+      removeDB(`/people/abcd`);
+    });
+
+    it('"child_removed" ignores added child', (done) => {
+      reset();
+
+      const callback: HandleValueEvent = (snap) => {
+        done('Should NOT have called callback!');
+      };
+      addListener('/people', FirebaseEvent.child_removed, callback);
+      setDB('people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
+      setTimeout(() => {
+        done();
+      }, 50);
+    });
+
+    it('"child_removed" ignores removal of non-existing child', (done) => {
+      reset();
+      const callback: HandleValueEvent = (snap) => {
+        done('Should NOT have called callback!');
+      };
+      addListener('/people', FirebaseEvent.child_removed, callback);
+      removeDB('people.abcdefg');
+      setTimeout(() => {
+        done();
+      }, 50);
+    });
+
+    it('"child_changed" responds to a new child', done => {
+      reset();
+      set(db, 'people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
+      const callback: HandleValueEvent = (snap) => {
+        expect(db.people).to.be.an('object');
+        expect(db.people).to.have.all.keys('abcd', snap.key)
+        expect(helpers.length(db.people)).to.equal(2);
+        expect(snap.val().name).to.equal('Barbara Streisand');
+        done();
+      };
+      addListener('/people', FirebaseEvent.child_changed, callback);
+      pushDB(`/people`, {
+        name: 'Barbara Streisand',
+        age: 70
+      });
+    });
+
+    it('"child_changed" responds to a removed child', done => {
+      reset();
+      set(db, 'people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
+      const callback: HandleValueEvent = (snap) => {
+        expect(db.people).to.be.an('object');
+        expect(db.people).to.not.have.key('abcd');
+        done();
+      };
+      addListener('/people', FirebaseEvent.child_changed, callback);
+      removeDB(`/people.abcd`);
+    });
+
   });
 });

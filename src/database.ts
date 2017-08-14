@@ -42,7 +42,13 @@ export function removeDB(path: string) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
 
-  set(db, dotPath, undefined);
+  const parentValue: any = get(db, getParent(dotPath));
+  if (typeof parentValue === 'object') {
+    delete parentValue[getKey(dotPath)];
+    set(db, getParent(dotPath), parentValue);
+  } else {
+    set(db, dotPath, undefined);
+  }
   notify(dotPath, undefined, oldValue);
 }
 
@@ -156,12 +162,13 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
     });
     if (newValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, FirebaseEvent.child_removed).forEach(l => {
+      findChildListeners(parent, FirebaseEvent.child_removed, FirebaseEvent.child_changed).forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
+
     } else if (oldValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, FirebaseEvent.child_added).forEach(l => {
+      findChildListeners(parent, FirebaseEvent.child_added, FirebaseEvent.child_changed).forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
     }
@@ -177,14 +184,14 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
  */
 export function findChildListeners(
   path: string,
-  eventType?: firebase.database.EventType
+  ...eventType: firebase.database.EventType[]
 ) {
   const correctPath = _listeners.filter(
     l => l.path === join(path) && l.eventType !== 'value'
   );
 
-  return eventType
-    ? correctPath.filter(l => l.eventType === eventType)
+  return eventType.length > 0
+    ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
     : correctPath;
 }
 

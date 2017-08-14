@@ -17,15 +17,14 @@ If you know how to query Firebase, then you know how to query the **firemock** A
 Here's a simple example :
 
 ```js
-it('test something about appointments', done => {
+it('test something about appointments', () => {
   // ... setup data ...
-  m.ref('/appointments')
+  return m.ref('/appointments')
     .once('value')
     .then(snap => {
       expect(snap.val()).is.an('object');
       expect(snap.key).is.equal('appointments');
       expect(snap.numChildren()).is.equal(25);
-      done();
     });
 });
 ```
@@ -46,9 +45,9 @@ Cool but basic. What if we wanted to test for appointments scheduled in the next
 
 ```js
 import * as moment from 'moment';
-it('appointments in the next week should exist', done => {
+it('appointments in the next week should exist', () => {
   // ... setup data ...
-  m.ref('/appointments')
+  return m.ref('/appointments')
     .startAt(moment().toISOString(), 'when')
     .endAt(moment().add(7, 'days').toISOString(), 'when')
     .once('value')
@@ -56,7 +55,6 @@ it('appointments in the next week should exist', done => {
       expect(snap.val()).is.an('object');
       expect(snap.key).is.a('string');
       expect(snap.numChildren()).is.equal(x);
-      done();
     });
 });
 ```
