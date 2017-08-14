@@ -2,7 +2,7 @@ import 'mocha';
 import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
-import Mock, { Delays } from '../src/mock';
+import Mock from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last } from 'lodash';
 import SnapShot from '../src/snapshot';
@@ -10,7 +10,8 @@ import {
   firstProp,
   lastProp,
   firstKey,
-  lastKey
+  lastKey,
+  Delays
 } from '../src/util';
 
 const expect = chai.expect;

@@ -20,7 +20,16 @@ import 'mocha';
 const expect = chai.expect;
 
 describe('Reference functions', () => {
-  const mocker: SchemaCallback = (h) => () => ({result: 'result'});
+  const mocker: SchemaCallback = (h) => () => ({
+    name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
+    gender: h.faker.helpers.randomize(['male', 'female']),
+    age: h.faker.random.number({min: 1, max: 10})
+  });
+  interface IMocker {
+    name: string;
+    gender: string;
+    age: number;
+  }
 
   describe('Basic DB Querying: ', () => {
     beforeEach(() => {
@@ -28,10 +37,15 @@ describe('Reference functions', () => {
     })
 
     it('using onceSync(), querying returns a synchronous result', () => {
+      reset();
       const m = new Mock();
-      m.addSchema('cat', mocker);
-      m.addSchema('bar', mocker);
-      m.deploy.queueSchema('cat', 5).queueSchema('bar', 5).generate();
+      m.addSchema('cat', (h) => () => ({
+        name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
+        gender: h.faker.helpers.randomize(['male', 'female'])
+      }));
+
+      m.queueSchema('cat', 5)
+      m.generate();
       try {
         const results = m.ref('/cats').onceSync('value') as SnapShot;
         expect(results.val).to.be.a('function');
@@ -39,24 +53,23 @@ describe('Reference functions', () => {
         expect(results.hasChild).to.be.a('function');
 
         expect(results.key).to.equal('cats');
-        expect(firstProp(results.val()).result).to.equal('result');
+        expect(firstProp(results.val()).name).to.be.a('string');
       } catch(e) {
-        throw new Error(e.message());
+        throw new Error(e);
       }
 
     });
 
     it('with default 5ms delay, querying returns an asynchronous result', () => {
+      reset();
       const m = new Mock();
-      m.addSchema('foo', mocker);
-      m.addSchema('bar', mocker);
-      m.queueSchema('foo', 5)
-        .queueSchema('bar', 5)
-        .generate();
+      m.addSchema<IMocker>('foo', mocker);
+      m.queueSchema('foo', 5).generate();
       return m.ref('/foos').once('value')
         .then((results) => {
           expect(results.numChildren()).is.equal(5);
-          expect(firstProp<string>(results.val()).result).to.equal('result');
+          expect(helpers.firstRecord(results.val()).name).to.be.a('string');
+          expect(helpers.firstRecord(results.val()).age).to.be.a('number');
         });
     });
 
@@ -69,7 +82,8 @@ describe('Reference functions', () => {
       const results = await m.ref('/foos').once('value');
 
       expect(results.numChildren()).is.equal(5);
-      expect(firstProp(results.val()).result).is.equal('result');
+      expect(helpers.firstRecord(results.val()).name).to.be.a('string');
+      expect(helpers.firstRecord(results.val()).age).to.be.a('number');
     });
 
     it('with named delay, querying returns an asynchronous result', () => {
@@ -85,7 +99,8 @@ describe('Reference functions', () => {
       return m.ref('/foos').once('value')
         .then(results => {
           expect(results.numChildren()).is.equal(5);
-          expect(firstProp<string>(results.val()).result).is.equal('result');
+          expect(helpers.firstRecord(results.val()).name).to.be.a('string');
+          expect(helpers.firstRecord(results.val()).age).to.be.a('number');
         });
     });
 
@@ -98,7 +113,8 @@ describe('Reference functions', () => {
       return m.ref('/foos').once('value')
         .then((results: any) => {
           expect(results.numChildren()).is.equal(5);
-          expect(firstProp(results.val()).result).is.equal('result');
+          expect(helpers.firstRecord(results.val()).name).to.be.a('string');
+          expect(helpers.firstRecord(results.val()).age).to.be.a('number');
         });
     });
 
