@@ -3,6 +3,7 @@ import { get } from 'lodash';
 import Reference from './reference';
 import * as firebase from 'firebase-admin';
 import * as convert from 'typed-conversions';
+import { getParent } from './util';
 
 /**
  * Each record in the forEach iteration will be passed

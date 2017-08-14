@@ -11,7 +11,11 @@ import {
   normalizeRef,
   leafNode,
   getRandomInt,
-  removeKeys
+  removeKeys,
+  DelayType,
+  Delays,
+  networkDelay,
+  setNetworkDelay
 } from './util';
 
 export type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
@@ -21,15 +25,6 @@ export type HandleNewEvent = (childSnapshot: SnapShot, prevChildKey: string) => 
 export type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
 export type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 export type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
-
-/** named network delays */
-export enum Delays {
-  random = 'random',
-  weak = 'weak-mobile',
-  mobile = 'mobile',
-  WiFi = 'WIFI'
-}
-export type DelayType = number | number[] | IDictionary<number> | Delays;
 
 export type QueryValue = number|string|boolean|null;
 export enum OrderingType {
@@ -158,11 +153,8 @@ export default class Query<T = any>
     return null;
   }
 
-  public once(eventType: 'value'): Promise<SnapShot<T>> {
-    const snapshot = this.process();
-    return new Promise(resolve => {
-      setTimeout(() => resolve(snapshot), this.delay());
-    });
+  public once(eventType: 'value') {
+    return networkDelay(this.process()) as Promise<SnapShot<T>>;
   }
 
   public onceSync(eventType: 'value'): SnapShot<T> {
@@ -253,7 +245,7 @@ export default class Query<T = any>
    */
   private processFilters(inputArray: T[]): T[] {
     let output = inputArray.slice(0);
-    this._queryFilters.forEach(q => output = q(output) );
+    this._queryFilters.forEach(q => output = q(output));
 
     return output as T[];
   }
@@ -302,38 +294,5 @@ export default class Query<T = any>
     }
 
     return sort;
-  }
-
-  private delay() {
-    const delay = this._delay as IDictionary | number | number[] | Delays;
-    if (typeof delay === 'number') {
-      return delay;
-    }
-
-    if (Array.isArray(delay)) {
-      const [min, max] = delay;
-      return getRandomInt(min, max);
-    }
-
-    if (typeof delay === 'object' && !Array.isArray(delay)) {
-      const { min, max } = delay;
-      return getRandomInt(min, max);
-    }
-
-    // these numbers need some reviewing
-    if (delay === 'random') {
-      return getRandomInt(10, 300);
-    }
-    if (delay === 'weak') {
-      return getRandomInt(400, 900);
-    }
-    if (delay === 'mobile') {
-      return getRandomInt(300, 500);
-    }
-    if (delay === 'WIFI') {
-      return getRandomInt(10, 100);
-    }
-
-    throw new Error('Delay property is of unknown format: ' + delay);
   }
 }

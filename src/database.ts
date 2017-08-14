@@ -3,7 +3,7 @@ import * as firebase from 'firebase-admin';
 import { IListener } from './query';
 import { set, get } from 'lodash';
 import { key as fbKey } from 'firebase-key';
-import { join, pathDiff } from '../src/util';
+import { join, pathDiff, getParent, getKey, keyAndParent } from '../src/util';
 import * as convert from 'typed-conversions';
 import SnapShot from './snapshot';
 export let db: IDictionary = [];
@@ -206,26 +206,6 @@ export function findValueListeners(path: string) {
   return _listeners.filter(
     l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === 'value'
   );
-}
-
-/**
- * Given a path, returns the parent path and child key
- */
-function keyAndParent(dotPath: string) {
-  const parts = dotPath.split('.');
-  const key = parts.pop();
-  const parent = parts.join('.');
-  return { parent, key };
-}
-
-/** Get the parent DB path */
-function getParent(dotPath: string) {
-  return keyAndParent(dotPath).parent;
-}
-
-/** Get the Key from the end of a path string */
-function getKey(dotPath: string) {
-  return keyAndParent(dotPath).key;
 }
 
 /** Clears the DB and removes all listeners */

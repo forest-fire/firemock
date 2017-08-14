@@ -1,7 +1,7 @@
 import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
-import Mock, { Delays, SchemaCallback } from '../src/mock';
+import Mock, { SchemaCallback } from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last, difference } from 'lodash';
 import SnapShot from '../src/snapshot';
@@ -11,7 +11,8 @@ import {
   lastProp,
   firstKey,
   lastKey,
-  orderedSnapToJS
+  orderedSnapToJS,
+  Delays
 } from '../src/util';
 import * as convert from 'typed-conversions';
 import 'mocha';
@@ -304,35 +305,6 @@ describe('Reference functions', () => {
     it('orderByChild() -- where child is a string -- sorts correctly', async () => {
       const m = new Mock();
       m.addSchema('person', personMock);
-      m.queueSchema('person', 5);
-      m.generate();
-      const results = m.ref('/people')
-        .orderByChild('name')
-        .onceSync('value');
-
-    });
-    it('orderByChild() -- where child is a number -- sorts correctly', async () => {
-      const m = new Mock();
-      m.addSchema('person', personMock);
-      m.queueSchema('person', 10);
-      m.generate();
-      const results = m.ref('/people')
-        .orderByChild('age')
-        .onceSync('value');
-
-      const orderedPeople = convert.snapshotToOrderedArray(results);
-      for(let i = 0; i <= 8; i++) {
-        expect(orderedPeople[i].age).is.gte(orderedPeople[i+1].age);
-      }
-      const orderedKeys = orderedPeople.map(p => p.id);
-      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
-      expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
-    });
-
-    it('orderByChild() -- where child is a string -- sorts correctly', async () => {
-      const m = new Mock();
-      m.addSchema('person', personMock);
       m.queueSchema('person', 10);
       m.generate();
       const results = m.ref('/people')
@@ -437,7 +409,98 @@ describe('Reference functions', () => {
         expect(person.age).to.equal(1);
       });
     });
+  });
 
+  describe('CRUD actions', () => {
+    beforeEach(() => {
+      reset();
+    })
+
+    it('push() can push record', async() => {
+      const m = new Mock();
+      await m.ref('/people').push({
+        name: 'Happy Jack',
+        age: 26
+      });
+      const people = (await m.ref('/people').once('value')).val();
+      expect(helpers.length(people)).to.equal(1);
+      expect(helpers.firstRecord(people).name).to.equal('Happy Jack');
+    });
+
+    it('push() can push scalar', async() => {
+      const m = new Mock();
+      await m.ref('/data').push(444);
+      const data = (await m.ref('/data').once('value')).val();
+      expect(helpers.firstRecord(data)).to.equal(444);
+    });
+
+    it('push() will call callback after pushing to DB', async() => {
+      const m = new Mock();
+      let count = 0;
+      const callback = () => count++;
+      await m.ref('/data').push(444, callback);
+      const data = (await m.ref('/data').once('value')).val();
+      expect(helpers.firstRecord(data)).to.equal(444);
+      expect(count).to.equal(1);
+    });
+
+    it('set() will set referenced path', async() => {
+      const m = new Mock();
+      await m.ref('/people/abcd').set({
+        name: 'Happy Jack',
+        age: 26
+      });
+      const people = (await m.ref('/people').once('value')).val();
+      expect(helpers.length(people)).to.equal(1);
+      expect(helpers.firstKey(people)).to.equal('abcd');
+      expect(helpers.firstRecord(people).name).to.equal('Happy Jack');
+    });
+
+    it('set() will call callback after setting referenced path ', async () => {
+      const m = new Mock();
+      let count = 0;
+      const callback = () => count++;
+      await m.ref('/people/abcd').set({
+        name: 'Happy Jack',
+        age: 26
+      }, callback);
+      const people = (await m.ref('/people').once('value')).val();
+      expect(helpers.firstRecord(people).name).to.equal('Happy Jack');
+      expect(count).to.equal(1);
+    });
+
+    it('update() will update referenced path', async() => {
+      const m = new Mock({
+        people: {
+          abcd: {
+            name: 'Happy Jack',
+            age: 35
+          }
+        }
+      });
+      await m.ref('/people/abcd').update({
+        age: 26
+      });
+      const people = (await m.ref('/people').once('value')).val();
+      expect(helpers.length(people)).to.equal(1);
+      expect(helpers.firstKey(people)).to.equal('abcd');
+      expect(helpers.firstRecord(people).name).to.equal('Happy Jack');
+      expect(helpers.firstRecord(people).age).to.equal(26);
+    });
+
+    it('remove() will remove data at referenced path', async() => {
+      const m = new Mock({
+        people: {
+          abcd: {
+            name: 'Happy Jack',
+            age: 35
+          }
+        }
+      });
+      await m.ref('/people/abcd').remove();
+      const people = (await m.ref('/people').once('value')).val();
+      expect(helpers.length(people)).to.equal(0);
+    });
   });
 
 });

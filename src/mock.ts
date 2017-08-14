@@ -8,7 +8,7 @@ import SchemaHelper from './schema-helper';
 import Schema from './schema';
 import Queue from './queue';
 import { db, clearDatabase, updateDatabase } from './database';
-import { getRandomInt, normalizeRef, leafNode } from './util';
+import { getRandomInt, normalizeRef, leafNode, DelayType, Delays, setNetworkDelay } from './util';
 
 export {default as SchemaHelper} from './schema-helper';
 
@@ -26,8 +26,6 @@ export interface ISchema {
   /** a static path that preceeds this schema's placement in the database */
   prefix?: string;
 }
-import { Delays, DelayType } from './query';
-export { Delays, DelayType } from './query';
 
 export interface IRelationship {
   id: string,
@@ -52,7 +50,6 @@ export default class Mock {
   private _schemas = new Queue<ISchema>('schemas').clear();
   private _relationships = new Queue<IRelationship>('relationships').clear();
   private _queues = new Queue('queues').clear();
-  private _delay?: DelayType = 5;
 
   constructor(raw?: IDictionary) {
     Queue.clearAll();
@@ -83,7 +80,7 @@ export default class Mock {
 
   /** Set the network delay for queries with "once" */
   public setDelay(d: DelayType) {
-    this._delay = d;
+    setNetworkDelay(d);
   }
 
   public get deploy() {
@@ -101,44 +98,7 @@ export default class Mock {
   }
 
   public ref = <T = IDictionary>(dbPath: string) => {
-    return new Reference<T>(dbPath, this._delay);
+    return new Reference<T>(dbPath);
   }
 
-  private delay() {
-    const delay = this._delay as IDictionary | number | number[] | Delays;
-    if (typeof delay === 'number') {
-      return delay;
-    }
-
-    if (Array.isArray(delay)) {
-      const [ min, max ] = delay;
-      return getRandomInt(min, max);
-    }
-
-    if (typeof delay === 'object' && !Array.isArray(delay)) {
-      const { min, max } = delay;
-      return getRandomInt(min, max);
-    }
-
-    // these numbers need some reviewing
-    if (delay === 'random') { return getRandomInt(10, 300); }
-    if (delay === 'weak') { return getRandomInt(400, 900); }
-    if (delay === 'mobile') { return getRandomInt(300, 500); }
-    if (delay === 'WIFI') { return getRandomInt(10, 100); }
-
-    throw new Error('Delay property is of unknown format: ' + delay);
-  }
-
-  private once = (reference: string) => <T = IDictionary>(eventType?: 'value') => {
-    const response = get(this.db, normalizeRef(reference), undefined);
-    const snapshot = new SnapShot<T>(leafNode(reference), response);
-
-    if (this._delay) {
-      return new Promise( resolve => {
-        setTimeout(() => resolve(snapshot), this.delay());
-      });
-    }
-
-    return snapshot;
-  }
 }

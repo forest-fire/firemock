@@ -42,7 +42,7 @@ export default class Reference<T = any>
   }
 
   public get root(): firebase.database.Reference {
-    return null;
+    return new Reference('/', db);
   }
 
   // TODO: this needs implementing
@@ -55,13 +55,13 @@ export default class Reference<T = any>
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
     removeDB(this.path);
     if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;;
+    return Promise.resolve(this) as firebase.database.ThenableReference;
   }
 
   public set(value: any, onComplete?: (a: Error | null) => any): Promise<void> {
     setDB(this.path, value);
     if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;;
+    return Promise.resolve(this) as firebase.database.ThenableReference;
   }
 
   public update(
