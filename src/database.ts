@@ -159,6 +159,11 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
       findChildListeners(parent, FirebaseEvent.child_removed).forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
+    } else if (oldValue === undefined) {
+      const { parent, key } = keyAndParent(dotPath);
+      findChildListeners(parent, FirebaseEvent.child_added).forEach(l => {
+        return l.callback(new SnapShot(key, newValue));
+      });
     }
   }
 }

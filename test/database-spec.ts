@@ -1,6 +1,7 @@
 import { IDictionary, FirebaseEvent } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
+import { set } from 'lodash';
 import Mock, { SchemaHelper, SchemaCallback } from '../src/mock';
 import {
   db,
@@ -322,7 +323,7 @@ describe('Database', () => {
       });
     });
 
-    it.skip('listening to "value" responds to scalar value set', (done) => {
+    it('listening to "value" responds to scalar value set', (done) => {
       reset();
       const callback: HandleValueEvent = (snap) => {
         const scalar = snap.val();
@@ -332,8 +333,53 @@ describe('Database', () => {
       addListener('/scalar', FirebaseEvent.value, callback);
       setDB('/scalar', 53);
     });
-    it.skip('"child_added" responds to new child');
-    it.skip('"child_added" ignores changed child');
+
+    it('"child_added" responds to NEW child', (done) => {
+      reset();
+      const callback: HandleValueEvent = (snap) => {
+        const person = snap.val();
+        expect(person.name).equal('Chris Christy');
+        expect(person.age).equal(100);
+        done();
+      };
+      addListener('/people', FirebaseEvent.child_added, callback);
+      pushDB('/people', {
+        name: 'Chris Christy',
+        age: 100
+      });
+    });
+    it('"child_added" ignores changed child', (done) => {
+      // note: picks up state from prior test
+      removeAllListeners();
+      const callback: HandleValueEvent = (snap) => {
+        done('Should NOT have called callback!');
+      };
+      addListener('/people', FirebaseEvent.child_added, callback);
+      const christy = helpers.firstKey(db.people);
+      updateDB(`/people/${christy}`, {
+        age: 150
+      });
+      setTimeout(() => {
+        done();
+      }, 50);
+    });
+    it('"child_added" ignores removed child', (done) => {
+      reset();
+      set(db, 'people.abcd', {
+        name: 'Chris Chisty',
+        age: 100
+      });
+      const callback: HandleValueEvent = (snap) => {
+        done('Should NOT have called callback!');
+      };
+      addListener('/people', FirebaseEvent.child_added, callback);
+      const christy = helpers.firstKey(db.people);
+      removeDB(`/people/${christy}`);
+      setTimeout(() => {
+        done();
+      }, 50);
+    });
+
     it.skip('"child_added" ignores removed child');
     it.skip('');
   });
