@@ -39,11 +39,7 @@ describe('Reference functions', () => {
     it('using onceSync(), querying returns a synchronous result', () => {
       reset();
       const m = new Mock();
-      m.addSchema('cat', (h) => () => ({
-        name: h.faker.name.firstName() + ' ' + h.faker.name.lastName(),
-        gender: h.faker.helpers.randomize(['male', 'female'])
-      }));
-
+      m.addSchema('cat', mocker);
       m.queueSchema('cat', 5)
       m.generate();
       try {
@@ -61,7 +57,6 @@ describe('Reference functions', () => {
     });
 
     it('with default 5ms delay, querying returns an asynchronous result', () => {
-      reset();
       const m = new Mock();
       m.addSchema<IMocker>('foo', mocker);
       m.queueSchema('foo', 5).generate();
@@ -80,7 +75,6 @@ describe('Reference functions', () => {
       m.queueSchema('foo', 5).queueSchema('bar', 5).generate();
       m.setDelay(100);
       const results = await m.ref('/foos').once('value');
-
       expect(results.numChildren()).is.equal(5);
       expect(helpers.firstRecord(results.val()).name).to.be.a('string');
       expect(helpers.firstRecord(results.val()).age).to.be.a('number');

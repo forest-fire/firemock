@@ -42,7 +42,7 @@ export interface IListener {
   path: string,
 
   eventType: firebase.database.EventType,
-  callback: (a: admin.database.DataSnapshot | null, b?: string) => any,
+  callback: (a: firebase.database.DataSnapshot | null, b?: string) => any,
   cancelCallbackOrContext?: object | null,
   context?: object | null
 }
@@ -137,10 +137,10 @@ export default class Query<T = any>
 
   public on(
     eventType: firebase.database.EventType,
-    callback: (a: admin.database.DataSnapshot | null, b?: string) => any,
+    callback: (a: firebase.database.DataSnapshot | null, b?: string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: admin.database.DataSnapshot | null, b?: string) => any {
+  ): (a: firebase.database.DataSnapshot | null, b?: string) => any {
 
     addListener(
       this.path,

@@ -93,12 +93,12 @@ export default class Reference<T = any>
     onComplete?: (
       a: Error | null,
       b: boolean,
-      c: admin.database.DataSnapshot | null
+      c: firebase.database.DataSnapshot | null
     ) => any,
     applyLocally?: boolean
   ): Promise<{
     committed: boolean;
-    snapshot: admin.database.DataSnapshot | null;
+    snapshot: firebase.database.DataSnapshot | null;
   }> {
     return Promise.resolve({
       committed: true,
