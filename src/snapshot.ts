@@ -3,7 +3,7 @@ import { get } from 'lodash';
 import Reference from './reference';
 import * as firebase from 'firebase-admin';
 import * as convert from 'typed-conversions';
-import { getParent } from './util';
+import { getParent, getKey, join } from './util';
 
 /**
  * Each record in the forEach iteration will be passed
@@ -15,10 +15,14 @@ export type Action = (record: SnapShot) => boolean | void;
 export default class SnapShot<T = any>
   implements firebase.database.DataSnapshot {
   private _sortingFunction: SortingFunction;
-  constructor(public key: string, private _value: T[] | T) {}
+  constructor(private _key: string, private _value: T[] | T) {}
+
+  public get key() {
+    return getKey(join(this._key));
+  }
 
   public get ref() {
-    return new Reference<T>(this.key) as firebase.database.Reference;
+    return new Reference<T>(this._key) as firebase.database.Reference;
   }
 
   public val() {
