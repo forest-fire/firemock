@@ -2,7 +2,7 @@ import 'mocha';
 import { IDictionary } from 'common-types';
 import * as chai from 'chai';
 import * as helpers from './testing/helpers';
-import Mock from '../src/mock';
+import Mock, {SchemaCallback} from '../src/mock';
 import SchemaHelper from '../src/schema-helper';
 import { first, last } from 'lodash';
 import SnapShot from '../src/snapshot';
@@ -15,6 +15,12 @@ import {
 } from '../src/util';
 
 const expect = chai.expect;
+
+const employeeMocker: SchemaCallback = (h: SchemaHelper) => () => ({
+  first: h.faker.name.firstName(),
+  last: h.faker.name.lastName(),
+  company: h.faker.company.companyName()
+});
 
 describe('Mock class()', () => {
   it('Mock → Schema API structured correctly', () => {
@@ -41,6 +47,7 @@ describe('Mock class()', () => {
   });
 
   describe('Building and basic config of database', () => {
+
     it('Sending in raw data to constructor allows manual setting of database state', () => {
       const m = new Mock({
         monkeys: {
@@ -351,6 +358,17 @@ describe('Mock class()', () => {
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
       expect(Object.keys(m.db.employees).length).to.equal(10);
+    });
+
+    it('Mock can generate more than once', () => {
+      const m = new Mock()
+      m.addSchema('employee', employeeMocker)
+      m.queueSchema('employee', 10);
+      m.generate();
+      expect(helpers.length(m.db.employees)).to.equal(10);
+      m.queueSchema('employee', 5);
+      m.generate();
+      expect(helpers.length(m.db.employees)).to.equal(15);
     });
   });
 

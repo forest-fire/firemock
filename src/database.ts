@@ -3,7 +3,7 @@ import * as firebase from 'firebase-admin';
 import { IListener } from './query';
 import { set, get } from 'lodash';
 import { key as fbKey } from 'firebase-key';
-import { join, pathDiff, getParent, getKey, keyAndParent } from '../src/util';
+import { join, pathDiff, getParent, getKey, keyAndParent } from './util';
 import * as convert from 'typed-conversions';
 import SnapShot from './snapshot';
 export let db: IDictionary = [];

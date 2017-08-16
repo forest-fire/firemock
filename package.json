@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -26,7 +26,7 @@
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
-    "cli": "ts-node cli/index.ts --"
+    "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
     "common-types": "^1.2.1",

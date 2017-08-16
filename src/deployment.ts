@@ -125,6 +125,8 @@ export default class Deployment {
         this.insertRelationshipLinks(q);
       }
     });
+
+    this._queue.clear();
   }
 
   private insertMockIntoDB(schemaId: string, overrides: IDictionary) {
