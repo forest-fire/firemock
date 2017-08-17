@@ -8,7 +8,7 @@ import * as convert from 'typed-conversions';
 import Reference from './reference';
 import {
   parts,
-  normalizeRef,
+  join,
   leafNode,
   getRandomInt,
   removeKeys,
@@ -228,7 +228,7 @@ export default class Query<T = any>
    */
   private process(): SnapShot<T> {
     const mockDatabaseResults: any[] = convert.hashToArray(
-      get(db, normalizeRef(this.path), undefined)
+      get(db, join(this.path), undefined)
     );
     const sorted: any[] = this.processSorting(mockDatabaseResults);
     const remainingIds = this.processFilters(sorted).map((f: any) => f.id);

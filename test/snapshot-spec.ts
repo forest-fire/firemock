@@ -14,5 +14,4 @@ describe('SnapShot:', () => {
     const s = new SnapShot('people/-Keyre2234as', { name: 'foobar' });
     expect(s.key).to.equal('-Keyre2234as');
   });
-
 });

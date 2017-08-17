@@ -36,7 +36,7 @@ describe('Reference functions', () => {
       reset();
     })
 
-    it('using onceSync(), querying returns a synchronous result', () => {
+    it.skip('using onceSync(), querying returns a synchronous result', () => {
       reset();
       const m = new Mock();
       m.addSchema('cat', mocker);
@@ -56,7 +56,7 @@ describe('Reference functions', () => {
 
     });
 
-    it('with default 5ms delay, querying returns an asynchronous result', () => {
+    it.skip('with default 5ms delay, querying returns an asynchronous result', () => {
       const m = new Mock();
       m.addSchema<IMocker>('foo', mocker);
       m.queueSchema('foo', 5).generate();
@@ -68,7 +68,7 @@ describe('Reference functions', () => {
         });
     });
 
-    it('with numeric delay, querying returns an asynchronous result', async() => {
+    it.skip('with numeric delay, querying returns an asynchronous result', async() => {
       const m = new Mock();
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
@@ -80,7 +80,7 @@ describe('Reference functions', () => {
       expect(helpers.firstRecord(results.val()).age).to.be.a('number');
     });
 
-    it('with named delay, querying returns an asynchronous result', () => {
+    it.skip('with named delay, querying returns an asynchronous result', () => {
       const m = new Mock();
 
       m.addSchema('foo', mocker);
@@ -98,7 +98,7 @@ describe('Reference functions', () => {
         });
     });
 
-    it('with delay range, querying returns an asynchronous result', () => {
+    it.skip('with delay range, querying returns an asynchronous result', () => {
       const m = new Mock();
       m.addSchema('foo', mocker);
       m.addSchema('bar', mocker);
