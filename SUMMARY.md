@@ -1,3 +1,4 @@
+<link rel="shortcut icon" href="docs/images/firemock-icon.png" type="image/x-icon">
 # Table of Contents
 
 - [Getting Started](README.md)
