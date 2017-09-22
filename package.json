@@ -32,6 +32,7 @@
     "common-types": "^1.2.1",
     "firebase-admin": "5.1.0",
     "firebase-key": "^1.0.4",
+    "gitbook-plugin-favicon": "^0.0.2",
     "moment": "^2.0.0",
     "typed-conversions": "^0.6.2"
   },

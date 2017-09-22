@@ -687,6 +687,10 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
+gitbook-plugin-favicon@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/gitbook-plugin-favicon/-/gitbook-plugin-favicon-0.0.2.tgz#b3e41642f152afc6c4535fd9b635dfe31b4c8772"
+
 glob-base@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-base/-/glob-base-0.3.0.tgz#dbb164f6221b1c0b1ccf82aea328b497df0ea3c4"
