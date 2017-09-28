@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/forest-fire/firemock.svg?branch=master)](https://travis-ci.org/forest-fire/firemock.svg?branch=master) [![MIT license](http://img.shields.io/badge/license-MIT-brightgreen.svg)](http://opensource.org/licenses/MIT)
+[![Build Status](https://travis-ci.org/forest-fire/firemock.svg?branch=master)](https://travis-ci.org/forest-fire/firemock.svg?branch=master) [![MIT license](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 
 ![](docs/images/firemock.jpg)
 
