@@ -1,22 +1,13 @@
 import { IDictionary } from 'common-types';
 import * as fbKey from 'firebase-key';
 import { get, set, first } from 'lodash';
-import { IRelationship, ISchema } from './mock';
+import { IRelationship, ISchema, IQueue } from './mock';
 import { getRandomInt, join } from './util';
 import Queue from './queue';
 import pluralize from './pluralize';
 import { db } from './database';
 
-export interface IQueue {
-  id: string;
-  schema: string;
-  quantity: number;
-  hasMany?: IDictionary<number>;
-  overrides?: IDictionary;
-  prefix: string;
-  /** the key refers to the property name, the value true means "fulfill" */
-  belongsTo?: IDictionary<boolean>;
-}
+
 export default class Deployment {
   private schemaId: string;
   private queueId: string;
@@ -115,13 +106,13 @@ export default class Deployment {
 
   public generate() {
 
-    this._queue.map(q => {
+    this._queue.map((q: IQueue) => {
       for (let i = q.quantity; i > 0; i--) {
         this.insertMockIntoDB(q.schema, q.overrides);
       }
     });
 
-    this._queue.map(q => {
+    this._queue.map((q: IQueue) => {
       for (let i = q.quantity; i > 0; i--) {
         this.insertRelationshipLinks(q);
       }
@@ -132,10 +123,10 @@ export default class Deployment {
 
   private insertMockIntoDB(schemaId: string, overrides: IDictionary) {
     const schema: ISchema = this._schemas.find(schemaId);
+
     const mock = schema.fn();
     const path = schema.path();
     const prefix = schema.prefix || '';
-    console.log(`path: "${path}"; prefix: "${prefix}"`);
 
     const key = fbKey.key();
     const prefixPathAndKey = join(prefix + path + '.' + key);

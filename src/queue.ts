@@ -23,7 +23,7 @@ export default class Queue<T = any> {
       throw new Error('A queue MUST have a named passed in to be managed');
     }
 
-    if (! Queue._queues[_name] ) {
+    if (! Queue._queues[_name]) {
       Queue._queues[_name] = [] as T[];
     }
   }
@@ -154,10 +154,10 @@ export default class Queue<T = any> {
       : queue.reduce((obj: IDictionary, item: any) => obj = { ...obj, ...{[item]: true} }, new Object());
   }
 
-  public map(fn: (f: any) => any) {
-    const queue = Queue._queues[this._name];
-    return queue
-      ? queue.map(fn) as T[]
+  public map(fn: (f: any) => any): T[] {
+    const queuedSchemas = Queue._queues[this._name];
+    return queuedSchemas
+      ? queuedSchemas.map(fn) as T[]
       : [];
   }
 

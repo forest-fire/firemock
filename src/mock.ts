@@ -42,6 +42,18 @@ export interface IRelationship {
   target: string;
 }
 
+/** Queued up schema's ready for generation */
+export interface IQueue {
+  id: string;
+  schema: string;
+  quantity: number;
+  hasMany?: IDictionary<number>;
+  overrides?: IDictionary;
+  prefix: string;
+  /** the key refers to the property name, the value true means "fulfill" */
+  belongsTo?: IDictionary<boolean>;
+}
+
 /** A Schema's mock callback generator must conform to this type signature */
 export type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
 
@@ -49,7 +61,7 @@ export type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
 export default class Mock {
   private _schemas = new Queue<ISchema>('schemas').clear();
   private _relationships = new Queue<IRelationship>('relationships').clear();
-  private _queues = new Queue('queues').clear();
+  private _queues = new Queue<IQueue>('queues').clear();
 
   constructor(raw?: IDictionary) {
     Queue.clearAll();
