@@ -159,6 +159,30 @@ describe('Reference functions', () => {
       expect(Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))).to.equal(-1);
     });
 
+    it('limitToFirst() an equalTo() query', async () => {
+      const m = new Mock();
+      m.addSchema('monkey').mock(mocker);
+      m.queueSchema('monkey', 15)
+      m.queueSchema('monkey', 3, { name: 'Space Monkey' });
+      m.generate();
+      let snap = await m.ref('/monkeys')
+        .orderByChild('name')
+        .limitToFirst(1)
+        .equalTo('Space Monkey')
+        .once('value');
+      expect(snap.numChildren()).to.equal(1);
+      expect(helpers.firstRecord(snap.val()).name).to.equal('Space Monkey');
+
+      snap = await m.ref('/monkeys')
+      .orderByChild('name')
+      .limitToFirst(4)
+      .equalTo('Space Monkey')
+      .once('value');
+      expect(snap.numChildren()).to.equal(3);
+      expect(helpers.firstRecord(snap.val()).name).to.equal('Space Monkey');
+
+    });
+
     /**
      * Note: limitToLast is cullening the key's which are smallest/oldest which is
      * the start of the list.

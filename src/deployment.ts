@@ -24,7 +24,7 @@ export default class Deployment {
     /** The number of this schema to generate */
     quantity: number = 1,
     /** Properties in the schema template which should be overriden with a static value */
-    overrides: IDictionary<Partial<T>> = {}
+    overrides: Partial<T> = {}
   ) {
     this.schemaId = schemaId;
     this.queueId = fbKey.key();

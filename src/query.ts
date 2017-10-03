@@ -49,13 +49,16 @@ export interface IListener {
 
 export type IQueryFilter<T> = (resultset: T[]) => T[];
 
-export default class Query<T = any>
-  implements firebase.database.Query {
-  protected _queryFilters: Array<IQueryFilter<T>> = [];
+/** tslint:ignore:member-ordering */
+export default class Query<T = any> implements firebase.database.Query {
   protected _order: IOrdering = { type: OrderingType.byKey, value: null };
   protected _listeners = new Queue<IListener>('listeners');
+  protected _limitFilters: Array<IQueryFilter<T>> = [];
+  protected _queryFilters: Array<IQueryFilter<T>> = [];
 
   constructor(public path: string, protected _delay: DelayType = 5) {}
+
+
 
   public get ref(): firebase.database.Reference {
     return new Reference<T>(this.path, this._delay);
@@ -65,7 +68,7 @@ export default class Query<T = any>
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.slice(resultset.length - num);
     };
-    this._queryFilters.push(filter);
+    this._limitFilters.push(filter);
 
     return this;
   }
@@ -74,7 +77,7 @@ export default class Query<T = any>
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.slice(0, num);
     };
-    this._queryFilters.push(filter);
+    this._limitFilters.push(filter);
 
     return this;
   }
@@ -89,17 +92,17 @@ export default class Query<T = any>
       if(!key) {
         switch(this._order.type) {
           case OrderingType.byChild:
-            comparison = (item) => item[this._order.value];
-            break;
+          comparison = (item) => item[this._order.value];
+          break;
           case OrderingType.byKey:
-            comparison = (item) => item.id;
-            break;
+          comparison = (item) => item.id;
+          break;
           case OrderingType.byValue:
-            comparison = (item) => item;
-            break;
+          comparison = (item) => item;
+          break;
 
           default:
-            throw new Error('unknown ordering type: ' + this._order.type);
+          throw new Error('unknown ordering type: ' + this._order.type);
         }
       }
       return resultset.filter((item: any) => comparison(item) === value) as T[];
@@ -113,8 +116,8 @@ export default class Query<T = any>
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.filter((record: any) => {
         return key
-          ? record[key] >= value
-          : record >= value
+        ? record[key] >= value
+        : record >= value
       });
     };
     this._queryFilters.push(filter);
@@ -126,8 +129,8 @@ export default class Query<T = any>
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.filter((record: any) => {
         return key
-          ? record[key] <= value
-          : record <= value
+        ? record[key] <= value
+        : record <= value
       });
     };
     this._queryFilters.push(filter);
@@ -246,6 +249,7 @@ export default class Query<T = any>
   private processFilters(inputArray: T[]): T[] {
     let output = inputArray.slice(0);
     this._queryFilters.forEach(q => output = q(output));
+    this._limitFilters.forEach(q => output = q(output));
 
     return output as T[];
   }
