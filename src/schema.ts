@@ -46,11 +46,13 @@ export default class Schema<T = any> {
     this._schemas.enqueue({
       id: this.schemaId,
       fn: cb(new SchemaHelper({})), // TODO: pass in support for DB lookups
-      path: () =>
-        this._schemas.find(this.schemaId).prefix +
-        this._schemas.find(this.schemaId).modelName
-            ? pluralize(this._schemas.find(this.schemaId).modelName)
-            : pluralize(this.schemaId)
+      path: () => {
+        const schema: ISchema = this._schemas.find(this.schemaId);
+        return [
+          schema.prefix,
+          schema.modelName ? pluralize(schema.modelName) : pluralize(this.schemaId)
+        ].join('/');
+      }
     });
 
     return this;
@@ -69,9 +71,10 @@ export default class Schema<T = any> {
 
   /** prefixes a static path to the beginning of the  */
   public pathPrefix(prefix: string) {
-    prefix = prefix.slice(-1) === '/' ? prefix : prefix + '/';
+    prefix = prefix.replace(/\./g, '/'); // slash reference preferred over dot
+    prefix = prefix.slice(-1) === '/' ? prefix.slice(0, prefix.length - 1) : prefix;
+
     this._schemas.update(this.schemaId, { prefix });
-    console.log('SCHEMA PREFIX: ', this._schemas.find(this.schemaId));
 
     return this;
   }

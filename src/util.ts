@@ -111,6 +111,12 @@ export function keyAndParent(dotPath: string) {
   return { parent, key };
 }
 
+/** converts a '/' delimited path to a '.' delimited one */
+export function dotNotation(path: string) {
+  path = path.slice(0, 1) === '/' ? path.slice(1) : path;
+  return path ? path.replace(/\//g, '.') : undefined;
+}
+
 /** Get the parent DB path */
 export function getParent(dotPath: string) {
   return keyAndParent(dotPath).parent;

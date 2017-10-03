@@ -2,7 +2,7 @@ import { IDictionary } from 'common-types';
 import * as fbKey from 'firebase-key';
 import { get, set, first } from 'lodash';
 import { IRelationship, ISchema, IQueue } from './mock';
-import { getRandomInt, join } from './util';
+import { getRandomInt, join, dotNotation } from './util';
 import Queue from './queue';
 import pluralize from './pluralize';
 import { db } from './database';
@@ -126,11 +126,9 @@ export default class Deployment {
 
     const mock = schema.fn();
     const path = schema.path();
-    const prefix = schema.prefix || '';
-
     const key = fbKey.key();
-    const prefixPathAndKey = join(prefix + path + '.' + key);
-    set(db, prefixPathAndKey, typeof mock === 'object'
+
+    set(db, dotNotation(path) + `.${key}`, typeof mock === 'object'
       ? { ...mock, ...overrides }
       : overrides && typeof overrides !== 'object'
         ? overrides
@@ -179,10 +177,10 @@ export default class Deployment {
 
       const property = r.sourceProperty;
       const path = source.path();
-      const recordList: IDictionary = get(db, source.path(), {});
+      const recordList: IDictionary = get(db, dotNotation(source.path()), {});
 
       Object.keys(recordList).forEach(key => {
-        set(db, `${source.path()}.${key}.${property}`, getID());
+        set(db, `${dotNotation(source.path())}.${key}.${property}`, getID());
       });
     });
 
@@ -223,11 +221,11 @@ export default class Deployment {
       const property = r.sourceProperty;
 
       const path = source.path();
-      const sourceRecords: IDictionary = get(db, source.path(), {});
+      const sourceRecords: IDictionary = get(db, dotNotation(source.path()), {});
 
       Object.keys(sourceRecords).forEach(key => {
         for (let i = 1; i <= howMany; i++) {
-          set(db, `${source.path()}.${key}.${property}.${getID()}`, true);
+          set(db, `${dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
         }
       });
     });

@@ -14,7 +14,7 @@ describe('Deployment', () => {
   const animalMock: SchemaCallback = h => () => ({
     name: h.faker.name.firstName(),
     age: h.faker.helpers.randomize([1, 2, 4]),
-    home: h.chance.address
+    home: h.chance.address()
   });
 
   it('Overriding the mock at deployment works', async() => {
@@ -54,8 +54,8 @@ describe('Deployment', () => {
       .addSchema('dog', animalMock)
       .modelName('animal')
       .pathPrefix('auth/anonymous/');
-    m.queueSchema('cat', 10);
-    m.queueSchema('dog', 10);
+    m.queueSchema('cat', 10, {kind: 'cat'});
+    m.queueSchema('dog', 10, {kind: 'dog'});
     m.generate();
 
     expect(length(m.db.dogs)).to.equal(0);
