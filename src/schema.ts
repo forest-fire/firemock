@@ -71,6 +71,7 @@ export default class Schema<T = any> {
   public pathPrefix(prefix: string) {
     prefix = prefix.slice(-1) === '/' ? prefix : prefix + '/';
     this._schemas.update(this.schemaId, { prefix });
+    console.log('SCHEMA PREFIX: ', this._schemas.find(this.schemaId));
 
     return this;
   }

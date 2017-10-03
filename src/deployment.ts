@@ -114,6 +114,7 @@ export default class Deployment {
   }
 
   public generate() {
+
     this._queue.map(q => {
       for (let i = q.quantity; i > 0; i--) {
         this.insertMockIntoDB(q.schema, q.overrides);
@@ -134,6 +135,7 @@ export default class Deployment {
     const mock = schema.fn();
     const path = schema.path();
     const prefix = schema.prefix || '';
+    console.log(`path: "${path}"; prefix: "${prefix}"`);
 
     const key = fbKey.key();
     const prefixPathAndKey = join(prefix + path + '.' + key);

@@ -87,7 +87,7 @@ export default class Mock {
     return new Deployment();
   }
 
-  public queueSchema<T = any>(schemaId: string, quantity: number = 1, overrides: IDictionary<Partial<T>> = {}) {
+  public queueSchema<T = any>(schemaId: string, quantity: number = 1, overrides: IDictionary = {}) {
     const d = new Deployment();
     d.queueSchema(schemaId, quantity, overrides);
     return d;

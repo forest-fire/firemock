@@ -6,9 +6,9 @@ export type Key = string | number;
 
 /**
  * Queue Class
- * 
+ *
  * A generic class for building singleton queues;
- * this is used as a container for schemas, deployment queues, 
+ * this is used as a container for schemas, deployment queues,
  * and relationships
  */
 export default class Queue<T = any> {
@@ -25,7 +25,7 @@ export default class Queue<T = any> {
 
     if (! Queue._queues[_name] ) {
       Queue._queues[_name] = [] as T[];
-    } 
+    }
   }
 
   public get name() {
@@ -148,7 +148,7 @@ export default class Queue<T = any> {
             const o = Object.assign({}, item);
             delete o[this.pkProperty];
             return { ...obj, ...{ [pk]: o } };
-          }, 
+          },
           new Object()
         )
       : queue.reduce((obj: IDictionary, item: any) => obj = { ...obj, ...{[item]: true} }, new Object());
@@ -170,6 +170,10 @@ export default class Queue<T = any> {
 
   public toJSON() {
     return JSON.stringify(Queue._queues);
+  }
+
+  public toObject() {
+    return Queue._queues;
   }
 
   private _find(key: string | number) {

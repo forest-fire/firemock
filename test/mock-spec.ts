@@ -148,6 +148,18 @@ describe('Mock class()', () => {
       expect(firstProp(m.db.cars).result).is.equal('result');
     });
 
+    it('using pathPrefix the generated data is appropriately offset', async() => {
+      const m = new Mock();
+      m.addSchema('car')
+        .mock((h: SchemaHelper) => () => ({result: 'result'}))
+        .pathPrefix('authenticated');
+      m.deploy
+        .queueSchema('car', 10)
+        .generate();
+
+      expect(m.db.authenticated).is.an('object');
+    })
+
     it('Mocking function that returns a scalar works as intended', async() => {
       const m = new Mock();
       m.addSchema('number', (h) => () => h.faker.random.number({min: 0, max: 1000}));
