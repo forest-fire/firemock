@@ -117,6 +117,10 @@ export function dotNotation(path: string) {
   return path ? path.replace(/\//g, '.') : undefined;
 }
 
+export function slashNotation(path: string) {
+  return path.replace(/\./g, '/');
+}
+
 /** Get the parent DB path */
 export function getParent(dotPath: string) {
   return keyAndParent(dotPath).parent;

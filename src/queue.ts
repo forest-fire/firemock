@@ -62,7 +62,7 @@ export default class Queue<T = any> {
    */
   public dequeue(key: string | number) {
     const queue = Queue._queues[this._name];
-    if (queue.length === 0 ) {
+    if (queue.length === 0) {
       throw new Error(`Queue ${this._name} is empty. Can not dequeue ${key}.`);
     }
 

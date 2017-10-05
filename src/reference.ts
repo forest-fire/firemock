@@ -9,7 +9,9 @@ import {
   normalizeRef,
   leafNode,
   getRandomInt,
-  removeKeys
+  removeKeys,
+  join,
+  slashNotation
 } from './util';
 
 import * as firebase from 'firebase-admin';
@@ -47,7 +49,8 @@ export default class Reference<T = any>
 
   // TODO: this needs implementing
   public push(value?: any, onComplete?: (a: Error | null) => any) {
-    pushDB(this.path, value);
+    const id = pushDB(this.path, value);
+    this.path = join(this.path, id);
     if(onComplete) { onComplete(null); }
     return Promise.resolve(this) as firebase.database.ThenableReference;
   }
@@ -108,6 +111,10 @@ export default class Reference<T = any>
 
   public onDisconnect(): firebase.database.OnDisconnect {
     return new Disconnected();
+  }
+
+  public toString() {
+    return slashNotation(join('https://mockdb.local', this.path, this.key));
   }
 
 }
