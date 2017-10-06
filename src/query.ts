@@ -86,6 +86,7 @@ export default class Query<T = any> implements firebase.database.Query {
     if(key && this._order.type === OrderingType.byKey) {
       throw new Error('You can not use equalTo\'s key property when using a key sort!');
     }
+    key = key ? key : this._order.value;
 
     const filter: IQueryFilter<T> = (resultset: T[]) => {
       let comparison: (item: any) => any = (item) => item[key];
@@ -113,6 +114,7 @@ export default class Query<T = any> implements firebase.database.Query {
   }
 
   public startAt(value: QueryValue, key?: string) {
+    key = key ? key : this._order.value;
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.filter((record: any) => {
         return key
@@ -126,6 +128,7 @@ export default class Query<T = any> implements firebase.database.Query {
   }
 
   public endAt(value: QueryValue, key?: string) {
+    key = key ? key : this._order.value;
     const filter: IQueryFilter<T> = (resultset) => {
       return resultset.filter((record: any) => {
         return key
