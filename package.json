@@ -1,20 +1,12 @@
 {
   "name": "firemock",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
   "author": "Ken Snyder<ken@ken.net>",
-  "keywords": [
-    "serverless",
-    "typescript",
-    "firebase",
-    "mocking",
-    "testing"
-  ],
-  "files": [
-    "lib"
-  ],
+  "keywords": ["serverless", "typescript", "firebase", "mocking", "testing"],
+  "files": ["lib"],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {

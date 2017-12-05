@@ -1,6 +1,6 @@
-import { IDictionary } from 'common-types';
-import { first } from 'lodash';
-import * as fbKey from 'firebase-key';
+import { IDictionary } from "common-types";
+import { first } from "lodash";
+import * as fbKey from "firebase-key";
 
 export type Key = string | number;
 
@@ -16,14 +16,14 @@ export default class Queue<T = any> {
     Queue._queues = {};
   }
   private static _queues: IDictionary = {};
-  public pkProperty = 'id';
+  public pkProperty = "id";
 
   constructor(private _name: string) {
     if (!_name) {
-      throw new Error('A queue MUST have a named passed in to be managed');
+      throw new Error("A queue MUST have a named passed in to be managed");
     }
 
-    if (! Queue._queues[_name]) {
+    if (!Queue._queues[_name]) {
       Queue._queues[_name] = [] as T[];
     }
   }
@@ -48,8 +48,8 @@ export default class Queue<T = any> {
    */
   public push(queueItem: any) {
     const id = fbKey.key();
-    if (typeof queueItem !== 'object') {
-      throw new Error('Using push() requires that the payload is an object');
+    if (typeof queueItem !== "object") {
+      throw new Error("Using push() requires that the payload is an object");
     }
     queueItem[this.pkProperty] = id;
     this.enqueue(queueItem);
@@ -66,9 +66,10 @@ export default class Queue<T = any> {
       throw new Error(`Queue ${this._name} is empty. Can not dequeue ${key}.`);
     }
 
-    Queue._queues[this._name] = typeof first(queue) === 'object'
-      ? queue.filter((item: any) => item[this.pkProperty] !== key)
-      : queue.filter((item: any) => item !== key);
+    Queue._queues[this._name] =
+      typeof first(queue) === "object"
+        ? queue.filter((item: any) => item[this.pkProperty] !== key)
+        : queue.filter((item: any) => item !== key);
 
     return this;
   }
@@ -84,12 +85,12 @@ export default class Queue<T = any> {
   }
 
   public find(key: Key) {
-    const [ obj, index ] = this._find(key);
+    const [obj, index] = this._find(key);
     return obj;
   }
 
   public indexOf(key: Key) {
-    const [ obj, index ] = this._find(key);
+    const [obj, index] = this._find(key);
     return index;
   }
 
@@ -99,9 +100,7 @@ export default class Queue<T = any> {
 
   public replace(key: Key, value: any) {
     value[this.pkProperty] = key;
-    this
-      .dequeue(key)
-      .enqueue(value as T);
+    this.dequeue(key).enqueue(value as T);
 
     return this;
   }
@@ -111,9 +110,9 @@ export default class Queue<T = any> {
     if (currently) {
       this.dequeue(key);
     }
-    if (typeof currently === 'object' && typeof value === 'object') {
+    if (typeof currently === "object" && typeof value === "object") {
       value[this.pkProperty] = key;
-      const updated = { ...currently as object, ...value as object };
+      const updated = { ...currently as any, ...value as any };
       this.enqueue(updated as T);
     } else {
       throw new Error(`Current and updated values must be objects!`);
@@ -136,36 +135,33 @@ export default class Queue<T = any> {
   /** returns the Queue as a JS Object */
   public toHash() {
     const queue = Queue._queues[this._name];
-    if(!queue || queue.length === 0) {
+    if (!queue || queue.length === 0) {
       return new Object();
     }
 
-    return (typeof first(queue) === 'object')
-      ? queue.reduce(
-          (obj: IDictionary, item: any) => {
-            const pk: string = item[this.pkProperty];
-            // tslint:disable-next-line
-            const o = Object.assign({}, item);
-            delete o[this.pkProperty];
-            return { ...obj, ...{ [pk]: o } };
-          },
+    return typeof first(queue) === "object"
+      ? queue.reduce((obj: IDictionary, item: any) => {
+          const pk: string = item[this.pkProperty];
+          // tslint:disable-next-line
+          const o = Object.assign({}, item);
+          delete o[this.pkProperty];
+          return { ...obj, ...{ [pk]: o } };
+        }, new Object())
+      : queue.reduce(
+          (obj: IDictionary, item: any) =>
+            (obj = { ...obj, ...{ [item]: true } }),
           new Object()
-        )
-      : queue.reduce((obj: IDictionary, item: any) => obj = { ...obj, ...{[item]: true} }, new Object());
+        );
   }
 
   public map(fn: (f: any) => any): T[] {
     const queuedSchemas = Queue._queues[this._name];
-    return queuedSchemas
-      ? queuedSchemas.map(fn) as T[]
-      : [];
+    return queuedSchemas ? queuedSchemas.map(fn) as T[] : [];
   }
 
   public filter(fn: (f: any) => any) {
     const queue = Queue._queues[this._name];
-    return queue
-      ? queue.filter(fn) as T[]
-      : [];
+    return queue ? queue.filter(fn) as T[] : [];
   }
 
   public toJSON() {
@@ -178,11 +174,11 @@ export default class Queue<T = any> {
 
   private _find(key: string | number) {
     const queue = Queue._queues[this._name];
-    const objectPayload = typeof first(queue) === 'object';
+    const objectPayload = typeof first(queue) === "object";
 
     let index = 0;
     let result: any[] = [null, -1];
-    for(const item of queue) {
+    for (const item of queue) {
       const condition = objectPayload
         ? item[this.pkProperty] === key
         : item === key;
@@ -195,5 +191,4 @@ export default class Queue<T = any> {
 
     return result;
   }
-
-};
+}
