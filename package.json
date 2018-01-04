@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.11.4",
+  "version": "0.12.0",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -14,19 +14,25 @@
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "build": "ts-node ./scripts/build.ts",
     "test": "ts-node ./scripts/test.ts ",
-    "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
+    "coverage":
+      "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "common-types": "^1.2.1",
-    "firebase-admin": "5.1.0",
-    "firebase-key": "^1.0.4",
+    "common-types": "^1.3.10",
+    "firebase-admin": "^5.6.0",
+    "firebase-key": "^1.0.6",
     "gitbook-plugin-favicon": "^0.0.2",
-    "moment": "^2.0.0",
-    "typed-conversions": "^0.6.2"
+    "moment": "^2.20.0",
+    "lodash": "^4.17.4",
+    "typed-conversions": "^0.7.3"
+  },
+  "peerDependencies": {
+    "chance": "^1.0.0",
+    "faker": "^4.1.0"
   },
   "devDependencies": {
     "@types/chai": "^3.0.0",
@@ -42,11 +48,8 @@
     "@types/stack-trace": "^0.0.28",
     "chai": "^4.0.0",
     "chalk": "^2.0.0",
-    "chance": "^1.0.0",
     "coveralls": "^2.0.0",
-    "faker": "^4.1.0",
     "js-yaml": "^3.0.0",
-    "lodash": "^4.17.4",
     "mocha": "^3.4.0",
     "nyc": "^11.0.0",
     "prettier": "^1.5.2",
@@ -54,9 +57,9 @@
     "shelljs": "^0.7.8",
     "test-console": "^1.0.0",
     "ts-node": "^3.2.0",
-    "tslint": "^5.6.0",
+    "tslint": "^5.8.0",
     "tslint-config-prettier": "^1.1.0",
-    "typescript": "^2.4.2"
+    "typescript": "^2.6.2"
   },
   "engines": {
     "node": ">=6.0.0"

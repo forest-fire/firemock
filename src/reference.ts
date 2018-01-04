@@ -1,9 +1,9 @@
-import { IDictionary } from 'common-types';
-import Query from './query';
-import SnapShot from './snapshot';
-import Disconnected from './disconnected';
-import { get } from 'lodash';
-import { db, setDB, updateDB, pushDB, removeDB } from './database';
+import { IDictionary } from "common-types";
+import Query from "./query";
+import SnapShot from "./snapshot";
+import Disconnected from "./disconnected";
+import { get } from "lodash";
+import { db, setDB, updateDB, pushDB, removeDB } from "./database";
 import {
   parts,
   normalizeRef,
@@ -11,60 +11,74 @@ import {
   getRandomInt,
   removeKeys,
   join,
-  slashNotation
-} from './util';
+  slashNotation,
+  networkDelay
+} from "./util";
 
-import * as firebase from 'firebase-admin';
+import * as firebase from "firebase-admin";
+
+export type IDBTransaction = Promise<{
+  committed: boolean;
+  snapshot: firebase.database.DataSnapshot;
+}>;
 
 export type AsyncOrSync<T> = Promise<SnapShot<T>> | SnapShot<T>;
 export enum EventType {
-  child_added = 'child_added',
-  child_removed = 'child_removed',
-  child_changed = 'child_changed',
-  child_moved = 'child_moved',
-  value = 'value'
+  child_added = "child_added",
+  child_removed = "child_removed",
+  child_changed = "child_changed",
+  child_moved = "child_moved",
+  value = "value"
 }
 
-export default class Reference<T = any>
-  extends Query
+export default class Reference<T = any> extends Query
   implements firebase.database.Reference {
-
   public get key(): string | null {
-    return this.path.split('.').pop();
+    return this.path.split(".").pop();
   }
 
   public get parent(): firebase.database.Reference | null {
-    const r = parts(this.path).slice(-1).join('.');
+    const r = parts(this.path)
+      .slice(-1)
+      .join(".");
     return new Reference(r, get(db, r));
   }
 
   public child(path: string): Reference {
-    const r = parts(this.path).concat([path]).join('.');
+    const r = parts(this.path)
+      .concat([path])
+      .join(".");
     return new Reference(r, get(db, r));
   }
 
   public get root(): firebase.database.Reference {
-    return new Reference('/', db);
+    return new Reference("/", db);
   }
 
-  // TODO: this needs implementing
-  public push(value?: any, onComplete?: (a: Error | null) => any) {
+  public push(value?: any, onComplete?: (a: Error | null) => any): any {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
-    if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;
+    if (onComplete) {
+      onComplete(null);
+    }
+
+    return networkDelay<firebase.database.Reference>(this);
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
     removeDB(this.path);
-    if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;
+    if (onComplete) {
+      onComplete(null);
+    }
+    return networkDelay<void>();
   }
 
   public set(value: any, onComplete?: (a: Error | null) => any): Promise<void> {
     setDB(this.path, value);
-    if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;
+    if (onComplete) {
+      onComplete(null);
+    }
+    return networkDelay<void>();
   }
 
   public update(
@@ -72,15 +86,17 @@ export default class Reference<T = any>
     onComplete?: (a: Error | null) => any
   ): Promise<void> {
     updateDB(this.path, values);
-    if(onComplete) { onComplete(null); }
-    return Promise.resolve(this) as firebase.database.ThenableReference;
+    if (onComplete) {
+      onComplete(null);
+    }
+    return networkDelay<void>();
   }
 
   public setPriority(
     priority: string | number | null,
     onComplete: (a: Error | null) => any
   ): Promise<void> {
-    return Promise.resolve();
+    return networkDelay<void>();
   }
 
   public setWithPriority(
@@ -88,7 +104,7 @@ export default class Reference<T = any>
     newPriority: string | number | null,
     onComplete: (a: Error | null) => any
   ) {
-    return Promise.resolve();
+    return networkDelay<void>();
   }
 
   public transaction(
@@ -114,7 +130,6 @@ export default class Reference<T = any>
   }
 
   public toString() {
-    return slashNotation(join('https://mockdb.local', this.path, this.key));
+    return slashNotation(join("https://mockdb.local", this.path, this.key));
   }
-
 }

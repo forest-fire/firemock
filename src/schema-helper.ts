@@ -1,5 +1,5 @@
-import Chance = require('chance');
-import * as faker from 'faker';
+import * as c from "chance";
+import * as faker from "faker";
 
 export default class SchemaHelper {
   private _db: any;
@@ -10,6 +10,6 @@ export default class SchemaHelper {
     return faker;
   }
   public get chance() {
-    return Chance.Chance();
+    return c();
   }
 }
