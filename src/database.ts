@@ -149,6 +149,14 @@ export function listenerPaths(type?: firebase.database.EventType) {
     : _listeners.map(l => l.path);
 }
 
+/**
+ * Notifies all appropriate "child" event listeners when changes
+ * in state happen
+ *
+ * @param dotPath the path where the change was made
+ * @param newValue the new value
+ * @param oldValue the prior value
+ */
 function notify(dotPath: string, newValue: any, oldValue: any) {
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
     findValueListeners(dotPath).map(l => {
@@ -162,11 +170,14 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
       }
       return l.callback(new SnapShot(join(l.path), result));
     });
+
     if (newValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-        return l.callback(new SnapShot(key, newValue));
-      });
+      findChildListeners(parent, "child_removed", "child_changed").forEach(
+        l => {
+          return l.callback(new SnapShot(key, newValue));
+        }
+      );
     } else if (oldValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
       findChildListeners(parent, "child_added", "child_changed").forEach(l => {

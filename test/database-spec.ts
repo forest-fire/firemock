@@ -1,5 +1,5 @@
 // tslint:disable:no-implicit-dependencies
-import { IDictionary, FirebaseEvent } from "common-types";
+import { IDictionary } from "common-types";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import set = require("lodash.set");
@@ -279,7 +279,7 @@ describe("Database", () => {
             expect(first.age).to.equal(firstRecord.age + 1);
             done();
           };
-          addListener("/people", FirebaseEvent.value, callback);
+          addListener("/people", "value", callback);
           expect(listenerCount()).to.equal(1);
           updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
         });
@@ -318,7 +318,7 @@ describe("Database", () => {
             expect(Object.keys(list)).to.not.include(firstKey);
             done();
           };
-          addListener("/people", FirebaseEvent.value, callback);
+          addListener("/people", "value", callback);
           expect(listenerCount()).to.equal(1);
           removeDB(`/people/${firstKey}`);
         });
@@ -331,7 +331,7 @@ describe("Database", () => {
         expect(scalar).to.not.equal(53);
         done();
       };
-      addListener("/scalar", FirebaseEvent.value, callback);
+      addListener("/scalar", "value", callback);
       setDB("/scalar", 53);
     });
 
@@ -343,12 +343,13 @@ describe("Database", () => {
         expect(person.age).equal(100);
         done();
       };
-      addListener("/people", FirebaseEvent.child_added, callback);
+      addListener("/people", "child_added", callback);
       pushDB("/people", {
         name: "Chris Christy",
         age: 100
       });
     });
+
     it('"child_added" ignores changed child', done => {
       reset();
       set(db, "people.abcd", {
@@ -358,7 +359,7 @@ describe("Database", () => {
       const callback: HandleValueEvent = snap => {
         done("Should NOT have called callback!");
       };
-      addListener("/people", FirebaseEvent.child_added, callback);
+      addListener("/people", "child_added", callback);
       const christy = helpers.firstKey(db.people);
       updateDB(`/people/abcd`, {
         age: 150
@@ -367,6 +368,7 @@ describe("Database", () => {
         done();
       }, 50);
     });
+
     it('"child_added" ignores removed child', done => {
       reset();
       set(db, "people.abcd", {
@@ -376,7 +378,7 @@ describe("Database", () => {
       const callback: HandleValueEvent = snap => {
         done("Should NOT have called callback!");
       };
-      addListener("/people", FirebaseEvent.child_added, callback);
+      addListener("/people", "child_added", callback);
       removeDB(`/people/abcd`);
       setTimeout(() => {
         done();
@@ -394,7 +396,7 @@ describe("Database", () => {
         expect(Object.keys(db.people)).length(0);
         done();
       };
-      addListener("/people", FirebaseEvent.child_removed, callback);
+      addListener("/people", "child_removed", callback);
       removeDB(`/people/abcd`);
     });
 
@@ -404,7 +406,7 @@ describe("Database", () => {
       const callback: HandleValueEvent = snap => {
         done("Should NOT have called callback!");
       };
-      addListener("/people", FirebaseEvent.child_removed, callback);
+      addListener("/people", "child_removed", callback);
       setDB("people.abcd", {
         name: "Chris Chisty",
         age: 100
@@ -419,7 +421,7 @@ describe("Database", () => {
       const callback: HandleValueEvent = snap => {
         done("Should NOT have called callback!");
       };
-      addListener("/people", FirebaseEvent.child_removed, callback);
+      addListener("/people", "child_removed", callback);
       removeDB("people.abcdefg");
       setTimeout(() => {
         done();
@@ -439,7 +441,7 @@ describe("Database", () => {
         expect(snap.val().name).to.equal("Barbara Streisand");
         done();
       };
-      addListener("/people", FirebaseEvent.child_changed, callback);
+      addListener("/people", "child_changed", callback);
       pushDB(`/people`, {
         name: "Barbara Streisand",
         age: 70
@@ -457,7 +459,7 @@ describe("Database", () => {
         expect(db.people).to.not.have.key("abcd");
         done();
       };
-      addListener("/people", FirebaseEvent.child_changed, callback);
+      addListener("/people", "child_changed", callback);
       removeDB(`/people.abcd`);
     });
   });

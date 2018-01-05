@@ -734,9 +734,9 @@ common-types@^1.1.0:
   dependencies:
     chalk "^2.3.0"
 
-common-types@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.0.tgz#b5150bf0353e1e553466054b022080af0d8a3ef6"
+common-types@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.1.tgz#b432a7a3259ce3c840f351ffe7aa33718439dbed"
   dependencies:
     chalk "^2.3.0"
 
@@ -1065,7 +1065,7 @@ find-up@^2.1.0:
   dependencies:
     locate-path "^2.0.0"
 
-firebase-admin@^5.6.0:
+firebase-admin@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-5.7.0.tgz#c8c72dc400cb2d742d0cf322f11ce138d260a424"
   dependencies:
