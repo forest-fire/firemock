@@ -56,7 +56,7 @@ async function execute(scope: string) {
       chalk.dim.grey(`./node_modules/.bin/tsc ${scope}`) +
       chalk.dim(` )`)
   );
-  exec(`./node_modules/.bin/tsc --module es2015 ${scope}`, (code, out) => {
+  exec(`./node_modules/.bin/tsc --module commonjs ${scope}`, (code, out) => {
     if (code === 0) {
       console.log(chalk.green.bold(`- build completed successfully 👍\n`));
     } else {
