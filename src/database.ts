@@ -1,4 +1,4 @@
-import { IDictionary, FirebaseEvent } from "common-types";
+import { IDictionary } from "common-types";
 import * as firebase from "firebase-admin";
 import { IListener } from "./query";
 import set = require("lodash.set");
@@ -164,20 +164,12 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
     });
     if (newValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(
-        parent,
-        FirebaseEvent.child_removed,
-        FirebaseEvent.child_changed
-      ).forEach(l => {
+      findChildListeners(parent, "child_added", "child_changed").forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
     } else if (oldValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(
-        parent,
-        FirebaseEvent.child_added,
-        FirebaseEvent.child_changed
-      ).forEach(l => {
+      findChildListeners(parent, "child_added", "child_changed").forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
     }
