@@ -1,11 +1,13 @@
-import { IDictionary } from 'common-types';
-import * as fbKey from 'firebase-key';
-import { get, set, first } from 'lodash';
-import { IRelationship } from './mock';
-import { getRandomInt } from './util';
-import Queue from './queue';
-import SchemaHelper from './schema-helper';
-import pluralize, { addException } from './pluralize';
+import { IDictionary } from "common-types";
+import * as fbKey from "firebase-key";
+import set = require("lodash.set");
+import get = require("lodash.get");
+import first = require("lodash.first");
+import { IRelationship } from "./mock";
+import { getRandomInt } from "./util";
+import Queue from "./queue";
+import SchemaHelper from "./schema-helper";
+import pluralize, { addException } from "./pluralize";
 
 export interface ISchema {
   id: string;
@@ -33,9 +35,9 @@ export type SchemaCallback = (helper: SchemaHelper) => any;
 export type SourceProperty = string;
 
 export default class Schema<T = any> {
-  private _schemas = new Queue<ISchema>('schemas');
-  private _relationships = new Queue<IRelationship>('relationships');
-  private _prefix: string = '';
+  private _schemas = new Queue<ISchema>("schemas");
+  private _relationships = new Queue<IRelationship>("relationships");
+  private _prefix: string = "";
 
   constructor(public schemaId: string) {}
 
@@ -50,8 +52,10 @@ export default class Schema<T = any> {
         const schema: ISchema = this._schemas.find(this.schemaId);
         return [
           schema.prefix,
-          schema.modelName ? pluralize(schema.modelName) : pluralize(this.schemaId)
-        ].join('/');
+          schema.modelName
+            ? pluralize(schema.modelName)
+            : pluralize(this.schemaId)
+        ].join("/");
       }
     });
 
@@ -71,8 +75,9 @@ export default class Schema<T = any> {
 
   /** prefixes a static path to the beginning of the  */
   public pathPrefix(prefix: string) {
-    prefix = prefix.replace(/\./g, '/'); // slash reference preferred over dot
-    prefix = prefix.slice(-1) === '/' ? prefix.slice(0, prefix.length - 1) : prefix;
+    prefix = prefix.replace(/\./g, "/"); // slash reference preferred over dot
+    prefix =
+      prefix.slice(-1) === "/" ? prefix.slice(0, prefix.length - 1) : prefix;
 
     this._schemas.update(this.schemaId, { prefix });
 
@@ -98,7 +103,7 @@ export default class Schema<T = any> {
    */
   public belongsTo(target: string, sourceProperty?: SourceProperty) {
     this._relationships.push({
-      type: 'belongsTo',
+      type: "belongsTo",
       source: this.schemaId,
       target,
       sourceProperty: sourceProperty ? sourceProperty : `${target}Id`
@@ -112,7 +117,7 @@ export default class Schema<T = any> {
    */
   public hasMany(target: string, sourceProperty?: SourceProperty) {
     this._relationships.push({
-      type: 'hasMany',
+      type: "hasMany",
       source: this.schemaId,
       target,
       sourceProperty: sourceProperty ? sourceProperty : pluralize(target)

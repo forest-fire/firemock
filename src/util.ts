@@ -1,4 +1,5 @@
-import { first, last } from "lodash";
+import first = require("lodash.first");
+import last = require("lodash.last");
 import { IDictionary } from "common-types";
 import * as firebase from "firebase-admin";
 

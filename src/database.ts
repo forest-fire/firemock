@@ -1,11 +1,12 @@
-import { IDictionary, FirebaseEvent } from 'common-types';
-import * as firebase from 'firebase-admin';
-import { IListener } from './query';
-import { set, get } from 'lodash';
-import { key as fbKey } from 'firebase-key';
-import { join, pathDiff, getParent, getKey, keyAndParent } from './util';
-import * as convert from 'typed-conversions';
-import SnapShot from './snapshot';
+import { IDictionary, FirebaseEvent } from "common-types";
+import * as firebase from "firebase-admin";
+import { IListener } from "./query";
+import set = require("lodash.set");
+import get = require("lodash.get");
+import { key as fbKey } from "firebase-key";
+import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
+import * as convert from "typed-conversions";
+import SnapShot from "./snapshot";
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];
@@ -32,7 +33,8 @@ export function setDB(path: string, value: any) {
 export function updateDB(path: string, value: any) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
-  const newValue = typeof oldValue === 'object' ? { ...oldValue, ...value } : value;
+  const newValue =
+    typeof oldValue === "object" ? { ...oldValue, ...value } : value;
 
   set(db, dotPath, newValue);
   notify(dotPath, newValue, oldValue);
@@ -43,7 +45,7 @@ export function removeDB(path: string) {
   const oldValue = get(db, dotPath);
 
   const parentValue: any = get(db, getParent(dotPath));
-  if (typeof parentValue === 'object') {
+  if (typeof parentValue === "object") {
     delete parentValue[getKey(dotPath)];
     set(db, getParent(dotPath), parentValue);
   } else {
@@ -121,7 +123,7 @@ export function removeListener(
 function cancelCallback(removed: IListener[]): number {
   let count = 0;
   removed.forEach(l => {
-    if (typeof l.cancelCallbackOrContext === 'function') {
+    if (typeof l.cancelCallbackOrContext === "function") {
       l.cancelCallbackOrContext();
       count++;
     }
@@ -152,23 +154,30 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
     findValueListeners(dotPath).map(l => {
       let result: IDictionary = {};
       const listeningRoot = get(db, l.path);
-      if(typeof listeningRoot === 'object' && !newValue) {
+      if (typeof listeningRoot === "object" && !newValue) {
         result = get(db, l.path);
         delete result[getKey(dotPath)];
       } else {
         set(result, pathDiff(dotPath, l.path), newValue);
       }
-      return l.callback(new SnapShot(join(l.path), result))
+      return l.callback(new SnapShot(join(l.path), result));
     });
     if (newValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, FirebaseEvent.child_removed, FirebaseEvent.child_changed).forEach(l => {
+      findChildListeners(
+        parent,
+        FirebaseEvent.child_removed,
+        FirebaseEvent.child_changed
+      ).forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
-
     } else if (oldValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, FirebaseEvent.child_added, FirebaseEvent.child_changed).forEach(l => {
+      findChildListeners(
+        parent,
+        FirebaseEvent.child_added,
+        FirebaseEvent.child_changed
+      ).forEach(l => {
         return l.callback(new SnapShot(key, newValue));
       });
     }
@@ -187,7 +196,7 @@ export function findChildListeners(
   ...eventType: firebase.database.EventType[]
 ) {
   const correctPath = _listeners.filter(
-    l => l.path === join(path) && l.eventType !== 'value'
+    l => l.path === join(path) && l.eventType !== "value"
   );
 
   return eventType.length > 0
@@ -204,7 +213,7 @@ export function findChildListeners(
  */
 export function findValueListeners(path: string) {
   return _listeners.filter(
-    l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === 'value'
+    l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value"
   );
 }
 

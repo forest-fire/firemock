@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { first } from "lodash";
+import first = require("lodash.first");
 import * as fbKey from "firebase-key";
 
 export type Key = string | number;
@@ -112,7 +112,7 @@ export default class Queue<T = any> {
     }
     if (typeof currently === "object" && typeof value === "object") {
       value[this.pkProperty] = key;
-      const updated = { ...currently as any, ...value as any };
+      const updated = { ...(currently as any), ...(value as any) };
       this.enqueue(updated as T);
     } else {
       throw new Error(`Current and updated values must be objects!`);
@@ -156,12 +156,12 @@ export default class Queue<T = any> {
 
   public map(fn: (f: any) => any): T[] {
     const queuedSchemas = Queue._queues[this._name];
-    return queuedSchemas ? queuedSchemas.map(fn) as T[] : [];
+    return queuedSchemas ? (queuedSchemas.map(fn) as T[]) : [];
   }
 
   public filter(fn: (f: any) => any) {
     const queue = Queue._queues[this._name];
-    return queue ? queue.filter(fn) as T[] : [];
+    return queue ? (queue.filter(fn) as T[]) : [];
   }
 
   public toJSON() {

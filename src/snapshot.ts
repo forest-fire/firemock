@@ -1,9 +1,9 @@
-import { IDictionary, SortingFunction } from 'common-types';
-import { get } from 'lodash';
-import Reference from './reference';
-import * as firebase from 'firebase-admin';
-import * as convert from 'typed-conversions';
-import { getParent, getKey, join } from './util';
+import { IDictionary, SortingFunction } from "common-types";
+import get = require("lodash.get");
+import Reference from "./reference";
+import * as firebase from "firebase-admin";
+import * as convert from "typed-conversions";
+import { getParent, getKey, join } from "./util";
 
 /**
  * Each record in the forEach iteration will be passed
@@ -41,7 +41,7 @@ export default class SnapShot<T = any>
   }
 
   public hasChild(path: string): boolean {
-    if (typeof this._value === 'object') {
+    if (typeof this._value === "object") {
       return Object.keys(this._value).indexOf(path) !== -1;
     }
 
@@ -49,7 +49,7 @@ export default class SnapShot<T = any>
   }
 
   public hasChildren(): boolean {
-    if (typeof this._value === 'object') {
+    if (typeof this._value === "object") {
       return Object.keys(this._value).length > 0;
     }
 
@@ -57,7 +57,7 @@ export default class SnapShot<T = any>
   }
 
   public numChildren(): number {
-    if (typeof this._value === 'object') {
+    if (typeof this._value === "object") {
       return Object.keys(this._value).length;
     }
 

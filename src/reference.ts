@@ -2,7 +2,8 @@ import { IDictionary } from "common-types";
 import Query from "./query";
 import SnapShot from "./snapshot";
 import Disconnected from "./disconnected";
-import { get } from "lodash";
+import get = require("lodash.get");
+
 import { db, setDB, updateDB, pushDB, removeDB } from "./database";
 import {
   parts,

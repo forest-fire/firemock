@@ -1,19 +1,20 @@
-import { IDictionary } from 'common-types';
-import * as fbKey from 'firebase-key';
-import { get, set, first } from 'lodash';
-import { IRelationship, ISchema, IQueue } from './mock';
-import { getRandomInt, join, dotNotation } from './util';
-import Queue from './queue';
-import pluralize from './pluralize';
-import { db } from './database';
-
+import { IDictionary } from "common-types";
+import * as fbKey from "firebase-key";
+import set = require("lodash.set");
+import get = require("lodash.get");
+import first = require("lodash.first");
+import { IRelationship, ISchema, IQueue } from "./mock";
+import { getRandomInt, join, dotNotation } from "./util";
+import Queue from "./queue";
+import pluralize from "./pluralize";
+import { db } from "./database";
 
 export default class Deployment {
   private schemaId: string;
   private queueId: string;
-  private _queue = new Queue<IQueue>('queue');
-  private _schemas = new Queue<ISchema>('schemas');
-  private _relationships = new Queue<IRelationship>('relationships');
+  private _queue = new Queue<IQueue>("queue");
+  private _schemas = new Queue<ISchema>("schemas");
+  private _relationships = new Queue<IRelationship>("relationships");
 
   /**
    * Queue a schema for deployment to the mock DB
@@ -53,19 +54,21 @@ export default class Deployment {
    */
   public quantifyHasMany(targetSchema: string, quantity: number) {
     const hasMany = this._relationships.filter(
-      r => r.type === 'hasMany' && r.source === this.schemaId
+      r => r.type === "hasMany" && r.source === this.schemaId
     );
     const targetted = hasMany.filter(r => r.target === targetSchema);
 
     if (hasMany.length === 0) {
       console.log(
-        `Attempt to quantify "hasMany" relationships with schema "${this
-          .schemaId}" is not possible; no such relationships exist`
+        `Attempt to quantify "hasMany" relationships with schema "${
+          this.schemaId
+        }" is not possible; no such relationships exist`
       );
     } else if (targetted.length === 0) {
       console.log(
-        `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${this
-          .schemaId}" model`
+        `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${
+          this.schemaId
+        }" model`
       );
     } else {
       const queue = this._queue.find(this.queueId);
@@ -105,7 +108,6 @@ export default class Deployment {
   }
 
   public generate() {
-
     this._queue.map((q: IQueue) => {
       for (let i = q.quantity; i > 0; i--) {
         this.insertMockIntoDB(q.schema, q.overrides);
@@ -128,11 +130,12 @@ export default class Deployment {
     const path = schema.path();
     const key = fbKey.key();
 
-    set(db, dotNotation(path) + `.${key}`, typeof mock === 'object'
-      ? { ...mock, ...overrides }
-      : overrides && typeof overrides !== 'object'
-        ? overrides
-        : mock
+    set(
+      db,
+      dotNotation(path) + `.${key}`,
+      typeof mock === "object"
+        ? { ...mock, ...overrides }
+        : overrides && typeof overrides !== "object" ? overrides : mock
     );
 
     return key;
@@ -142,8 +145,8 @@ export default class Deployment {
     const relationships = this._relationships.filter(
       r => r.source === queue.schema
     );
-    const belongsTo = relationships.filter(r => r.type === 'belongsTo');
-    const hasMany = relationships.filter(r => r.type === 'hasMany');
+    const belongsTo = relationships.filter(r => r.type === "belongsTo");
+    const hasMany = relationships.filter(r => r.type === "hasMany");
 
     belongsTo.forEach(r => {
       const fulfill =
@@ -172,7 +175,7 @@ export default class Deployment {
               : this.insertMockIntoDB(r.target, {})
             : fbKey.key();
       } else {
-        getID = () => '';
+        getID = () => "";
       }
 
       const property = r.sourceProperty;
@@ -221,11 +224,19 @@ export default class Deployment {
       const property = r.sourceProperty;
 
       const path = source.path();
-      const sourceRecords: IDictionary = get(db, dotNotation(source.path()), {});
+      const sourceRecords: IDictionary = get(
+        db,
+        dotNotation(source.path()),
+        {}
+      );
 
       Object.keys(sourceRecords).forEach(key => {
         for (let i = 1; i <= howMany; i++) {
-          set(db, `${dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
+          set(
+            db,
+            `${dotNotation(source.path())}.${key}.${property}.${getID()}`,
+            true
+          );
         }
       });
     });

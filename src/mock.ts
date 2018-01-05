@@ -1,16 +1,25 @@
-import { IDictionary } from 'common-types';
-import { set, get, first } from 'lodash';
-import * as fbKey from 'firebase-key';
-import SnapShot from './snapshot';
-import Reference from './reference';
-import Deployment from './deployment';
-import SchemaHelper from './schema-helper';
-import Schema from './schema';
-import Queue from './queue';
-import { db, clearDatabase, updateDatabase } from './database';
-import { getRandomInt, normalizeRef, leafNode, DelayType, Delays, setNetworkDelay } from './util';
+import { IDictionary } from "common-types";
+import set = require("lodash.set");
+import get = require("lodash.get");
+import first = require("lodash.first");
+import * as fbKey from "firebase-key";
+import SnapShot from "./snapshot";
+import Reference from "./reference";
+import Deployment from "./deployment";
+import SchemaHelper from "./schema-helper";
+import Schema from "./schema";
+import Queue from "./queue";
+import { db, clearDatabase, updateDatabase } from "./database";
+import {
+  getRandomInt,
+  normalizeRef,
+  leafNode,
+  DelayType,
+  Delays,
+  setNetworkDelay
+} from "./util";
 
-export {default as SchemaHelper} from './schema-helper';
+export { default as SchemaHelper } from "./schema-helper";
 
 export interface ISchema {
   id: string;
@@ -28,9 +37,9 @@ export interface ISchema {
 }
 
 export interface IRelationship {
-  id: string,
+  id: string;
   /** cardinality type */
-  type: 'hasMany' | 'belongsTo';
+  type: "hasMany" | "belongsTo";
   /** the source model */
   source: string;
   /**
@@ -59,9 +68,9 @@ export type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
 
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
-  private _schemas = new Queue<ISchema>('schemas').clear();
-  private _relationships = new Queue<IRelationship>('relationships').clear();
-  private _queues = new Queue<IQueue>('queues').clear();
+  private _schemas = new Queue<ISchema>("schemas").clear();
+  private _relationships = new Queue<IRelationship>("relationships").clear();
+  private _queues = new Queue<IQueue>("queues").clear();
 
   constructor(raw?: IDictionary) {
     Queue.clearAll();
@@ -99,11 +108,15 @@ export default class Mock {
     return new Deployment();
   }
 
-  public queueSchema<T = any>(schemaId: string, quantity: number = 1, overrides: IDictionary = {}) {
+  public queueSchema<T = any>(
+    schemaId: string,
+    quantity: number = 1,
+    overrides: IDictionary = {}
+  ) {
     const d = new Deployment();
     d.queueSchema(schemaId, quantity, overrides);
     return d;
-  };
+  }
 
   public generate() {
     return new Deployment().generate();
@@ -111,6 +124,5 @@ export default class Mock {
 
   public ref = <T = IDictionary>(dbPath: string) => {
     return new Reference<T>(dbPath);
-  }
-
+  };
 }
