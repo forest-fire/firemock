@@ -5,8 +5,16 @@
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
   "author": "Ken Snyder<ken@ken.net>",
-  "keywords": ["serverless", "typescript", "firebase", "mocking", "testing"],
-  "files": ["lib"],
+  "keywords": [
+    "serverless",
+    "typescript",
+    "firebase",
+    "mocking",
+    "testing"
+  ],
+  "files": [
+    "lib"
+  ],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
@@ -14,8 +22,7 @@
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "build": "ts-node ./scripts/build.ts",
     "test": "ts-node ./scripts/test.ts ",
-    "coverage":
-      "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
+    "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
@@ -42,6 +49,7 @@
     "@types/chai": "^3.0.0",
     "@types/chalk": "^0.4.31",
     "@types/chance": "^0.7.33",
+    "@types/commander": "^2.12.2",
     "@types/faker": "^4.1.0",
     "@types/js-yaml": "^3.9.0",
     "@types/lodash.difference": "^4.5.3",
@@ -57,6 +65,7 @@
     "chai": "^4.0.0",
     "chalk": "^2.0.0",
     "chance": "^1.0.0",
+    "commander": "^2.13.0",
     "coveralls": "^2.0.0",
     "faker": "^4.1.0",
     "js-yaml": "^3.0.0",
