@@ -10,7 +10,7 @@ import { stdout, stderr } from "test-console";
 function getScope(files: string): string {
   let fileScope: string;
 
-  if (!files) {
+  if (!files || files === "all") {
     console.log(
       chalk.white(
         "no specific files specified so all files being tested, use -h for more help"
