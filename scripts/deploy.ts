@@ -5,7 +5,7 @@ import * as rm from "rimraf";
 
 exec(`ts-node scripts/build.ts --color=true`, code => {
   if (code === 0) {
-    exec(`npm publish`, (publishCode: any) => {
+    exec(`yarn publish`, (publishCode: any) => {
       if (publishCode === 0) {
         console.log(chalk.green.bold(`- published to npm successfully 👍\n`));
       } else {

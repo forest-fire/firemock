@@ -122,7 +122,7 @@ export default class Mock {
     return new Deployment().generate();
   }
 
-  public ref = <T = IDictionary>(dbPath: string) => {
+  public ref = <T = any>(dbPath: string) => {
     return new Reference<T>(dbPath);
   };
 }
