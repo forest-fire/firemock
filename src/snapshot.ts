@@ -1,7 +1,8 @@
 import { IDictionary, SortingFunction } from "common-types";
 import get = require("lodash.get");
 import Reference from "./reference";
-import * as firebase from "firebase-admin";
+// tslint:disable-next-line:no-implicit-dependencies
+import { rtdb } from "firebase-api-surface";
 import * as convert from "typed-conversions";
 import { getParent, getKey, join } from "./util";
 
@@ -12,8 +13,7 @@ import { getParent, getKey, join } from "./util";
  */
 export type Action = (record: SnapShot) => boolean | void;
 
-export default class SnapShot<T = any>
-  implements firebase.database.DataSnapshot {
+export default class SnapShot<T = any> implements rtdb.IDataSnapshot {
   private _sortingFunction: SortingFunction;
   constructor(private _key: string, private _value: T[] | T) {}
 
@@ -22,7 +22,7 @@ export default class SnapShot<T = any>
   }
 
   public get ref() {
-    return new Reference<T>(this._key) as firebase.database.Reference;
+    return new Reference<T>(this._key) as rtdb.IReference;
   }
 
   public val() {
@@ -35,7 +35,7 @@ export default class SnapShot<T = any>
     return JSON.stringify(this._value);
   }
 
-  public child<TC = IDictionary>(path: string): firebase.database.DataSnapshot {
+  public child<TC = IDictionary>(path: string): rtdb.IDataSnapshot {
     const value = get(this._value, path, null);
     return value ? new SnapShot<TC>(path, value) : null;
   }

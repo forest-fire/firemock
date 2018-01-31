@@ -1,3 +1,5 @@
+// tslint:disable:no-implicit-dependencies
+import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
 import Query from "./query";
 import SnapShot from "./snapshot";
@@ -16,43 +18,27 @@ import {
   networkDelay
 } from "./util";
 
-import * as firebase from "firebase-admin";
-
-export type IDBTransaction = Promise<{
-  committed: boolean;
-  snapshot: firebase.database.DataSnapshot;
-}>;
-
-export type AsyncOrSync<T> = Promise<SnapShot<T>> | SnapShot<T>;
-export enum EventType {
-  child_added = "child_added",
-  child_removed = "child_removed",
-  child_changed = "child_changed",
-  child_moved = "child_moved",
-  value = "value"
-}
-
 export default class Reference<T = any> extends Query
-  implements firebase.database.Reference {
+  implements rtdb.IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
   }
 
-  public get parent(): firebase.database.Reference | null {
+  public get parent(): rtdb.IReference | null {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
     return new Reference(r, get(db, r));
   }
 
-  public child(path: string): Reference {
+  public child(path: string): rtdb.IReference {
     const r = parts(this.path)
       .concat([path])
       .join(".");
     return new Reference(r, get(db, r));
   }
 
-  public get root(): firebase.database.Reference {
+  public get root(): rtdb.IReference {
     return new Reference("/", db);
   }
 
@@ -63,7 +49,7 @@ export default class Reference<T = any> extends Query
       onComplete(null);
     }
 
-    return networkDelay<firebase.database.Reference>(this);
+    return networkDelay<rtdb.IReference>(this);
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
@@ -109,24 +95,24 @@ export default class Reference<T = any> extends Query
   }
 
   public transaction(
-    transactionUpdate: (a: any) => any,
+    transactionUpdate: (a: Partial<T>) => Partial<T>,
     onComplete?: (
       a: Error | null,
       b: boolean,
-      c: firebase.database.DataSnapshot | null
+      c: rtdb.IDataSnapshot<T> | null
     ) => any,
     applyLocally?: boolean
-  ): Promise<{
-    committed: boolean;
-    snapshot: firebase.database.DataSnapshot | null;
-  }> {
+  ): Promise<rtdb.ITransactionResult> {
     return Promise.resolve({
       committed: true,
-      snapshot: null
+      snapshot: null,
+      toJSON() {
+        return {};
+      }
     });
   }
 
-  public onDisconnect(): firebase.database.OnDisconnect {
+  public onDisconnect(): rtdb.IOnDisconnect {
     return new Disconnected();
   }
 
