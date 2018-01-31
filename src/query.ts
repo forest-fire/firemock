@@ -1,5 +1,6 @@
 import { IDictionary } from "common-types";
-import * as firebase from "firebase-admin";
+// tslint:disable-next-line:no-implicit-dependencies
+import { rtdb } from "firebase-api-surface";
 import { db, addListener } from "./database";
 import get = require("lodash.get");
 import SnapShot from "./snapshot";
@@ -53,8 +54,8 @@ export interface IOrdering {
 export interface IListener {
   path: string;
 
-  eventType: firebase.database.EventType;
-  callback: (a: firebase.database.DataSnapshot | null, b?: string) => any;
+  eventType: rtdb.EventType;
+  callback: (a: rtdb.IDataSnapshot | null, b?: string) => any;
   cancelCallbackOrContext?: object | null;
   context?: object | null;
 }
@@ -62,15 +63,17 @@ export interface IListener {
 export type IQueryFilter<T> = (resultset: T[]) => T[];
 
 /** tslint:ignore:member-ordering */
-export default class Query<T = any> implements firebase.database.Query {
+export default class Query<T = any> implements rtdb.IQuery {
   protected _order: IOrdering = { type: OrderingType.byKey, value: null };
   protected _listeners = new Queue<IListener>("listeners");
   protected _limitFilters: Array<IQueryFilter<T>> = [];
   protected _queryFilters: Array<IQueryFilter<T>> = [];
+  private queryParams_: any;
+  private orderByCalled_: any;
 
   constructor(public path: string, protected _delay: DelayType = 5) {}
 
-  public get ref(): firebase.database.Reference {
+  public get ref(): rtdb.IReference {
     return new Reference<T>(this.path, this._delay);
   }
 
@@ -150,11 +153,11 @@ export default class Query<T = any> implements firebase.database.Query {
   }
 
   public on(
-    eventType: firebase.database.EventType,
-    callback: (a: firebase.database.DataSnapshot | null, b?: string) => any,
+    eventType: rtdb.EventType,
+    callback: (a: rtdb.IDataSnapshot<T> | null, b?: string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: firebase.database.DataSnapshot | null, b?: string) => any {
+  ): (a: rtdb.IDataSnapshot | null, b?: string) => any {
     addListener(
       this.path,
       eventType,
@@ -167,10 +170,10 @@ export default class Query<T = any> implements firebase.database.Query {
   }
 
   public once(eventType: "value") {
-    return networkDelay(this.process()) as Promise<SnapShot<T>>;
+    return networkDelay(this.process()) as Promise<rtdb.IDataSnapshot<T>>;
   }
 
-  public onceSync(eventType: "value"): SnapShot<T> {
+  public onceSync(eventType: "value"): rtdb.IDataSnapshot<T> {
     return this.process();
   }
 
@@ -179,7 +182,7 @@ export default class Query<T = any> implements firebase.database.Query {
   }
 
   /** NOT IMPLEMENTED YET */
-  public isEqual(other: firebase.database.Query) {
+  public isEqual(other: rtdb.IQuery) {
     return false;
   }
 
@@ -233,6 +236,28 @@ export default class Query<T = any> implements firebase.database.Query {
 
   public toString() {
     return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
+  }
+
+  /**
+   * This is an undocumented API endpoint that is within the
+   * typing provided by Google
+   */
+  protected getKey(): string | null {
+    return null;
+  }
+  /**
+   * This is an undocumented API endpoint that is within the
+   * typing provided by Google
+   */
+  protected getParent(): rtdb.IReference | null {
+    return null;
+  }
+  /**
+   * This is an undocumented API endpoint that is within the
+   * typing provided by Google
+   */
+  protected getRoot(): rtdb.IReference {
+    return null;
   }
 
   /**
