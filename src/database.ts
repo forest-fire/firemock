@@ -1,5 +1,6 @@
 import { IDictionary } from "common-types";
-import * as firebase from "firebase-admin";
+// tslint:disable:no-implicit-dependencies
+import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
 import set = require("lodash.set");
 import get = require("lodash.get");
@@ -64,8 +65,8 @@ export function pushDB(path: string, value: any): string {
 
 export function addListener(
   path: string,
-  eventType: firebase.database.EventType,
-  callback: (snap: SnapShot, key?: string) => void,
+  eventType: rtdb.EventType,
+  callback: (snap: rtdb.IDataSnapshot, key?: string) => void,
   cancelCallbackOrContext?: (err?: Error) => void,
   context?: IDictionary
 ) {
@@ -79,7 +80,7 @@ export function addListener(
 }
 
 export function removeListener(
-  eventType?: firebase.database.EventType,
+  eventType?: rtdb.EventType,
   callback?: (snap: SnapShot, key?: string) => void,
   context?: IDictionary
 ): number {
@@ -137,13 +138,13 @@ export function removeAllListeners(): number {
   return howMany;
 }
 
-export function listenerCount(type?: firebase.database.EventType) {
+export function listenerCount(type?: rtdb.EventType) {
   return type
     ? _listeners.filter(l => l.eventType === type).length
     : _listeners.length;
 }
 
-export function listenerPaths(type?: firebase.database.EventType) {
+export function listenerPaths(type?: rtdb.EventType) {
   return type
     ? _listeners.filter(l => l.eventType === type).map(l => l.path)
     : _listeners.map(l => l.path);
@@ -196,7 +197,7 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
  */
 export function findChildListeners(
   path: string,
-  ...eventType: firebase.database.EventType[]
+  ...eventType: rtdb.EventType[]
 ) {
   const correctPath = _listeners.filter(
     l => l.path === join(path) && l.eventType !== "value"
