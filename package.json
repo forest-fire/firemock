@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.15.4",
+  "version": "0.15.5",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "common-types": "^1.5.2",
-    "firebase-api-surface": "^0.7.1",
+    "firebase-api-surface": "^0.7.2",
     "firebase-key": "^2.0.0",
     "gitbook-plugin-favicon": "^0.0.2",
     "lodash.difference": "^4.5.0",

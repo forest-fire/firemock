@@ -1,7 +1,7 @@
 import first = require("lodash.first");
 import last = require("lodash.last");
 import { IDictionary } from "common-types";
-import * as firebase from "firebase-admin";
+import { rtdb } from "firebase-api-surface";
 
 export function normalizeRef(r: string): string {
   r = r.replace("/", ".");
@@ -86,7 +86,7 @@ export function pathDiff(longPath: string, pathSubset: string) {
     : long.slice(subset.length - long.length).join(".");
 }
 
-export function orderedSnapToJS<T = any>(snap: firebase.database.DataSnapshot) {
+export function orderedSnapToJS<T = any>(snap: rtdb.IDataSnapshot) {
   const jsObject: IDictionary<T> = {};
   snap.forEach(record => (jsObject[record.key] = record.val()));
 
