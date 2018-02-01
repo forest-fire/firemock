@@ -56,6 +56,11 @@ function executeTests(stg: string, fileScope: string): void {
   exec(`mocha --require ts-node/register ` + fileScope);
 }
 
+if (process.argv.length === 2) {
+  console.log(`No tests specified, running ${chalk.bold("all")} tests.`);
+  process.argv.push("all");
+}
+
 program
   .arguments("[files]")
   .option(
