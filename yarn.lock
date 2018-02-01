@@ -239,7 +239,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/js-yaml@^3.9.0":
+"@types/js-yaml@^3.10.0":
   version "3.10.1"
   resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.10.1.tgz#a4ddaf67fec34151e620cdbdd22e40b64217f577"
 
@@ -772,9 +772,9 @@ common-types@^1.1.0:
   dependencies:
     chalk "^2.3.0"
 
-common-types@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.1.tgz#b432a7a3259ce3c840f351ffe7aa33718439dbed"
+common-types@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.2.tgz#36be29dcae6be5e57175690d0ca3ce282b96a0d0"
   dependencies:
     chalk "^2.3.0"
 
@@ -1117,9 +1117,9 @@ firebase-admin@^5.8.1:
     jsonwebtoken "8.1.0"
     node-forge "0.7.1"
 
-firebase-api-surface@^0.6.3:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.6.3.tgz#4d390265eea1663bf65ea8413ea23f357de2a646"
+firebase-api-surface@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.0.tgz#91410084476bed9d7bd0de73e1c2f1199eaf2127"
   dependencies:
     "@firebase/app-types" "^0.1.1"
     "@firebase/auth-types" "^0.1.1"
@@ -1129,9 +1129,9 @@ firebase-api-surface@^0.6.3:
     "@firebase/storage-types" "^0.1.1"
     "@firebase/util" "^0.1.7"
 
-firebase-key@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-1.0.6.tgz#b579cac0662629b3403e6708158331e249a9c42f"
+firebase-key@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-2.0.0.tgz#1caa572d6f5c7c94ef9a836e97b5e09d39e3edc3"
 
 for-in@^1.0.1:
   version "1.0.2"
@@ -1736,7 +1736,7 @@ js-yaml@3.6.1:
     argparse "^1.0.7"
     esprima "^2.6.0"
 
-js-yaml@^3.0.0:
+js-yaml@^3.10.0:
   version "3.10.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
   dependencies:
