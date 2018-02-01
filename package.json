@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.15.3",
+  "version": "0.15.4",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -39,9 +39,6 @@
     "faker": "^4.1.0"
   },
   "devDependencies": {
-    "@firebase/app-types": "^0.1.1",
-    "@firebase/auth-types": "^0.1.1",
-    "@firebase/database-types": "^0.1.1",
     "@types/chai": "^3.0.0",
     "@types/chalk": "^0.4.31",
     "@types/chance": "^0.7.33",
