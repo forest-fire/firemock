@@ -18,7 +18,7 @@ import {
   networkDelay
 } from "./util";
 
-export default class Reference<T = any> extends Query
+export default class Reference<T = any> extends Query<T>
   implements rtdb.IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
@@ -49,7 +49,7 @@ export default class Reference<T = any> extends Query
       onComplete(null);
     }
 
-    return networkDelay<rtdb.IReference>(this);
+    return networkDelay<rtdb.IThenableReference>(this);
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
