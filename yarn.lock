@@ -1117,9 +1117,9 @@ firebase-admin@^5.8.1:
     jsonwebtoken "8.1.0"
     node-forge "0.7.1"
 
-firebase-api-surface@^0.6.3:
-  version "0.6.3"
-  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.6.3.tgz#4d390265eea1663bf65ea8413ea23f357de2a646"
+firebase-api-surface@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.0.tgz#91410084476bed9d7bd0de73e1c2f1199eaf2127"
   dependencies:
     "@firebase/app-types" "^0.1.1"
     "@firebase/auth-types" "^0.1.1"

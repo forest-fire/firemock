@@ -5,8 +5,16 @@
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
   "author": "Ken Snyder<ken@ken.net>",
-  "keywords": ["serverless", "typescript", "firebase", "mocking", "testing"],
-  "files": ["lib"],
+  "keywords": [
+    "serverless",
+    "typescript",
+    "firebase",
+    "mocking",
+    "testing"
+  ],
+  "files": [
+    "lib"
+  ],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
@@ -14,8 +22,7 @@
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "build": "ts-node ./scripts/build.ts",
     "test": "ts-node ./scripts/test.ts ",
-    "coverage":
-      "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
+    "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
@@ -23,7 +30,7 @@
   },
   "dependencies": {
     "common-types": "^1.5.1",
-    "firebase-api-surface": "^0.6.3",
+    "firebase-api-surface": "^0.7.0",
     "firebase-key": "^1.0.6",
     "gitbook-plugin-favicon": "^0.0.2",
     "lodash.difference": "^4.5.0",
