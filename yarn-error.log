@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn version
+  /usr/local/bin/node /usr/local/bin/yarn publish
 
 PATH: 
-  /usr/local/bin:/Users/ken/.yarn/bin:/usr/local/share/android-sdk/platform-tools:.:/usr/local/sbin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/ken/.rvm/bin:/Users/ken/.ec2/bin:/Developer/usr/bin:/Users/ken/pear/bin:/usr/local/share/npm/bin:/Applications/Couchbase Server.app/Contents/Resources/couchbase-core/bin:/Users/ken/repos/mine/api/commandline/bin
+  /Users/ken/Documents/mine/forest-fire/firemock/node_modules/.bin:/Users/ken/.config/yarn/link/node_modules/.bin:/Users/ken/Documents/mine/forest-fire/firemock/node_modules/.bin:/Users/ken/.config/yarn/link/node_modules/.bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/usr/local/bin:/Users/ken/.yarn/bin:/usr/local/share/android-sdk/platform-tools:.:/usr/local/sbin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/ken/.rvm/bin:/Users/ken/.ec2/bin:/Developer/usr/bin:/Users/ken/pear/bin:/usr/local/share/npm/bin:/Applications/Couchbase Server.app/Contents/Resources/couchbase-core/bin:/Users/ken/repos/mine/api/commandline/bin
 
 Yarn version: 
   1.3.2
@@ -16,21 +16,13 @@ Platform:
 npm manifest: 
   {
     "name": "firemock",
-    "version": "0.14.9",
+    "version": "0.15.6",
     "description": "firemock",
     "license": "MIT",
     "repository": "git@github.com:forest-fire/firemock.git",
     "author": "Ken Snyder<ken@ken.net>",
-    "keywords": [
-      "serverless",
-      "typescript",
-      "firebase",
-      "mocking",
-      "testing"
-    ],
-    "files": [
-      "lib"
-    ],
+    "keywords": ["serverless", "typescript", "firebase", "mocking", "testing"],
+    "files": ["lib"],
     "main": "lib/index.js",
     "typings": "lib/index.d.ts",
     "scripts": {
@@ -38,15 +30,17 @@ npm manifest:
       "lint": "tslint --force --format verbose \"src/**/*.ts\"",
       "build": "ts-node ./scripts/build.ts",
       "test": "ts-node ./scripts/test.ts ",
-      "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
+      "coverage":
+        "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
       "watch": "ts-node ./scripts/watch.ts",
       "watch:test": "ts-node ./scripts/watch.ts test",
       "watch:all": "ts-node ./scripts/watch.ts all",
       "deploy": "ts-node ./scripts/deploy.ts "
     },
     "dependencies": {
-      "common-types": "^1.5.1",
-      "firebase-key": "^1.0.6",
+      "common-types": "^1.5.2",
+      "firebase-api-surface": "^0.7.2",
+      "firebase-key": "^2.0.0",
       "gitbook-plugin-favicon": "^0.0.2",
       "lodash.difference": "^4.5.0",
       "lodash.first": "^3.0.0",
@@ -66,7 +60,7 @@ npm manifest:
       "@types/chance": "^0.7.33",
       "@types/commander": "^2.12.2",
       "@types/faker": "^4.1.0",
-      "@types/js-yaml": "^3.9.0",
+      "@types/js-yaml": "^3.10.0",
       "@types/lodash.difference": "^4.5.3",
       "@types/lodash.first": "^3.0.3",
       "@types/lodash.get": "^4.4.3",
@@ -84,7 +78,7 @@ npm manifest:
       "coveralls": "^2.0.0",
       "faker": "^4.1.0",
       "firebase-admin": "^5.8.1",
-      "js-yaml": "^3.0.0",
+      "js-yaml": "^3.10.0",
       "mocha": "^4.1.0",
       "nyc": "^11.0.0",
       "prettier": "^1.5.2",
@@ -113,6 +107,10 @@ Lockfile:
     version "0.1.0"
     resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.1.0.tgz#27069ba4f8d74990eae7c88ec8f3d282e5215786"
   
+  "@firebase/app-types@^0.1.1":
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/@firebase/app-types/-/app-types-0.1.1.tgz#1b794e101c779310763b1bfce8c24e7728fb9a91"
+  
   "@firebase/app@^0.1.1":
     version "0.1.5"
     resolved "https://registry.yarnpkg.com/@firebase/app/-/app-0.1.5.tgz#3e7610a69ba6dbebc649a1b785eb898619c8a067"
@@ -120,9 +118,17 @@ Lockfile:
       "@firebase/app-types" "0.1.0"
       "@firebase/util" "0.1.5"
   
+  "@firebase/auth-types@^0.1.1":
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/@firebase/auth-types/-/auth-types-0.1.1.tgz#1b38caa9971cc9d8ed6dd114976d18d986f24a9a"
+  
   "@firebase/database-types@0.1.0":
     version "0.1.0"
     resolved "https://registry.yarnpkg.com/@firebase/database-types/-/database-types-0.1.0.tgz#dbc9e096cf1061ac422f17e8957baac6d3c018a7"
+  
+  "@firebase/database-types@^0.1.1":
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/@firebase/database-types/-/database-types-0.1.1.tgz#601b8040191766777b785c1675eac34ce57c669c"
   
   "@firebase/database@^0.1.3":
     version "0.1.6"
@@ -132,9 +138,25 @@ Lockfile:
       "@firebase/util" "0.1.5"
       faye-websocket "0.11.1"
   
+  "@firebase/firestore-types@^0.2.1":
+    version "0.2.1"
+    resolved "https://registry.yarnpkg.com/@firebase/firestore-types/-/firestore-types-0.2.1.tgz#f2f35856b283a521c64ac4fa45d140010037e046"
+  
+  "@firebase/messaging-types@^0.1.1":
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/@firebase/messaging-types/-/messaging-types-0.1.1.tgz#66d61d800081b3f7e4d26f1f8523f0a307e37730"
+  
+  "@firebase/storage-types@^0.1.1":
+    version "0.1.1"
+    resolved "https://registry.yarnpkg.com/@firebase/storage-types/-/storage-types-0.1.1.tgz#c8e1cd328e96ef5b88e07b0a4f5ce1c68087126b"
+  
   "@firebase/util@0.1.5":
     version "0.1.5"
     resolved "https://registry.yarnpkg.com/@firebase/util/-/util-0.1.5.tgz#b8daf57cedda1c035fddf5ca9c56b86a1f95b38b"
+  
+  "@firebase/util@^0.1.7":
+    version "0.1.7"
+    resolved "https://registry.yarnpkg.com/@firebase/util/-/util-0.1.7.tgz#efe5f119ae6449f66dd286c7cbdccfed090ad274"
   
   "@google-cloud/common-grpc@^0.5.0":
     version "0.5.2"
@@ -318,7 +340,7 @@ Lockfile:
     dependencies:
       "@types/node" "*"
   
-  "@types/js-yaml@^3.9.0":
+  "@types/js-yaml@^3.10.0":
     version "3.10.1"
     resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.10.1.tgz#a4ddaf67fec34151e620cdbdd22e40b64217f577"
   
@@ -851,9 +873,9 @@ Lockfile:
     dependencies:
       chalk "^2.3.0"
   
-  common-types@^1.5.1:
-    version "1.5.1"
-    resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.1.tgz#b432a7a3259ce3c840f351ffe7aa33718439dbed"
+  common-types@^1.5.2:
+    version "1.5.2"
+    resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.5.2.tgz#36be29dcae6be5e57175690d0ca3ce282b96a0d0"
     dependencies:
       chalk "^2.3.0"
   
@@ -1196,9 +1218,21 @@ Lockfile:
       jsonwebtoken "8.1.0"
       node-forge "0.7.1"
   
-  firebase-key@^1.0.6:
-    version "1.0.6"
-    resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-1.0.6.tgz#b579cac0662629b3403e6708158331e249a9c42f"
+  firebase-api-surface@^0.7.1:
+    version "0.7.1"
+    resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.1.tgz#a23bf9767817e97a7f6dc50db6d607f711bc1937"
+    dependencies:
+      "@firebase/app-types" "^0.1.1"
+      "@firebase/auth-types" "^0.1.1"
+      "@firebase/database-types" "^0.1.1"
+      "@firebase/firestore-types" "^0.2.1"
+      "@firebase/messaging-types" "^0.1.1"
+      "@firebase/storage-types" "^0.1.1"
+      "@firebase/util" "^0.1.7"
+  
+  firebase-key@^2.0.0:
+    version "2.0.0"
+    resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-2.0.0.tgz#1caa572d6f5c7c94ef9a836e97b5e09d39e3edc3"
   
   for-in@^1.0.1:
     version "1.0.2"
@@ -1803,7 +1837,7 @@ Lockfile:
       argparse "^1.0.7"
       esprima "^2.6.0"
   
-  js-yaml@^3.0.0:
+  js-yaml@^3.10.0:
     version "3.10.0"
     resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.10.0.tgz#2e78441646bd4682e963f22b6e92823c309c62dc"
     dependencies:
@@ -3231,14 +3265,10 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/yn/-/yn-2.0.0.tgz#e5adabc8acf408f6385fc76495684c88e6af689a"
 
 Trace: 
-  Error: canceled
-      at Interface.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:121045:13)
-      at emitNone (events.js:106:13)
-      at Interface.emit (events.js:208:7)
-      at Interface._ttyWrite (readline.js:775:16)
-      at ReadStream.onkeypress (readline.js:160:10)
-      at emitTwo (events.js:126:13)
-      at ReadStream.emit (events.js:214:7)
-      at emitKeys (internal/readline.js:420:14)
-      at emitKeys.next (<anonymous>)
-      at ReadStream.onData (readline.js:1011:36)
+  Error: Can't answer a question unless a user TTY
+      at ConsoleReporter.question (/usr/local/lib/node_modules/yarn/lib/cli.js:87314:59)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:58969:35
+      at Generator.next (<anonymous>)
+      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:92:30)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:103:13
+      at <anonymous>

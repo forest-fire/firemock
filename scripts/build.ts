@@ -1,6 +1,6 @@
 // tslint:disable:no-implicit-dependencies
 import chalk from "chalk";
-import { exec } from "shelljs";
+import { exec } from "async-shelljs";
 import * as rm from "rimraf";
 import * as process from "process";
 import "../test/testing/test-console";
