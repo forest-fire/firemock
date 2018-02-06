@@ -17,39 +17,43 @@ import {
   slashNotation,
   networkDelay
 } from "./util";
+// tslint:disable-next-line:no-submodule-imports
+import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
 
-export default class Reference<T = any> extends Query<T>
-  implements rtdb.IReference {
+export default class Reference<T = any> extends Query<T> implements IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
   }
 
-  public get parent(): rtdb.IReference | null {
+  public get parent(): IReference | null {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
     return new Reference(r, get(db, r));
   }
 
-  public child(path: string): rtdb.IReference {
+  public child<C = any>(path: string): IReference {
     const r = parts(this.path)
       .concat([path])
       .join(".");
-    return new Reference(r, get(db, r));
+    return new Reference<C>(r, get(db, r));
   }
 
-  public get root(): rtdb.IReference {
+  public get root(): IReference {
     return new Reference("/", db);
   }
 
-  public push(value?: any, onComplete?: (a: Error | null) => any): any {
+  public push(
+    value?: any,
+    onComplete?: (a: Error | null) => any
+  ): IThenableReference<T> {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {
       onComplete(null);
     }
 
-    return networkDelay<rtdb.IThenableReference>(this);
+    return networkDelay<T>(this) as any; // TODO: try and get this typed appropriately
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
