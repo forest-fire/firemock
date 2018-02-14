@@ -46,7 +46,7 @@ export default class Reference<T = any> extends Query<T> implements IReference {
   public push(
     value?: any,
     onComplete?: (a: Error | null) => any
-  ): IThenableReference<T> {
+  ): IThenableReference<IReference<T>> {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {

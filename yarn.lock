@@ -45,10 +45,6 @@
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@firebase/messaging-types/-/messaging-types-0.1.1.tgz#66d61d800081b3f7e4d26f1f8523f0a307e37730"
 
-"@firebase/storage-types@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@firebase/storage-types/-/storage-types-0.1.1.tgz#c8e1cd328e96ef5b88e07b0a4f5ce1c68087126b"
-
 "@firebase/util@0.1.5":
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/@firebase/util/-/util-0.1.5.tgz#b8daf57cedda1c035fddf5ca9c56b86a1f95b38b"
@@ -312,6 +308,13 @@
     "@types/glob" "*"
     "@types/node" "*"
 
+"@types/shelljs@^0.7.7":
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@types/shelljs/-/shelljs-0.7.8.tgz#4b4d6ee7926e58d7bca448a50ba442fd9f6715bd"
+  dependencies:
+    "@types/glob" "*"
+    "@types/node" "*"
+
 "@types/stack-trace@^0.0.28":
   version "0.0.28"
   resolved "https://registry.yarnpkg.com/@types/stack-trace/-/stack-trace-0.0.28.tgz#b3ef4f869f1d8e628408cc26d679b987b6f1aace"
@@ -455,6 +458,13 @@ assert-plus@^0.2.0:
 assertion-error@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/assertion-error/-/assertion-error-1.0.2.tgz#13ca515d86206da0bac66e834dd397d87581094c"
+
+async-shelljs@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/async-shelljs/-/async-shelljs-0.1.2.tgz#e1f660ab362dc52f5844cb8f01125e083e13a55a"
+  dependencies:
+    "@types/shelljs" "^0.7.7"
+    shelljs "^0.8.1"
 
 async@^1.4.0:
   version "1.5.2"
@@ -1117,16 +1127,15 @@ firebase-admin@^5.8.1:
     jsonwebtoken "8.1.0"
     node-forge "0.7.1"
 
-firebase-api-surface@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.1.tgz#a23bf9767817e97a7f6dc50db6d607f711bc1937"
+firebase-api-surface@^0.7.2:
+  version "0.7.9"
+  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.9.tgz#d109e672b7281739f353af440633aca22ce67c31"
   dependencies:
     "@firebase/app-types" "^0.1.1"
     "@firebase/auth-types" "^0.1.1"
     "@firebase/database-types" "^0.1.1"
     "@firebase/firestore-types" "^0.2.1"
     "@firebase/messaging-types" "^0.1.1"
-    "@firebase/storage-types" "^0.1.1"
     "@firebase/util" "^0.1.7"
 
 firebase-key@^2.0.0:
@@ -2634,9 +2643,9 @@ shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
 
-shelljs@^0.7.8:
-  version "0.7.8"
-  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.7.8.tgz#decbcf874b0d1e5fb72e14b164a9683048e9acb3"
+shelljs@^0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.1.tgz#729e038c413a2254c4078b95ed46e0397154a9f1"
   dependencies:
     glob "^7.0.0"
     interpret "^1.0.0"
