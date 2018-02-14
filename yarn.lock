@@ -1127,7 +1127,7 @@ firebase-admin@^5.8.1:
     jsonwebtoken "8.1.0"
     node-forge "0.7.1"
 
-firebase-api-surface@^0.7.2:
+firebase-api-surface@^0.7.9:
   version "0.7.9"
   resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.7.9.tgz#d109e672b7281739f353af440633aca22ce67c31"
   dependencies:
@@ -1138,9 +1138,9 @@ firebase-api-surface@^0.7.2:
     "@firebase/messaging-types" "^0.1.1"
     "@firebase/util" "^0.1.7"
 
-firebase-key@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-2.0.0.tgz#1caa572d6f5c7c94ef9a836e97b5e09d39e3edc3"
+firebase-key@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/firebase-key/-/firebase-key-2.0.1.tgz#5f1fe462c011c7f944f2f0f489c838dd1ed162ef"
 
 for-in@^1.0.1:
   version "1.0.2"
@@ -2070,7 +2070,7 @@ modelo@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/modelo/-/modelo-4.2.0.tgz#3b4b420023a66ca7e32bdba16e710937e14d1b0b"
 
-moment@^2.20.0:
+moment@^2.20.1:
   version "2.20.1"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
 
