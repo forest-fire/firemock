@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.15.8",
+  "version": "0.15.9",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -14,16 +14,15 @@
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "build": "ts-node ./scripts/build.ts",
     "test": "ts-node ./scripts/test.ts ",
-    "coverage":
-      "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
+    "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "common-types": "^1.5.2",
-    "firebase-api-surface": "^0.7.9",
+    "common-types": "^1.5.4",
+    "firebase-api-surface": "^0.7.11",
     "firebase-key": "^2.0.1",
     "gitbook-plugin-favicon": "^0.0.2",
     "lodash.difference": "^4.5.0",
