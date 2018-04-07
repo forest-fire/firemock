@@ -6,7 +6,7 @@ import SnapShot from "./snapshot";
 import Disconnected from "./disconnected";
 import get = require("lodash.get");
 
-import { db, setDB, updateDB, pushDB, removeDB } from "./database";
+import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
 import {
   parts,
   normalizeRef,
@@ -20,6 +20,11 @@ import {
 // tslint:disable-next-line:no-submodule-imports
 import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
 
+function isMultiPath(data: IDictionary) {
+  const indexesAreStrings = Object.keys(data).every(i => typeof i === "string");
+  const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
+  return indexesAreStrings && indexesLookLikeAPath ? true : false;
+}
 export default class Reference<T = any> extends Query<T> implements IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
@@ -72,11 +77,12 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     return networkDelay<void>();
   }
 
-  public update(
-    values: IDictionary,
-    onComplete?: (a: Error | null) => any
-  ): Promise<void> {
-    updateDB(this.path, values);
+  public update(values: IDictionary, onComplete?: (a: Error | null) => any): Promise<void> {
+    if (isMultiPath(values)) {
+      multiPathUpdateDB(values);
+    } else {
+      updateDB(this.path, values);
+    }
     if (onComplete) {
       onComplete(null);
     }
@@ -100,11 +106,7 @@ export default class Reference<T = any> extends Query<T> implements IReference {
 
   public transaction(
     transactionUpdate: (a: Partial<T>) => Partial<T>,
-    onComplete?: (
-      a: Error | null,
-      b: boolean,
-      c: rtdb.IDataSnapshot<T> | null
-    ) => any,
+    onComplete?: (a: Error | null, b: boolean, c: rtdb.IDataSnapshot<T> | null) => any,
     applyLocally?: boolean
   ): Promise<rtdb.ITransactionResult> {
     return Promise.resolve({
