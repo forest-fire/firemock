@@ -31,6 +31,7 @@ export function setDB(path: string, value: any) {
   notify(dotPath, value, oldValue);
 }
 
+/** single-path update */
 export function updateDB(path: string, value: any) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
@@ -39,6 +40,10 @@ export function updateDB(path: string, value: any) {
 
   set(db, dotPath, newValue);
   notify(dotPath, newValue, oldValue);
+}
+
+export function multiPathUpdateDB(data: IDictionary) {
+  Object.keys(data).map(key => updateDB(key, data[key]));
 }
 
 export function removeDB(path: string) {
