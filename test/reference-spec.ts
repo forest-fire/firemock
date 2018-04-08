@@ -9,14 +9,7 @@ import last = require("lodash.last");
 import difference = require("lodash.difference");
 import SnapShot from "../src/snapshot";
 import { reset } from "../src/database";
-import {
-  firstProp,
-  lastProp,
-  firstKey,
-  lastKey,
-  orderedSnapToJS,
-  Delays
-} from "../src/util";
+import { firstProp, lastProp, firstKey, lastKey, orderedSnapToJS, Delays } from "../src/util";
 import * as convert from "typed-conversions";
 import "mocha";
 
@@ -169,19 +162,11 @@ describe("Reference functions", () => {
       const sortedMonkeys = convert.snapshotToOrderedHash(allMonkeys);
       expect(snap.numChildren()).to.equal(10);
       expect(Object.keys(m.db.monkeys).length).to.equal(15);
-      expect(
-        Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))
-      ).to.not.equal(-1);
-      expect(
-        Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))
-      ).to.not.equal(-1);
+      expect(Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))).to.not.equal(-1);
+      expect(Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))).to.not.equal(-1);
       expect(Object.keys(filteredMonkeys)).to.include(lastKey(m.db.monkeys));
-      expect(
-        Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))
-      ).to.equal(-1);
-      expect(
-        Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))
-      ).to.equal(-1);
+      expect(Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
+      expect(Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))).to.equal(-1);
     });
 
     it("limitToFirst() an equalTo() query", async () => {
@@ -225,15 +210,9 @@ describe("Reference functions", () => {
           const listOf = snap.val();
           expect(snap.numChildren()).to.equal(10);
           expect(Object.keys(m.db.monkeys).length).to.equal(15);
-          expect(
-            Object.keys(m.db.monkeys).indexOf(lastKey(listOf))
-          ).to.not.equal(-1);
-          expect(
-            Object.keys(m.db.monkeys).indexOf(firstKey(listOf))
-          ).to.not.equal(-1);
-          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(
-            -1
-          );
+          expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
+          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
         });
     });
 
@@ -393,16 +372,12 @@ describe("Reference functions", () => {
 
       const orderedPeople = convert.snapshotToOrderedArray(results);
       for (let i = 1; i <= 8; i++) {
-        expect(orderedPeople[i].name >= orderedPeople[i + 1].name).is.equal(
-          true
-        );
+        expect(orderedPeople[i].name >= orderedPeople[i + 1].name).is.equal(true);
       }
 
       const orderedKeys = orderedPeople.map(p => p.id);
       const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(
-        JSON.stringify(unorderedKeys)
-      );
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
@@ -426,9 +401,7 @@ describe("Reference functions", () => {
 
       const orderedKeys = orderedPeople.map(p => p.id);
       const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(
-        JSON.stringify(unorderedKeys)
-      );
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
@@ -446,17 +419,13 @@ describe("Reference functions", () => {
       const orderedPeople = convert.snapshotToOrderedArray(people);
       const orderedKeys = orderedPeople.map(p => p.id);
       const unorderedKeys = convert.snapshotToArray(people).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(
-        JSON.stringify(unorderedKeys)
-      );
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
     it("orderByValue() sorts correctly", async () => {
       const m = new Mock();
-      m.addSchema("number", h => () =>
-        h.faker.random.number({ min: 0, max: 1000 })
-      );
+      m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 1000 }));
       m.queueSchema("number", 10);
       m.generate();
 
@@ -467,9 +436,7 @@ describe("Reference functions", () => {
       const orderedSnap = convert.snapshotToOrderedArray(snap);
       const orderedKeys = orderedSnap.map(p => p.id);
       const unorderedKeys = convert.snapshotToArray(snap).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(
-        JSON.stringify(unorderedKeys)
-      );
+      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
       for (let i = 1; i <= 8; i++) {
         expect(orderedSnap[i] >= orderedSnap[i + 1]).is.equal(true);
@@ -590,6 +557,51 @@ describe("Reference functions", () => {
       expect(helpers.firstKey(people)).to.equal("abcd");
       expect(helpers.firstRecord(people).name).to.equal("Happy Jack");
       expect(helpers.firstRecord(people).age).to.equal(26);
+    });
+
+    it("multi-path updates are reconized and set correctly", async () => {
+      const now = new Date().toISOString();
+      const m = new Mock({
+        people: {
+          abcd: {
+            name: "Happy Jack",
+            age: 35
+          }
+        }
+      });
+      const updated = {};
+      updated["/people/abcd/age"] = 40;
+      updated["/people/abcd/lastUpdated"] = now;
+      await m.ref("/").update(updated);
+      const person = (await m.ref("/people/abcd").once("value")).val();
+      expect(person.age).to.equal(40);
+      expect(person.lastUpdated).to.equal(now);
+      expect(person.name).to.equal("Happy Jack");
+    });
+
+    it("multi-path 'updates' behaves destructively like 'set' operations", async () => {
+      const now = new Date().toISOString();
+      const m = new Mock({
+        people: {
+          abcd: {
+            name: "Happy Jack",
+            age: 35,
+            foo: {
+              bar: 1,
+              baz: 2
+            }
+          }
+        }
+      });
+      const updated = {};
+      updated["/people/abcd/foo"] = { bar: 5 };
+      updated["/people/abcd/lastUpdated"] = now;
+      await m.ref("/").update(updated);
+      const person = (await m.ref("/people/abcd").once("value")).val();
+      expect(person.age).to.equal(35);
+      expect(person.lastUpdated).to.equal(now);
+      expect(person.foo.bar).to.equal(5);
+      expect(person.foo.baz).is.an("undefined");
     });
 
     it("remove() will remove data at referenced path", async () => {

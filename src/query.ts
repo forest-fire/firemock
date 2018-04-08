@@ -19,25 +19,13 @@ import {
   setNetworkDelay
 } from "./util";
 
-export type EventHandler =
-  | HandleValueEvent
-  | HandleNewEvent
-  | HandleRemoveEvent;
+export type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
 export type GenericEventHandler = (snap: SnapShot, key?: string) => void;
 export type HandleValueEvent = (dataSnapShot: SnapShot) => void;
-export type HandleNewEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
+export type HandleNewEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 export type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
-export type HandleMoveEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
-export type HandleChangeEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
+export type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
+export type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 
 export type QueryValue = number | string | boolean | null;
 export enum OrderingType {
@@ -97,9 +85,7 @@ export default class Query<T = any> implements rtdb.IQuery {
 
   public equalTo(value: QueryValue, key?: keyof T) {
     if (key && this._order.type === OrderingType.byKey) {
-      throw new Error(
-        "You can not use equalTo's key property when using a key sort!"
-      );
+      throw new Error("You can not use equalTo's key property when using a key sort!");
     }
     key = key ? key : this._order.value;
 
@@ -158,13 +144,7 @@ export default class Query<T = any> implements rtdb.IQuery {
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
   ): (a: rtdb.IDataSnapshot | null, b?: string) => any {
-    addListener(
-      this.path,
-      eventType,
-      callback,
-      cancelCallbackOrContext,
-      context
-    );
+    addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
 
     return null;
   }
@@ -265,17 +245,23 @@ export default class Query<T = any> implements rtdb.IQuery {
    * order to new SnapShot (so natural order is preserved)
    */
   private process(): SnapShot<T> {
-    const mockDatabaseResults: any[] = convert.hashToArray(
-      get(db, join(this.path), undefined)
-    );
-    const sorted: any[] = this.processSorting(mockDatabaseResults);
-    const remainingIds = this.processFilters(sorted).map((f: any) => f.id);
-    const snap = new SnapShot<T>(
-      leafNode(this.path),
-      mockDatabaseResults.filter(
-        (record: any) => remainingIds.indexOf(record.id) !== -1
-      )
-    );
+    // typically a hash/object but could be a JS native type (string/number/boolean)
+    const input = get(db, join(this.path), undefined);
+    let snap;
+    if (typeof input !== "object") {
+      snap = new SnapShot<T>(leafNode(this.path), input);
+    } else {
+      const mockDatabaseResults: any[] = convert.hashToArray(input);
+      const sorted: any[] = this.processSorting(mockDatabaseResults);
+      const remainingIds = this.processFilters(sorted).map(
+        (f: any) => (typeof f === "object" ? f.id : f)
+      );
+      snap = new SnapShot<T>(
+        leafNode(this.path),
+        mockDatabaseResults.filter((record: any) => remainingIds.indexOf(record.id) !== -1)
+      );
+    }
+
     snap.sortingFunction(this.getSortingFunction(this._order));
     return snap;
   }
@@ -292,6 +278,8 @@ export default class Query<T = any> implements rtdb.IQuery {
   }
 
   private processSorting(inputArray: T[]): T[] {
+    console.log("input array", inputArray);
+
     const sortFn = this.getSortingFunction(this._order);
     const sorted = inputArray.slice(0).sort(sortFn);
 
