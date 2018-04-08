@@ -21,6 +21,11 @@ import {
 import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
 
 function isMultiPath(data: IDictionary) {
+  Object.keys(data).map((d: any) => {
+    if (!d) {
+      data[d] = "/";
+    }
+  });
   const indexesAreStrings = Object.keys(data).every(i => typeof i === "string");
   const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
   return indexesAreStrings && indexesLookLikeAPath ? true : false;

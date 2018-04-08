@@ -35,15 +35,14 @@ export function setDB(path: string, value: any) {
 export function updateDB(path: string, value: any) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
-  const newValue =
-    typeof oldValue === "object" ? { ...oldValue, ...value } : value;
+  const newValue = typeof oldValue === "object" ? { ...oldValue, ...value } : value;
 
   set(db, dotPath, newValue);
   notify(dotPath, newValue, oldValue);
 }
 
 export function multiPathUpdateDB(data: IDictionary) {
-  Object.keys(data).map(key => updateDB(key, data[key]));
+  Object.keys(data).map(key => setDB(key, data[key]));
 }
 
 export function removeDB(path: string) {
@@ -104,9 +103,7 @@ export function removeListener(
       .filter(l => l.callback === callback)
       .filter(l => l.eventType === eventType);
 
-    _listeners = _listeners.filter(
-      l => l.eventType !== eventType || l.callback !== callback
-    );
+    _listeners = _listeners.filter(l => l.eventType !== eventType || l.callback !== callback);
 
     return cancelCallback(removed);
   } else {
@@ -116,10 +113,7 @@ export function removeListener(
       .filter(l => l.context === context);
 
     _listeners = _listeners.filter(
-      l =>
-        l.context !== context ||
-        l.callback !== callback ||
-        l.eventType !== eventType
+      l => l.context !== context || l.callback !== callback || l.eventType !== eventType
     );
 
     return cancelCallback(removed);
@@ -144,9 +138,7 @@ export function removeAllListeners(): number {
 }
 
 export function listenerCount(type?: rtdb.EventType) {
-  return type
-    ? _listeners.filter(l => l.eventType === type).length
-    : _listeners.length;
+  return type ? _listeners.filter(l => l.eventType === type).length : _listeners.length;
 }
 
 export function listenerPaths(type?: rtdb.EventType) {
@@ -179,11 +171,9 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
 
     if (newValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
-      findChildListeners(parent, "child_removed", "child_changed").forEach(
-        l => {
-          return l.callback(new SnapShot(key, newValue));
-        }
-      );
+      findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
+        return l.callback(new SnapShot(key, newValue));
+      });
     } else if (oldValue === undefined) {
       const { parent, key } = keyAndParent(dotPath);
       findChildListeners(parent, "child_added", "child_changed").forEach(l => {
@@ -200,13 +190,8 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
  * @param path the parent path that children are detected off of
  * @param eventType <optional> the specific child event to filter down to
  */
-export function findChildListeners(
-  path: string,
-  ...eventType: rtdb.EventType[]
-) {
-  const correctPath = _listeners.filter(
-    l => l.path === join(path) && l.eventType !== "value"
-  );
+export function findChildListeners(path: string, ...eventType: rtdb.EventType[]) {
+  const correctPath = _listeners.filter(l => l.path === join(path) && l.eventType !== "value");
 
   return eventType.length > 0
     ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
@@ -221,9 +206,7 @@ export function findChildListeners(
  * @param path path to root listening point
  */
 export function findValueListeners(path: string) {
-  return _listeners.filter(
-    l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value"
-  );
+  return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
 }
 
 /** Clears the DB and removes all listeners */
