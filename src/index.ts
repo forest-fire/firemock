@@ -1,6 +1,7 @@
 export { default as Mock } from "./mock";
 export { default } from "./mock";
 export { SchemaCallback } from "./mock";
+export { default as SchemaHelper } from "./schema-helper";
 export { default as Reference } from "./reference";
 export { default as Query } from "./query";
 export { default as SnapShot } from "./snapshot";
