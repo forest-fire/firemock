@@ -3,11 +3,11 @@ export default class SchemaHelper {
   constructor(raw: any) {
     this._db = raw;
   }
-  public get faker() {
+  public get faker(): Faker.FakerStatic {
     const faker = require("faker");
     return faker;
   }
-  public get chance() {
+  public get chance(): Chance.Chance {
     const chance = require("chance");
     return chance();
   }
