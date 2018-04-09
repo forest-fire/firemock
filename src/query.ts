@@ -59,7 +59,7 @@ export default class Query<T = any> implements rtdb.IQuery {
   private queryParams_: any;
   private orderByCalled_: any;
 
-  constructor(public path: string, protected _delay: DelayType = 5) {}
+  constructor(public path: string, protected _delay: DelayType = 5) { }
 
   public get ref(): rtdb.IReference {
     return new Reference<T>(this.path, this._delay);
@@ -278,8 +278,6 @@ export default class Query<T = any> implements rtdb.IQuery {
   }
 
   private processSorting(inputArray: T[]): T[] {
-    console.log("input array", inputArray);
-
     const sortFn = this.getSortingFunction(this._order);
     const sorted = inputArray.slice(0).sort(sortFn);
 
