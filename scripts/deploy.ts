@@ -23,31 +23,20 @@ import * as rm from "rimraf";
       currentVersion
     )
   );
-  const info: any = JSON.parse(
-    await asyncExec(`yarn info --json`, { silent: true })
-  );
+  const info: any = JSON.parse(await asyncExec(`yarn info --json`, { silent: true }));
   const npmVersion = info.data.version.trim();
-  console.log(
-    chalk.dim(
-      `- The latest published version on ${chalk.bold("npm")} is`,
-      npmVersion
-    )
-  );
+  console.log(chalk.dim(`- The latest published version on ${chalk.bold("npm")} is`, npmVersion));
 
   if (currentVersion === npmVersion) {
     console.log(
-      chalk.red.bold(
-        `- Versions are the same, update your package.json before deploying 💩`
-      )
+      chalk.red.bold(`- Versions are the same, update your package.json before deploying 💩`)
     );
   } else {
     try {
       await asyncExec(`yarn publish --new-version ${currentVersion}`);
       console.log(chalk.green.bold(`- published to npm successfully 👍\n`));
     } catch (e) {
-      console.log(
-        chalk.red.bold(`\n- problems publishing to npm: ${e.code}  😡 `)
-      );
+      console.log(chalk.red.bold(`\n- problems publishing to npm: ${e.code}  😡 `));
     }
   }
 })();
