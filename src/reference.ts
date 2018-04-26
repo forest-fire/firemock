@@ -1,5 +1,6 @@
 // tslint:disable:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
+import { key as fbKey } from "firebase-key";
 import { IDictionary } from "common-types";
 import Query from "./query";
 import SnapShot from "./snapshot";
@@ -15,7 +16,8 @@ import {
   removeKeys,
   join,
   slashNotation,
-  networkDelay
+  networkDelay,
+  DelayType
 } from "./util";
 // tslint:disable-next-line:no-submodule-imports
 import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
@@ -30,6 +32,7 @@ function isMultiPath(data: IDictionary) {
   const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
   return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
+
 export default class Reference<T = any> extends Query<T> implements IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
@@ -56,14 +59,25 @@ export default class Reference<T = any> extends Query<T> implements IReference {
   public push(
     value?: any,
     onComplete?: (a: Error | null) => any
-  ): IThenableReference<IReference<T>> {
-    const id = pushDB(this.path, value);
-    this.path = join(this.path, id);
-    if (onComplete) {
-      onComplete(null);
+  ): IThenableReference<T> {
+    if (value) {
+      const id = pushDB(this.path, value);
+      const ref = new Reference<T>(join(this.path, id), db);
+      const then = new ThenableReference<T>(join(this.path, id), db, networkDelay(ref));
+      if (onComplete) {
+        then.then(() => onComplete(null));
+      }
+      return then;
+    } else {
+      const id = fbKey();
+      const ref = new Reference<T>(join(this.path, id), db);
+      // no-arg push should not have any network delay
+      const then = new ThenableReference<T>(join(this.path, id), db, Promise.resolve(ref));
+      if (onComplete) {
+        then.then(() => onComplete(null));
+      }
+      return then;
     }
-
-    return networkDelay<T>(this) as any; // TODO: try and get this typed appropriately
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
@@ -129,5 +143,18 @@ export default class Reference<T = any> extends Query<T> implements IReference {
 
   public toString() {
     return slashNotation(join("https://mockdb.local", this.path, this.key));
+  }
+}
+
+// Implements IThenableReference by inheriting from our concrete Reference and composing a promise.
+export class ThenableReference<T = any> extends Reference<T> implements IThenableReference<T> {
+  constructor(path: string, delay: DelayType = 5, private promise: Promise<IReference<T>>) {
+    super(path, delay);
+  }
+
+  then<TResult1 = IReference<T>, TResult2 = never>(
+    onfulfilled?: ((value: IReference<T>) => TResult1 | PromiseLike<TResult1>) | undefined | null,
+    onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2> {
+    return this.promise.then(onfulfilled, onrejected);
   }
 }

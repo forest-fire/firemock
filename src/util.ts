@@ -139,11 +139,11 @@ export function setNetworkDelay(
   _delay = value;
 }
 
-export function networkDelay<T = any>(returnValue?: any): Promise<T> {
+export function networkDelay<T = any>(returnValue?: T): Promise<T> {
   return new Promise(resolve => {
     setTimeout(() => {
       if (returnValue) {
-        resolve(returnValue as T);
+        resolve(returnValue);
       } else {
         resolve();
       }

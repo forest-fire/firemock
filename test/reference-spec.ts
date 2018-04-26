@@ -495,6 +495,12 @@ describe("Reference functions", () => {
       expect(helpers.firstRecord(people).name).to.equal("Happy Jack");
     });
 
+    it("push() with no value returns new key immediately", () => {
+      const m = new Mock();
+      let key = m.ref("/people").push().key;
+      expect(key).to.be.not.undefined;
+    });
+
     it("push() can push scalar", async () => {
       const m = new Mock();
       await m.ref("/data").push(444);
