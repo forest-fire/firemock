@@ -1,5 +1,4 @@
 import { IDictionary } from "common-types";
-import * as fbKey from "firebase-key";
 import set = require("lodash.set");
 import get = require("lodash.get");
 import first = require("lodash.first");
@@ -39,7 +38,7 @@ export default class Schema<T = any> {
   private _relationships = new Queue<IRelationship>("relationships");
   private _prefix: string = "";
 
-  constructor(public schemaId: string) {}
+  constructor(public schemaId: string) { }
 
   /**
    * Add a mocking function to be used to generate the schema in mock DB

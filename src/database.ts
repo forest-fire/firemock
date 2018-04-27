@@ -8,6 +8,7 @@ import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import * as convert from "typed-conversions";
 import SnapShot from "./snapshot";
+
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];
@@ -21,6 +22,10 @@ export function updateDatabase(state: any) {
     ...db,
     ...state
   };
+}
+
+export function newId() {
+  return fbKey();
 }
 
 export function setDB(path: string, value: any) {
@@ -60,7 +65,7 @@ export function removeDB(path: string) {
 }
 
 export function pushDB(path: string, value: any): string {
-  const pushId = fbKey();
+  const pushId = newId();
   const fullPath = join(path, pushId);
 
   setDB(fullPath, value);

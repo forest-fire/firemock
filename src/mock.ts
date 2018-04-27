@@ -2,7 +2,6 @@ import { IDictionary } from "common-types";
 import set = require("lodash.set");
 import get = require("lodash.get");
 import first = require("lodash.first");
-import * as fbKey from "firebase-key";
 import SnapShot from "./snapshot";
 import Reference from "./reference";
 import Deployment from "./deployment";

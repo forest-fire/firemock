@@ -1,13 +1,12 @@
 // tslint:disable:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
-import { key as fbKey } from "firebase-key";
 import { IDictionary } from "common-types";
 import Query from "./query";
 import SnapShot from "./snapshot";
 import Disconnected from "./disconnected";
 import get = require("lodash.get");
 
-import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
+import { db, setDB, updateDB, newId, pushDB, removeDB, multiPathUpdateDB } from "./database";
 import {
   parts,
   normalizeRef,
@@ -69,7 +68,7 @@ export default class Reference<T = any> extends Query<T> implements IReference {
       }
       return then;
     } else {
-      const id = fbKey();
+      const id = newId();
       const ref = new Reference<T>(join(this.path, id), db);
       // no-arg push should not have any network delay
       const then = new ThenableReference<T>(join(this.path, id), db, Promise.resolve(ref));
@@ -152,7 +151,7 @@ export class ThenableReference<T = any> extends Reference<T> implements IThenabl
     super(path, delay);
   }
 
-  then<TResult1 = IReference<T>, TResult2 = never>(
+  public then<TResult1 = IReference<T>, TResult2 = never>(
     onfulfilled?: ((value: IReference<T>) => TResult1 | PromiseLike<TResult1>) | undefined | null,
     onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2> {
     return this.promise.then(onfulfilled, onrejected);
