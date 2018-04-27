@@ -8,7 +8,7 @@ import Deployment from "./deployment";
 import SchemaHelper from "./schema-helper";
 import Schema from "./schema";
 import Queue from "./queue";
-import { db, clearDatabase, updateDatabase } from "./database";
+import { db, clearDatabase, updateDatabase, useDeterministicIds } from "./database";
 import {
   getRandomInt,
   normalizeRef,
@@ -123,5 +123,10 @@ export default class Mock {
 
   public ref<T = any>(dbPath: string) {
     return new Reference<T>(dbPath);
+  }
+
+  public useDeterministicIds(): Mock {
+    useDeterministicIds();
+    return this;
   }
 }

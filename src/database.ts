@@ -11,10 +11,15 @@ import SnapShot from "./snapshot";
 
 export let db: IDictionary = [];
 
+let _useDeterministicIds = false;
 let _listeners: IListener[] = [];
+let _nextId = 0;
 
 export function clearDatabase() {
   db = {};
+  // go back to fbKeys unless user re-opts in
+  _useDeterministicIds = false;
+  _nextId = 0;
 }
 
 export function updateDatabase(state: any) {
@@ -24,7 +29,15 @@ export function updateDatabase(state: any) {
   };
 }
 
-export function newId() {
+export function useDeterministicIds() {
+  _useDeterministicIds = true;
+}
+
+export function newId(): string {
+  if (_useDeterministicIds) {
+    // prefix id to keep firebase from thinking this is an array index
+    return 'id' + (++_nextId);
+  }
   return fbKey();
 }
 
