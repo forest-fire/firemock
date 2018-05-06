@@ -162,8 +162,8 @@ export default class Query<T = any> implements rtdb.IQuery {
   }
 
   public off(
-    eventType: rtdb.EventType,
-    callback: (a: rtdb.IDataSnapshot<T> | null, b?: string) => any,
+    eventType?: rtdb.EventType,
+    callback?: (a: rtdb.IDataSnapshot<T> | null, b?: string) => any,
     context?: object | null): void {
     removeListener(this.path, eventType, callback, context);
   }
