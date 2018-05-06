@@ -252,17 +252,25 @@ describe("Database", () => {
       reset();
       const callback: HandleValueEvent = snap => {
         const record = helpers.firstRecord(snap.val());
-
         expect(record.name).to.equal("Humpty Dumpty");
         expect(record.age).to.equal(5);
-        done();
       };
       addListener("/people", "value", callback);
       expect(listenerCount()).to.equal(1);
-      const pushKey = pushDB("/people", {
-        name: "Humpty Dumpty",
-        age: 5
-      });
+      pushDB("/people", { name: "Humpty Dumpty", age: 5 });
+      // if we add another person, the snapshot will contain both
+      const callback2: HandleValueEvent = snap => {
+        const first = helpers.firstRecord(snap.val());
+        expect(first.name).to.equal("Humpty Dumpty");
+        expect(first.age).to.equal(5);
+        const last = helpers.lastRecord(snap.val());
+        expect(last.name).to.equal("An Egg");
+        expect(last.age).to.equal(15);
+        done();
+      };
+      removeListener("/people", "value", callback);
+      addListener("/people", "value", callback2);
+      pushDB("/people", { name: "An Egg", age: 15 });
     });
 
     it('"value" responds to UPDATED child', done => {
@@ -332,7 +340,7 @@ describe("Database", () => {
       reset();
       const callback: HandleValueEvent = snap => {
         const scalar = snap.val();
-        expect(scalar).to.not.equal(53);
+        expect(scalar).to.equal(53);
         done();
       };
       addListener("/scalar", "value", callback);

@@ -4,6 +4,7 @@ import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
 import set = require("lodash.set");
 import get = require("lodash.get");
+import * as _ from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import * as convert from "typed-conversions";
@@ -187,7 +188,7 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
         result = get(db, l.path);
         delete result[getKey(dotPath)];
       } else {
-        set(result, pathDiff(dotPath, l.path), newValue);
+        result = _.cloneDeep(listeningRoot);
       }
       return l.callback(new SnapShot(join(l.path), result));
     });
