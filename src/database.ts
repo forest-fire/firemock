@@ -65,6 +65,11 @@ export function updateDB(path: string, value: any) {
 }
 
 export function multiPathUpdateDB(data: IDictionary) {
+  // Currently this fires N notification events for each entry
+  // in data (e.g. if listening to /path and data has /path/1
+  // and /path/2, there are two events fired). Ideally we would
+  // apply all of the updates, and then fire a single notification
+  // event.
   Object.keys(data).map(key => setDB(key, data[key]));
 }
 
