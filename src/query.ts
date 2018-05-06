@@ -148,8 +148,8 @@ export default class Query<T = any> implements rtdb.IQuery {
     return null;
   }
 
-  public once(eventType: "value") {
-    return networkDelay(this.process()) as Promise<rtdb.IDataSnapshot<T>>;
+  public once(eventType: "value"): Promise<rtdb.IDataSnapshot<T>> {
+    return networkDelay(this.process());
   }
 
   public onceSync(eventType: "value"): rtdb.IDataSnapshot<T> {
