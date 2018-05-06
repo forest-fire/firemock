@@ -95,6 +95,10 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     return networkDelay<void>();
   }
 
+  public setSync(value: any): void {
+    setDB(this.path, value);
+  }
+
   public update(values: IDictionary, onComplete?: (a: Error | null) => any): Promise<void> {
     if (isMultiPath(values)) {
       multiPathUpdateDB(values);
