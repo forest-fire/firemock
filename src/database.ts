@@ -41,12 +41,16 @@ export function newId(): string {
   return fbKey();
 }
 
-export function setDB(path: string, value: any) {
+export function setDB(path: string, value: any): void {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
 
   set(db, dotPath, value);
   notify(dotPath, value, oldValue);
+}
+
+export function getDB(path: string): any {
+  return get(db, join(path), undefined);
 }
 
 /** single-path update */
