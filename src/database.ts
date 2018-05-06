@@ -102,6 +102,7 @@ export function addListener(
 }
 
 export function removeListener(
+  path: string,
   eventType?: rtdb.EventType,
   callback?: (snap: SnapShot, key?: string) => void,
   context?: IDictionary
@@ -110,30 +111,30 @@ export function removeListener(
     return removeAllListeners();
   }
 
+  path = join(path);
   if (!callback) {
-    const removed = _listeners.filter(l => l.eventType === eventType);
-    _listeners = _listeners.filter(l => l.eventType !== eventType);
+    const removed = _listeners.filter(l => l.path === path && l.eventType === eventType);
+    _listeners = _listeners.filter(l => l.path !== path || l.eventType !== eventType);
     return cancelCallback(removed);
   }
 
   if (!context) {
     const removed = _listeners
+      .filter(l => l.path === path)
       .filter(l => l.callback === callback)
       .filter(l => l.eventType === eventType);
-
-    _listeners = _listeners.filter(l => l.eventType !== eventType || l.callback !== callback);
-
+    _listeners = _listeners.filter(l =>
+      l.path !== path || l.eventType !== eventType || l.callback !== callback);
     return cancelCallback(removed);
   } else {
     const removed = _listeners
+      .filter(l => l.path === path)
       .filter(l => l.callback === callback)
       .filter(l => l.eventType === eventType)
       .filter(l => l.context === context);
-
-    _listeners = _listeners.filter(
-      l => l.context !== context || l.callback !== callback || l.eventType !== eventType
+    _listeners = _listeners.filter(l =>
+      l.path !== path || l.context !== context || l.callback !== callback || l.eventType !== eventType
     );
-
     return cancelCallback(removed);
   }
 }

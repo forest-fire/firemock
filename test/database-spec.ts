@@ -62,7 +62,7 @@ describe("Database", () => {
       addListener("/path/to/node", "value", callback);
       addListener("/path/to/node", "value", callback);
       expect(listenerCount()).to.equal(3);
-      removeListener();
+      removeListener("/path/to/node");
       expect(listenerCount()).to.equal(0);
       addListener("/path/to/node", "value", callback);
       addListener("/path/to/node", "value", callback);
@@ -71,17 +71,18 @@ describe("Database", () => {
       removeAllListeners();
     });
 
-    it("can remove all listeners of given eventType", () => {
+    it("can remove listeners of given eventType", () => {
       const callback: GenericEventHandler = snap => undefined;
       removeAllListeners();
       addListener("/path/to/value1", "value", callback);
       addListener("/path/to/added", "child_added", callback);
       addListener("/path/to/value2", "value", callback);
       addListener("/path/to/moved", "child_moved", callback);
-      removeListener("child_added");
+      removeListener("/path/to/added", "child_added");
       expect(listenerCount()).to.equal(3);
       listenerPaths().forEach(p => expect(p).to.not.include("added"));
-      removeListener("value");
+      removeListener("/path/to/value1", "value");
+      removeListener("/path/to/value2", "value");
       expect(listenerCount()).to.equal(1);
       listenerPaths().forEach(p => expect(p).to.include("moved"));
     });
@@ -95,7 +96,8 @@ describe("Database", () => {
       addListener("/path/to/added", "child_added", callback);
       addListener("/path/to/value3", "value", callback2);
       addListener("/path/to/moved", "child_moved", callback);
-      removeListener("value", callback);
+      removeListener("/path/to/value1", "value", callback);
+      removeListener("/path/to/value2", "value", callback);
       expect(listenerCount()).to.equal(3);
       expect(listenerCount("value")).to.equal(1);
       listenerPaths("value").forEach(l => expect(l).to.include("value3"));
@@ -113,7 +115,7 @@ describe("Database", () => {
       addListener("/path/to/value3", "value", callback2, null, context2);
       addListener("/path/to/moved", "child_moved", callback, null, context);
       expect(listenerCount()).to.equal(5);
-      removeListener("value", callback2, context2);
+      removeListener("/path/to/value2", "value", callback2, context);
       expect(listenerCount()).to.equal(4);
       expect(listenerPaths("value")).to.be.length(2);
     });
@@ -137,8 +139,10 @@ describe("Database", () => {
       addListener("/path/to/added", "child_added", callback, cancelCallback);
       addListener("/path/to/value3", "value", callback2);
       addListener("/path/to/moved", "child_moved", callback);
-      howMany = removeListener("value");
-      expect(howMany).to.equal(2);
+      howMany = removeListener("/path/to/value1", "value");
+      expect(howMany).to.equal(1);
+      howMany = removeListener("/path/to/value2", "value");
+      expect(howMany).to.equal(1);
       expect(count).to.equal(5);
     });
   });

@@ -1,7 +1,7 @@
 import { IDictionary } from "common-types";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
-import { db, addListener } from "./database";
+import { db, addListener, removeListener } from "./database";
 import get = require("lodash.get");
 import SnapShot from "./snapshot";
 import Queue from "./queue";
@@ -134,7 +134,6 @@ export default class Query<T = any> implements rtdb.IQuery {
       });
     };
     this._queryFilters.push(filter);
-
     return this;
   }
 
@@ -157,8 +156,11 @@ export default class Query<T = any> implements rtdb.IQuery {
     return this.process();
   }
 
-  public off() {
-    console.log("off() not implemented yet");
+  public off(
+    eventType: rtdb.EventType,
+    callback: (a: rtdb.IDataSnapshot<T> | null, b?: string) => any,
+    context?: object | null): void {
+    removeListener(this.path, eventType, callback, context);
   }
 
   /** NOT IMPLEMENTED YET */
