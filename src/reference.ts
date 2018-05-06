@@ -81,18 +81,20 @@ export default class Reference<T = any> extends Query<T> implements IReference {
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
     removeDB(this.path);
-    if (onComplete) {
-      onComplete(null);
-    }
-    return networkDelay<void>();
+    return networkDelay<void>().then(() => {
+      if (onComplete) {
+        onComplete(null);
+      }
+    });
   }
 
   public set(value: any, onComplete?: (a: Error | null) => any): Promise<void> {
     setDB(this.path, value);
-    if (onComplete) {
-      onComplete(null);
-    }
-    return networkDelay<void>();
+    return networkDelay<void>().then(() => {
+      if (onComplete) {
+        onComplete(null);
+      }
+    });
   }
 
   public setSync(value: any): void {
@@ -105,10 +107,11 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     } else {
       updateDB(this.path, values);
     }
-    if (onComplete) {
-      onComplete(null);
-    }
-    return networkDelay<void>();
+    return networkDelay<void>().then(() => {
+      if (onComplete) {
+        onComplete(null);
+      }
+    });
   }
 
   public setPriority(
