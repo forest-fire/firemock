@@ -144,8 +144,13 @@ export default class Query<T = any> implements rtdb.IQuery {
     context?: object | null
   ): (a: rtdb.IDataSnapshot | null, b?: string) => any {
     addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
-
-    return null;
+    if (eventType === "value") {
+      const current = this.onceSync("value");
+      if (current && current.val()) {
+        networkDelay(null).then(() => callback(current));
+      }
+    }
+    return callback;
   }
 
   public once(eventType: "value"): Promise<rtdb.IDataSnapshot<T>> {
