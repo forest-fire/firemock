@@ -1,12 +1,20 @@
 {
   "name": "firemock",
-  "version": "0.15.15",
+  "version": "0.16.0",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
   "author": "Ken Snyder<ken@ken.net>",
-  "keywords": ["serverless", "typescript", "firebase", "mocking", "testing"],
-  "files": ["lib"],
+  "keywords": [
+    "serverless",
+    "typescript",
+    "firebase",
+    "mocking",
+    "testing"
+  ],
+  "files": [
+    "lib"
+  ],
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "scripts": {
@@ -70,7 +78,7 @@
     "ts-node": "^5.0.1",
     "tslint": "^5.9.1",
     "tslint-config-prettier": "^1.1.0",
-    "typescript": "^2.8.1"
+    "typescript": "^3.0.0-dev.20180522"
   },
   "engines": {
     "node": ">=6.0.0"
