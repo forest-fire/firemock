@@ -113,7 +113,7 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
 
     return this as rtdb.IQuery<T>;
   }
-
+  /** Creates a Query with the specified starting point. */
   public startAt(value: QueryValue, key?: string): rtdb.IQuery<T> {
     key = key ? key : this._order.value;
     const filter: IQueryFilter<T> = resultset => {

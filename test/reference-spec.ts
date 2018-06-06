@@ -9,7 +9,14 @@ import last = require("lodash.last");
 import difference = require("lodash.difference");
 import SnapShot from "../src/snapshot";
 import { reset } from "../src/database";
-import { firstProp, lastProp, firstKey, lastKey, orderedSnapToJS, Delays } from "../src/util";
+import {
+  firstProp,
+  lastProp,
+  firstKey,
+  lastKey,
+  orderedSnapToJS,
+  Delays
+} from "../src/util";
 import * as convert from "typed-conversions";
 import "mocha";
 
@@ -69,8 +76,7 @@ describe("Reference functions", () => {
       const m = new Mock();
       m.addSchema("foo", mocker);
       m.addSchema("bar", mocker);
-      m
-        .queueSchema("foo", 5)
+      m.queueSchema("foo", 5)
         .queueSchema("bar", 5)
         .generate();
       m.setDelay(100);
@@ -104,8 +110,7 @@ describe("Reference functions", () => {
       const m = new Mock();
       m.addSchema("foo", mocker);
       m.addSchema("bar", mocker);
-      m
-        .queueSchema("foo", 5)
+      m.queueSchema("foo", 5)
         .queueSchema("bar", 5)
         .generate();
       m.setDelay([50, 80]);
@@ -162,8 +167,12 @@ describe("Reference functions", () => {
       const sortedMonkeys = convert.snapshotToOrderedHash(allMonkeys);
       expect(snap.numChildren()).to.equal(10);
       expect(Object.keys(m.db.monkeys).length).to.equal(15);
-      expect(Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))).to.not.equal(-1);
-      expect(Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))).to.not.equal(-1);
+      expect(Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))).to.not.equal(
+        -1
+      );
+      expect(Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))).to.not.equal(
+        -1
+      );
       expect(Object.keys(filteredMonkeys)).to.include(lastKey(m.db.monkeys));
       expect(Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
       expect(Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))).to.equal(-1);
@@ -365,10 +374,10 @@ describe("Reference functions", () => {
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
-      const results = m
+      const results = await m
         .ref("/people")
         .orderByChild("name")
-        .onceSync("value");
+        .once("value");
 
       const orderedPeople = convert.snapshotToOrderedArray(results);
       for (let i = 1; i <= 8; i++) {
@@ -386,10 +395,10 @@ describe("Reference functions", () => {
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
-      const results = m
+      const results = await m
         .ref("/people")
         .orderByChild("inUSA")
-        .onceSync("value");
+        .once("value");
 
       const orderedPeople = convert.snapshotToOrderedArray(results);
 
