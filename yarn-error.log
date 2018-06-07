@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn run build
+  /usr/local/bin/node /usr/local/bin/yarn run test
 
 PATH: 
   /usr/local/bin:/Users/ken/.yarn/bin:/usr/local/share/android-sdk/platform-tools:.:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/MacGPG2/bin:/Users/ken/.yarn/bin:/usr/local/share/android-sdk/platform-tools:.:/Users/ken/Library/Python/2.7/bin:/usr/local/sbin:/opt/local/bin:/opt/local/sbin:/opt/X11/bin:/Users/kensnyder/.rvm/bin:/Users/kensnyder/.ec2/bin:/Developer/usr/bin:/Users/kensnyder/pear/bin:/usr/local/share/npm/bin:/Applications/Couchbase Server.app/Contents/Resources/couchbase-core/bin:/Users/kensnyder/repos/mine/api/commandline/bin:/Users/ken/Library/Python/2.7/bin:/usr/local/sbin:/usr/local/bin:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Users/kensnyder/.rvm/bin:/Users/kensnyder/.ec2/bin:/Developer/usr/bin:/Users/kensnyder/pear/bin:/usr/local/share/npm/bin:/Applications/Couchbase Server.app/Contents/Resources/couchbase-core/bin:/Users/kensnyder/repos/mine/api/commandline/bin
@@ -16,7 +16,7 @@ Platform:
 npm manifest: 
   {
     "name": "firemock",
-    "version": "0.16.0",
+    "version": "0.16.1",
     "description": "firemock",
     "license": "MIT",
     "repository": "git@github.com:forest-fire/firemock.git",
@@ -31,13 +31,15 @@ npm manifest:
     "files": [
       "lib"
     ],
-    "main": "lib/index.js",
+    "main": "dist/index.cjs.js",
+    "module": "list/index.js",
+    "browser": "dist/index.min.js",
     "typings": "lib/index.d.ts",
     "scripts": {
       "clean": "rimraf lib",
       "lint": "tslint --force --format verbose \"src/**/*.ts\"",
       "build": "tslint src/**/*.ts && tsc && bili lib/index.js --format umd-min,cjs",
-      "test": "ts-node ./scripts/test.ts ",
+      "test": "TS_NODE_PROJECT='tsconfig.test.json' ts-node ./scripts/test.ts",
       "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
       "watch": "ts-node ./scripts/watch.ts",
       "watch:test": "ts-node ./scripts/watch.ts test",
@@ -3749,9 +3751,9 @@ Lockfile:
 
 Trace: 
   Error: Command failed.
-  Exit code: 2
+  Exit code: 1
   Command: sh
-  Arguments: -c tslint src/**/*.ts && tsc && bili lib/index.js --format umd-min,cjs
+  Arguments: -c TS_NODE_PROJECT='tsconfig.test.json' ts-node ./scripts/test.ts
   Directory: /Users/ken/mine/forest-fire/firemock
   Output:
   

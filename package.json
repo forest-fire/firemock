@@ -23,7 +23,7 @@
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
     "build": "tslint src/**/*.ts && tsc && bili lib/index.js --format umd-min,cjs",
-    "test": "ts-node ./scripts/test.ts ",
+    "test": "TS_NODE_PROJECT='tsconfig.test.json' ts-node ./scripts/test.ts",
     "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
     "watch:test": "ts-node ./scripts/watch.ts test",

@@ -25,9 +25,7 @@ function getScope(files: string): string {
   }
 
   console.log(
-    chalk.green(
-      `${chalk.bold("mocha")} --compilers ts:ts-node/register  ${fileScope}`
-    )
+    chalk.green(`${chalk.bold("mocha")} --compilers ts:ts-node/register  ${fileScope}`)
   );
 
   return fileScope;
@@ -52,6 +50,7 @@ function cleanJSTests() {
 
 function executeTests(stg: string, fileScope: string): void {
   process.env.AWS_STAGE = stg;
+  process.env.TS_NODE_PROJECT = "tsconfig.scripts.json";
   process.env.TS_NODE_COMPILER_OPTIONS = '{ "noImplicitAny": false }';
   exec(`mocha --require ts-node/register ` + fileScope);
 }
@@ -63,12 +62,7 @@ if (process.argv.length === 2) {
 
 program
   .arguments("[files]")
-  .option(
-    "-s, --stage [env]",
-    "Environment to use",
-    /^(dev|test|stage|prod)^/,
-    "test"
-  )
+  .option("-s, --stage [env]", "Environment to use", /^(dev|test|stage|prod)^/, "test")
   .option(
     "-f, --files",
     "an alternative syntax to just specifying files as first argument on command line"
