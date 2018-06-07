@@ -1,14 +1,8 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
-import { IDictionary } from "common-types";
 import * as chai from "chai";
-import * as helpers from "./testing/helpers";
-// tslint:disable-next-line
 import { length } from "./testing/helpers";
 import Mock, { SchemaCallback } from "../src/mock";
-import SchemaHelper from "../src/schema-helper";
-import first = require("lodash.first");
-import last = require("lodash.last");
 
 const expect = chai.expect;
 

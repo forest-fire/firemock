@@ -1,10 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
-import { IDictionary } from "common-types";
 import * as chai from "chai";
 import Queue from "../src/queue";
-import first = require("lodash.first");
-import last = require("lodash.last");
 
 const expect = chai.expect;
 
@@ -15,8 +12,7 @@ describe("Queue Class", () => {
 
   it("simple queue can add items", () => {
     const q = new Queue("testing");
-    q
-      .clear()
+    q.clear()
       .enqueue("foo")
       .enqueue("bar")
       .enqueue("baz");
@@ -25,8 +21,7 @@ describe("Queue Class", () => {
 
   it("simple queue can enqueue and dequeue items", () => {
     const q = new Queue("testing");
-    q
-      .clear()
+    q.clear()
       .enqueue("foo")
       .enqueue("bar")
       .enqueue("baz");
@@ -48,8 +43,7 @@ describe("Queue Class", () => {
 
   it("object queue can add items", () => {
     const q = new Queue("testing");
-    q
-      .clear()
+    q.clear()
       .enqueue({ id: 1, value: "foo" })
       .enqueue({ id: 2, value: "bar" })
       .enqueue({ id: 3, value: "baz" });
@@ -64,8 +58,7 @@ describe("Queue Class", () => {
 
   it("object queue can enqueue and dequeue items", () => {
     const q = new Queue("testing");
-    q
-      .clear()
+    q.clear()
       .enqueue({ id: 1, value: "foo" })
       .enqueue({ id: 2, value: "bar" })
       .enqueue({ id: 3, value: "baz" });
@@ -78,8 +71,7 @@ describe("Queue Class", () => {
   it("queue is a singleton", () => {
     const q = new Queue("singleton");
     const q2 = new Queue("singleton");
-    q
-      .clear()
+    q.clear()
       .enqueue("foo")
       .enqueue("bar");
     expect(q2.length).to.equal(2);
@@ -89,12 +81,10 @@ describe("Queue Class", () => {
   it("separate queues remain separate", () => {
     const q = new Queue("first");
     const q2 = new Queue("second");
-    q
-      .clear()
+    q.clear()
       .enqueue("foo")
       .enqueue("bar");
-    q2
-      .clear()
+    q2.clear()
       .enqueue("uno")
       .enqueue("dos");
     expect(q.length).to.equal(2);

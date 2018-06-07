@@ -1,10 +1,10 @@
-export { default as Mock } from "./mock";
-export { default } from "./mock";
-export { SchemaCallback } from "./mock";
+export { default as Mock, SchemaCallback } from "./mock";
 export { default as SchemaHelper } from "./schema-helper";
 export { default as Reference } from "./reference";
 export { default as Query } from "./query";
 export { default as SnapShot } from "./snapshot";
+export { default as Queue } from "./queue";
+export { default as Schema } from "./schema";
 export { reset as resetDatabase } from "./database";
 
 export {

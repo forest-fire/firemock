@@ -1,22 +1,16 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es2015",
+    "lib": ["es2015", "esnext.asynciterable", "es2015.reflect"],
     "moduleResolution": "node",
     "sourceMap": true,
     "noImplicitAny": true,
     "outDir": "./lib",
     "removeComments": false,
-    "typeRoots": [
-      "./node_modules/@types"
-    ]
+    "typeRoots": ["./node_modules/@types"]
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "**/*-spec.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*-spec.ts"]
 }

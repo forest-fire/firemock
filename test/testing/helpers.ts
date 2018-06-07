@@ -1,7 +1,6 @@
 // tslint:disable:no-implicit-dependencies
 import { IDictionary } from "common-types";
-import first = require("lodash.first");
-import last = require("lodash.last");
+import { first, last } from "lodash-es";
 import * as fs from "fs";
 import * as yaml from "js-yaml";
 import * as process from "process";

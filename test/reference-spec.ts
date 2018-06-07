@@ -4,9 +4,7 @@ import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import Mock, { SchemaCallback } from "../src/mock";
 import SchemaHelper from "../src/schema-helper";
-import first = require("lodash.first");
-import last = require("lodash.last");
-import difference = require("lodash.difference");
+import { difference } from "lodash-es";
 import SnapShot from "../src/snapshot";
 import { reset } from "../src/database";
 import {
@@ -37,25 +35,6 @@ describe("Reference functions", () => {
   describe("Basic DB Querying: ", () => {
     beforeEach(() => {
       reset();
-    });
-
-    it.skip("using onceSync(), querying returns a synchronous result", () => {
-      reset();
-      const m = new Mock();
-      m.addSchema("cat", mocker);
-      m.queueSchema("cat", 5);
-      m.generate();
-      try {
-        const results = m.ref("/cats").onceSync("value") as SnapShot;
-        expect(results.val).to.be.a("function");
-        expect(results.child).to.be.a("function");
-        expect(results.hasChild).to.be.a("function");
-
-        expect(results.key).to.equal("cats");
-        expect(firstProp(results.val()).name).to.be.a("string");
-      } catch (e) {
-        throw new Error(e);
-      }
     });
 
     it.skip("with default 5ms delay, querying returns an asynchronous result", () => {
@@ -279,7 +258,7 @@ describe("Reference functions", () => {
       expect(mature.numChildren()).to.equal(10);
     });
 
-    it("startAt() filters a string property", () => {
+    it("startAt() filters a string property", async () => {
       const m = new Mock();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
@@ -290,15 +269,15 @@ describe("Reference functions", () => {
       m.queueSchema("dog", 10, { born: "2016-12-08T08:02:17-05:00" });
       m.generate();
 
-      const all = m.ref("/dogs").onceSync("value");
-      const nov14 = m
+      const all = await m.ref("/dogs").once("value");
+      const nov14 = await m
         .ref("/dogs")
         .startAt("2014-11-01T01:00:00-05:00", "born")
-        .onceSync("value");
-      const pupsOnly = m
+        .once("value");
+      const pupsOnly = await m
         .ref("/dogs")
         .startAt("2016-12-01T08:02:17-05:00", "born")
-        .onceSync("value");
+        .once("value");
 
       expect(all.numChildren()).to.equal(30);
       expect(nov14.numChildren()).to.equal(20);
@@ -307,7 +286,7 @@ describe("Reference functions", () => {
 
     it.skip("startAt() filters sort by value when using value sort");
     it.skip("endAt() filters result by key by default");
-    it("endAt() filters a numeric property", () => {
+    it("endAt() filters a numeric property", async () => {
       const m = new Mock();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
@@ -318,17 +297,17 @@ describe("Reference functions", () => {
       m.queueSchema("dog", 10, { age: 10 });
       m.generate();
 
-      const results = m.ref("/dogs").onceSync("value");
-      const pups = m
+      const results = await m.ref("/dogs").once("value");
+      const pups = await m
         .ref("/dogs")
         .endAt(2, "age")
-        .onceSync("value");
+        .once("value");
 
       expect(results.numChildren()).to.equal(30);
       expect(pups.numChildren()).to.equal(10);
     });
     it.skip("endAt() filters sort by value when using value sort");
-    it("startAt() combined with endAt() filters correctly", () => {
+    it("startAt() combined with endAt() filters correctly", async () => {
       const m = new Mock();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
@@ -339,12 +318,12 @@ describe("Reference functions", () => {
       m.queueSchema("dog", 10, { age: 10 });
       m.generate();
 
-      const results = m.ref("/dogs").onceSync("value");
-      const middling = m
+      const results = await m.ref("/dogs").once("value");
+      const middling = await m
         .ref("/dogs")
         .startAt(3, "age")
         .endAt(9, "age")
-        .onceSync("value");
+        .once("value");
 
       expect(results.numChildren()).to.equal(30);
       expect(middling.numChildren()).to.equal(10);
