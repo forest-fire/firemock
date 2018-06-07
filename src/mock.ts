@@ -1,25 +1,8 @@
 import { IDictionary } from "common-types";
-import set = require("lodash.set");
-import get = require("lodash.get");
-import first = require("lodash.first");
-import * as fbKey from "firebase-key";
-import SnapShot from "./snapshot";
-import Reference from "./reference";
 import Deployment from "./deployment";
-import SchemaHelper from "./schema-helper";
-import Schema from "./schema";
-import Queue from "./queue";
+import { Queue, Schema, SchemaHelper, Reference } from ".";
 import { db, clearDatabase, updateDatabase } from "./database";
-import {
-  getRandomInt,
-  normalizeRef,
-  leafNode,
-  DelayType,
-  Delays,
-  setNetworkDelay
-} from "./util";
-
-export { default as SchemaHelper } from "./schema-helper";
+import { DelayType, setNetworkDelay } from "./util";
 
 export interface ISchema {
   id: string;

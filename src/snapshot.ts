@@ -1,5 +1,5 @@
 import { IDictionary, SortingFunction } from "common-types";
-import get = require("lodash.get");
+import { get } from "lodash-es";
 import Reference from "./reference";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
@@ -26,9 +26,7 @@ export default class SnapShot<T = any> implements rtdb.IDataSnapshot {
   }
 
   public val() {
-    return Array.isArray(this._value)
-      ? convert.arrayToHash(this._value)
-      : this._value;
+    return Array.isArray(this._value) ? convert.arrayToHash(this._value) : this._value;
   }
 
   public toJSON() {

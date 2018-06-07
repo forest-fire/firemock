@@ -1,10 +1,8 @@
 import { IDictionary } from "common-types";
 import * as fbKey from "firebase-key";
-import set = require("lodash.set");
-import get = require("lodash.get");
-import first = require("lodash.first");
+import { set, get, first } from "lodash-es";
 import { IRelationship, ISchema, IQueue } from "./mock";
-import { getRandomInt, join, dotNotation } from "./util";
+import { getRandomInt, dotNotation } from "./util";
 import Queue from "./queue";
 import pluralize from "./pluralize";
 import { db } from "./database";
@@ -135,16 +133,16 @@ export default class Deployment {
       dotNotation(path) + `.${key}`,
       typeof mock === "object"
         ? { ...mock, ...overrides }
-        : overrides && typeof overrides !== "object" ? overrides : mock
+        : overrides && typeof overrides !== "object"
+          ? overrides
+          : mock
     );
 
     return key;
   }
 
   private insertRelationshipLinks(queue: IQueue) {
-    const relationships = this._relationships.filter(
-      r => r.source === queue.schema
-    );
+    const relationships = this._relationships.filter(r => r.source === queue.schema);
     const belongsTo = relationships.filter(r => r.type === "belongsTo");
     const hasMany = relationships.filter(r => r.type === "hasMany");
 
@@ -188,8 +186,7 @@ export default class Deployment {
     });
 
     hasMany.forEach(r => {
-      const fulfill =
-        Object.keys(queue.hasMany || {}).indexOf(r.sourceProperty) !== -1;
+      const fulfill = Object.keys(queue.hasMany || {}).indexOf(r.sourceProperty) !== -1;
       const howMany = fulfill ? queue.hasMany[r.sourceProperty] : 0;
 
       const source = this._schemas.find(r.source);
@@ -224,19 +221,11 @@ export default class Deployment {
       const property = r.sourceProperty;
 
       const path = source.path();
-      const sourceRecords: IDictionary = get(
-        db,
-        dotNotation(source.path()),
-        {}
-      );
+      const sourceRecords: IDictionary = get(db, dotNotation(source.path()), {});
 
       Object.keys(sourceRecords).forEach(key => {
         for (let i = 1; i <= howMany; i++) {
-          set(
-            db,
-            `${dotNotation(source.path())}.${key}.${property}.${getID()}`,
-            true
-          );
+          set(db, `${dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
         }
       });
     });

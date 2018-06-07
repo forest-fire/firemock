@@ -2,7 +2,7 @@
 import { IDictionary } from "common-types";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import set = require("lodash.set");
+import { set } from "lodash-es";
 import Mock, { SchemaHelper, SchemaCallback } from "../src/mock";
 import {
   db,
@@ -267,8 +267,7 @@ describe("Database", () => {
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
-      m
-        .ref("/people")
+      m.ref("/people")
         .once("value")
         .then(people => {
           const firstKey = helpers.firstKey(people.val());
@@ -307,8 +306,7 @@ describe("Database", () => {
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
-      m
-        .ref("/people")
+      m.ref("/people")
         .once("value")
         .then(people => {
           const firstKey = helpers.firstKey(people.val());

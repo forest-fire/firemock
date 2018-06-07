@@ -1,10 +1,8 @@
 // tslint:disable:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
-import Query from "./query";
-import SnapShot from "./snapshot";
-import Disconnected from "./disconnected";
-import get = require("lodash.get");
+import { Query } from "./";
+import { get } from "lodash-es";
 
 import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
 import {
@@ -82,7 +80,10 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     return networkDelay<void>();
   }
 
-  public update(values: IDictionary, onComplete?: (a: Error | null) => any): Promise<void> {
+  public update(
+    values: IDictionary,
+    onComplete?: (a: Error | null) => any
+  ): Promise<void> {
     if (isMultiPath(values)) {
       multiPathUpdateDB(values);
     } else {
@@ -123,8 +124,8 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     });
   }
 
-  public onDisconnect(): rtdb.IOnDisconnect {
-    return new Disconnected();
+  public onDisconnect(): any {
+    return {};
   }
 
   public toString() {

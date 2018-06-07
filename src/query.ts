@@ -2,7 +2,7 @@ import { IDictionary } from "common-types";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
 import { db, addListener } from "./database";
-import get = require("lodash.get");
+import { get } from "lodash-es";
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";
@@ -151,10 +151,6 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
 
   public once(eventType: "value") {
     return networkDelay(this.process()) as Promise<rtdb.IDataSnapshot<T>>;
-  }
-
-  public onceSync(eventType: "value"): rtdb.IDataSnapshot<T> {
-    return this.process();
   }
 
   public off() {

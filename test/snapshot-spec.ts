@@ -2,13 +2,7 @@
 import "mocha";
 import { IDictionary } from "common-types";
 import * as chai from "chai";
-import * as helpers from "./testing/helpers";
-import Mock, { SchemaCallback } from "../src/mock";
-import SchemaHelper from "../src/schema-helper";
-import first = require("lodash.first");
-import last = require("lodash.last");
 import SnapShot from "../src/snapshot";
-import { firstProp, lastProp, firstKey, lastKey, Delays } from "../src/util";
 const expect = chai.expect;
 
 describe("SnapShot:", () => {

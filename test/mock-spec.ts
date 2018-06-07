@@ -1,14 +1,11 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
-import { IDictionary } from "common-types";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import Mock, { SchemaCallback } from "../src/mock";
 import SchemaHelper from "../src/schema-helper";
-import first = require("lodash.first");
-import last = require("lodash.last");
-import SnapShot from "../src/snapshot";
-import { firstProp, lastProp, firstKey, lastKey, Delays } from "../src/util";
+import { first } from "lodash-es";
+import { firstProp, lastProp } from "../src/util";
 
 const expect = chai.expect;
 
@@ -41,7 +38,7 @@ describe("Mock class()", () => {
   });
 
   describe("Building and basic config of database", () => {
-    it("Sending in raw data to constructor allows manual setting of database state", () => {
+    it("Sending in raw data to constructor allows manual setting of database state", async () => {
       const m = new Mock({
         monkeys: {
           a: { name: "abbey" },
@@ -52,15 +49,11 @@ describe("Mock class()", () => {
 
       expect(m.db.monkeys).to.be.an("object");
       expect(m.db.monkeys.a.name).to.equal("abbey");
-      expect(
-        m
-          .ref("/monkeys")
-          .onceSync("value")
-          .numChildren()
-      ).to.equal(3);
+      const result = await m.ref("/monkeys").once("value");
+      expect(result.numChildren()).to.equal(3);
     });
 
-    it("Adding a call to updateDB() allows additional state in conjunction with API additions", () => {
+    it("Adding a call to updateDB() allows additional state in conjunction with API additions", async () => {
       const m = new Mock();
       m.addSchema("owner").mock(h => () => ({
         name: h.faker.name.firstName()
@@ -78,18 +71,11 @@ describe("Mock class()", () => {
       expect(m.db.monkeys).to.be.an("object");
       expect(m.db.owners).to.be.an("object");
       expect(m.db.monkeys.a.name).to.equal("abbey");
-      expect(
-        m
-          .ref("/monkeys")
-          .onceSync("value")
-          .numChildren()
-      ).to.equal(3);
-      expect(
-        m
-          .ref("/owners")
-          .onceSync("value")
-          .numChildren()
-      ).to.equal(10);
+      const monkeys = await m.ref("/monkeys").once("value");
+      expect(monkeys.numChildren()).to.equal(3);
+
+      const owners = await m.ref("/owners").once("value");
+      expect(owners.numChildren()).to.equal(10);
     });
 
     it("Simple mock-to-generate populates DB correctly", () => {
@@ -114,8 +100,7 @@ describe("Mock class()", () => {
 
     it("using pluralName() modifier changes a schema's database path", () => {
       const m = new Mock();
-      m
-        .addSchema("foo")
+      m.addSchema("foo")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .pluralName("fooie")
         .addSchema("company") // built-in exception
@@ -137,8 +122,7 @@ describe("Mock class()", () => {
 
     it("using modelName() modifier changes db path appropriately", () => {
       const m = new Mock();
-      m
-        .addSchema("foo")
+      m.addSchema("foo")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .modelName("car");
       m.deploy.queueSchema("foo").generate();
@@ -151,8 +135,7 @@ describe("Mock class()", () => {
 
     it("using pathPrefix the generated data is appropriately offset", async () => {
       const m = new Mock();
-      m
-        .addSchema("car")
+      m.addSchema("car")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .pathPrefix("authenticated");
       m.deploy.queueSchema("car", 10).generate();
@@ -162,9 +145,7 @@ describe("Mock class()", () => {
 
     it("Mocking function that returns a scalar works as intended", async () => {
       const m = new Mock();
-      m.addSchema("number", h => () =>
-        h.faker.random.number({ min: 0, max: 1000 })
-      );
+      m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 1000 }));
       m.addSchema("string", h => () => h.faker.random.words(3));
       m.queueSchema("number", 10);
       m.queueSchema("string", 10);
@@ -180,8 +161,7 @@ describe("Mock class()", () => {
   describe("Relationships", () => {
     it("Adding belongsTo relationship adds FK property with empty value", () => {
       const m = new Mock();
-      m
-        .addSchema("user")
+      m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
         })
@@ -193,14 +173,12 @@ describe("Mock class()", () => {
     });
     it("Adding belongsTo relationship adds fulfilled shadow FK property when external schema not present", () => {
       const m = new Mock();
-      m
-        .addSchema("user")
+      m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
         })
         .belongsTo("company");
-      m
-        .queueSchema("user", 2)
+      m.queueSchema("user", 2)
         .fulfillBelongsTo("company")
         .generate();
 
@@ -215,8 +193,7 @@ describe("Mock class()", () => {
 
     it("Adding belongsTo relationship adds fulfilled real FK property when external schema is present but not deployed", () => {
       const m = new Mock();
-      m
-        .addSchema("user")
+      m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
         })
@@ -239,8 +216,7 @@ describe("Mock class()", () => {
 
     it("Adding belongsTo relationship adds fulfilled real FK property when available in DB", () => {
       const m = new Mock();
-      m
-        .addSchema("user")
+      m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
         })
@@ -264,8 +240,7 @@ describe("Mock class()", () => {
 
     it("Adding hasMany relationship does not add FK property without quantifyHasMany()", () => {
       const m = new Mock();
-      m
-        .addSchema("company")
+      m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
         })
@@ -277,8 +252,7 @@ describe("Mock class()", () => {
 
     it("Adding hasMany with quantifyHasMany() produces ghost references when FK reference is not a defined schema", () => {
       const m = new Mock();
-      m
-        .addSchema("company")
+      m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
         })
@@ -289,15 +263,12 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
-        10
-      );
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.be.an("object");
     });
     it("Adding hasMany with quantifyHasMany() produces real references when FK reference is a defined schema", () => {
       const m = new Mock();
-      m
-        .addSchema("company")
+      m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
         })
@@ -314,16 +285,13 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
-        10
-      );
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
     });
 
     it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist", () => {
       const m = new Mock();
-      m
-        .addSchema("company")
+      m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
         })
@@ -349,8 +317,7 @@ describe("Mock class()", () => {
 
     it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist, adds more when runs out", () => {
       const m = new Mock();
-      m
-        .addSchema("company")
+      m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
         })
@@ -368,9 +335,7 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
-        10
-      );
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.equal(undefined);
       expect(Object.keys(m.db.employees).length).to.equal(10);
     });

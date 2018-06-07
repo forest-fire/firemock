@@ -1,13 +1,11 @@
-import { IDictionary } from "common-types";
 // tslint:disable:no-implicit-dependencies
+import { IDictionary } from "common-types";
 import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
-import set = require("lodash.set");
-import get = require("lodash.get");
+import { set, get } from "lodash-es";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
-import * as convert from "typed-conversions";
-import SnapShot from "./snapshot";
+import { SnapShot } from "./";
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];
@@ -103,7 +101,9 @@ export function removeListener(
       .filter(l => l.callback === callback)
       .filter(l => l.eventType === eventType);
 
-    _listeners = _listeners.filter(l => l.eventType !== eventType || l.callback !== callback);
+    _listeners = _listeners.filter(
+      l => l.eventType !== eventType || l.callback !== callback
+    );
 
     return cancelCallback(removed);
   } else {
@@ -191,7 +191,9 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
  * @param eventType <optional> the specific child event to filter down to
  */
 export function findChildListeners(path: string, ...eventType: rtdb.EventType[]) {
-  const correctPath = _listeners.filter(l => l.path === join(path) && l.eventType !== "value");
+  const correctPath = _listeners.filter(
+    l => l.path === join(path) && l.eventType !== "value"
+  );
 
   return eventType.length > 0
     ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
@@ -206,7 +208,9 @@ export function findChildListeners(path: string, ...eventType: rtdb.EventType[])
  * @param path path to root listening point
  */
 export function findValueListeners(path: string) {
-  return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
+  return _listeners.filter(
+    l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value"
+  );
 }
 
 /** Clears the DB and removes all listeners */

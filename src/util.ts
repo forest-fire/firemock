@@ -1,5 +1,4 @@
-import first = require("lodash.first");
-import last = require("lodash.last");
+import { first, last } from "lodash-es";
 import { IDictionary } from "common-types";
 import { rtdb } from "firebase-api-surface";
 
@@ -133,9 +132,7 @@ export enum Delays {
 export type DelayType = number | number[] | IDictionary<number> | Delays;
 let _delay: IDictionary | number | number[] | Delays = 5;
 
-export function setNetworkDelay(
-  value: IDictionary | number | number[] | Delays
-) {
+export function setNetworkDelay(value: IDictionary | number | number[] | Delays) {
   _delay = value;
 }
 

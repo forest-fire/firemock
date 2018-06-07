@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import first = require("lodash.first");
+import { first } from "lodash-es";
 import * as fbKey from "firebase-key";
 
 export type Key = string | number;
@@ -127,9 +127,7 @@ export default class Queue<T = any> {
 
   /** returns the Queue as a JS array */
   public toArray() {
-    return Queue._queues && Queue._queues[this._name]
-      ? Queue._queues[this._name]
-      : [];
+    return Queue._queues && Queue._queues[this._name] ? Queue._queues[this._name] : [];
   }
 
   /** returns the Queue as a JS Object */
@@ -148,8 +146,7 @@ export default class Queue<T = any> {
           return { ...obj, ...{ [pk]: o } };
         }, new Object())
       : queue.reduce(
-          (obj: IDictionary, item: any) =>
-            (obj = { ...obj, ...{ [item]: true } }),
+          (obj: IDictionary, item: any) => (obj = { ...obj, ...{ [item]: true } }),
           new Object()
         );
   }
@@ -179,9 +176,7 @@ export default class Queue<T = any> {
     let index = 0;
     let result: any[] = [null, -1];
     for (const item of queue) {
-      const condition = objectPayload
-        ? item[this.pkProperty] === key
-        : item === key;
+      const condition = objectPayload ? item[this.pkProperty] === key : item === key;
       if (condition) {
         result = [item, index];
         break;
