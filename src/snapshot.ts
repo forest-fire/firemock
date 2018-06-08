@@ -1,5 +1,5 @@
 import { IDictionary, SortingFunction } from "common-types";
-import { get } from "lodash-es";
+import { get } from "lodash";
 import Reference from "./reference";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";

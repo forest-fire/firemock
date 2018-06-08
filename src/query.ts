@@ -2,7 +2,7 @@ import { IDictionary } from "common-types";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
 import { db, addListener } from "./database";
-import { get } from "lodash-es";
+import { get } from "lodash";
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";

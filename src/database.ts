@@ -2,10 +2,10 @@
 import { IDictionary } from "common-types";
 import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
-import { set, get } from "lodash-es";
+import { set, get } from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
-import { SnapShot } from "./";
+import { SnapShot } from ".";
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];

@@ -5,7 +5,8 @@ import * as rm from "rimraf";
 import * as process from "process";
 import * as program from "commander";
 import "../test/testing/test-console";
-import { stdout, stderr } from "test-console";
+
+process.env.TS_NODE_COMPILER_OPTIONS = '{ "noImplicitAny": false }';
 
 function getScope(files: string): string {
   let fileScope: string;
@@ -50,8 +51,7 @@ function cleanJSTests() {
 
 function executeTests(stg: string, fileScope: string): void {
   process.env.AWS_STAGE = stg;
-  process.env.TS_NODE_PROJECT = "tsconfig.scripts.json";
-  process.env.TS_NODE_COMPILER_OPTIONS = '{ "noImplicitAny": false }';
+  // process.env.TS_NODE_PROJECT = "tsconfig.scripts.json";
   exec(`mocha --require ts-node/register ` + fileScope);
 }
 

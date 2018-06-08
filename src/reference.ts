@@ -1,8 +1,8 @@
 // tslint:disable:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
-import { Query } from "./";
-import { get } from "lodash-es";
+import { Query } from ".";
+import { get } from "lodash";
 
 import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
 import {
