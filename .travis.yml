@@ -3,4 +3,4 @@ node_js:
   - '10'
   - '8'
 script:
-  - npm run test # build and test
+  - yarn test # build and test
