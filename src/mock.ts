@@ -1,6 +1,5 @@
 import { IDictionary } from "common-types";
-import Deployment from "./deployment";
-import { Queue, Schema, SchemaHelper, Reference } from ".";
+import { Queue, Schema, SchemaHelper, Reference, Deployment } from ".";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { DelayType, setNetworkDelay } from "./util";
 

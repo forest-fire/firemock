@@ -1,4 +1,4 @@
-import { first, last } from "lodash-es";
+import { first, last } from "lodash";
 import { IDictionary } from "common-types";
 import { rtdb } from "firebase-api-surface";
 

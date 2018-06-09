@@ -1,6 +1,6 @@
 import { IDictionary } from "common-types";
 import * as fbKey from "firebase-key";
-import { set, get, first } from "lodash-es";
+import { set, get, first } from "lodash";
 import { IRelationship, ISchema, IQueue } from "./mock";
 import { getRandomInt, dotNotation } from "./util";
 import Queue from "./queue";

@@ -4,6 +4,6 @@
     "**/.git": true,
     "**/.DS_Store": true,
     "lib/*": true,
-    "dist/*": true
+    "var/folders/**": true
   }
 }

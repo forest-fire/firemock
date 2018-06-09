@@ -2,7 +2,7 @@ import { IDictionary } from "common-types";
 // tslint:disable-next-line:no-implicit-dependencies
 import { rtdb } from "firebase-api-surface";
 import { db, addListener } from "./database";
-import { get } from "lodash-es";
+import { get } from "lodash";
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";
@@ -241,10 +241,14 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
    * order to new SnapShot (so natural order is preserved)
    */
   private process(): SnapShot<T> {
-    // typically a hash/object but could be a JS native type (string/number/boolean)
+    // typically a hash/object but could be a scalar type (string/number/boolean)
     const input = get(db, join(this.path), undefined);
+    const hashOfHashes =
+      typeof input === "object" &&
+      Object.keys(input).every(i => typeof input[i] === "object");
+
     let snap;
-    if (typeof input !== "object") {
+    if (!hashOfHashes) {
       snap = new SnapShot<T>(leafNode(this.path), input);
     } else {
       const mockDatabaseResults: any[] = convert.hashToArray(input);

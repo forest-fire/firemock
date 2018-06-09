@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es2017",
+    "noImplicitAny": true,
+    "outDir": "./dist/esnext",
+    "preserveConstEnums": true,
+    "removeComments": false,
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": ["src/**/*.ts"]
+}

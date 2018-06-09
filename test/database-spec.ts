@@ -1,9 +1,8 @@
 // tslint:disable:no-implicit-dependencies
-import { IDictionary } from "common-types";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { set } from "lodash-es";
-import Mock, { SchemaHelper, SchemaCallback } from "../src/mock";
+import { set } from "lodash";
+import { Mock, SchemaCallback } from "../src/index";
 import {
   db,
   clearDatabase,

@@ -7,12 +7,4 @@ export { default as Queue } from "./queue";
 export { default as Schema } from "./schema";
 export { default as Deployment } from "./Deployment";
 export { reset as resetDatabase } from "./database";
-
-export {
-  GenericEventHandler,
-  HandleValueEvent,
-  HandleChangeEvent,
-  HandleMoveEvent,
-  HandleNewEvent,
-  HandleRemoveEvent
-} from "./query";
+export { GenericEventHandler, HandleValueEvent, HandleChangeEvent, HandleMoveEvent, HandleNewEvent, HandleRemoveEvent } from "./query";
