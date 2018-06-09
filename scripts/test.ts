@@ -51,7 +51,6 @@ function cleanJSTests() {
 
 function executeTests(stg: string, fileScope: string): void {
   process.env.AWS_STAGE = stg;
-  // process.env.TS_NODE_PROJECT = "tsconfig.scripts.json";
   exec(`mocha --require ts-node/register ` + fileScope);
 }
 

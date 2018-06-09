@@ -815,9 +815,9 @@ commander@*, commander@2.15.1, commander@^2.12.1, commander@^2.15.0, commander@^
   version "2.15.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.15.1.tgz#df46e867d0fc2aec66a34662b406a9ccafff5b0f"
 
-common-types@^1.1.0, common-types@^1.7.35:
-  version "1.7.35"
-  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.7.35.tgz#400c006dfa4cb1694487fb5c445eebc746189764"
+common-types@^1.7.35, common-types@^1.7.36:
+  version "1.7.36"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.7.36.tgz#19eb8782752b0bf98e7f758d26f87bec25ee3e6e"
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -3399,11 +3399,11 @@ type-name@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/type-name/-/type-name-2.0.2.tgz#efe7d4123d8ac52afff7f40c7e4dec5266008fb4"
 
-typed-conversions@^0.8.2:
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/typed-conversions/-/typed-conversions-0.8.2.tgz#74e921013f15af4c33bff9e26483aa5dc3fb4fe5"
+typed-conversions@^0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/typed-conversions/-/typed-conversions-0.8.3.tgz#8b477cf03f383b2a08259a9f018fee0113a075bd"
   dependencies:
-    common-types "^1.1.0"
+    common-types "^1.7.36"
     lodash.get "^4.4.2"
 
 typedarray@^0.0.6:
