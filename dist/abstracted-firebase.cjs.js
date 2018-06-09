@@ -185,7 +185,7 @@ function cancelCallback(removed) {
     let count = 0;
     removed.forEach(l => {
         if (typeof l.cancelCallbackOrContext === "function") {
-            // l.cancelCallbackOrContext();
+            l.cancelCallbackOrContext();
             count++;
         }
     });
@@ -320,92 +320,6 @@ class SchemaHelper {
     get chance() {
         const chance = require("chance");
         return chance();
-    }
-}
-
-function isMultiPath(data) {
-    Object.keys(data).map((d) => {
-        if (!d) {
-            data[d] = "/";
-        }
-    });
-    const indexesAreStrings = Object.keys(data).every(i => typeof i === "string");
-    const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
-    return indexesAreStrings && indexesLookLikeAPath ? true : false;
-}
-class Reference extends _.Query {
-    get key() {
-        return this.path.split(".").pop();
-    }
-    get parent() {
-        const r = parts(this.path)
-            .slice(-1)
-            .join(".");
-        return new Reference(r, lodash.get(db, r));
-    }
-    child(path) {
-        const r = parts(this.path)
-            .concat([path])
-            .join(".");
-        return new Reference(r, lodash.get(db, r));
-    }
-    get root() {
-        return new Reference("/", db);
-    }
-    push(value, onComplete) {
-        const id = pushDB(this.path, value);
-        this.path = join(this.path, id);
-        if (onComplete) {
-            onComplete(null);
-        }
-        return networkDelay(this); // TODO: try and get this typed appropriately
-    }
-    remove(onComplete) {
-        removeDB(this.path);
-        if (onComplete) {
-            onComplete(null);
-        }
-        return networkDelay();
-    }
-    set(value, onComplete) {
-        setDB(this.path, value);
-        if (onComplete) {
-            onComplete(null);
-        }
-        return networkDelay();
-    }
-    update(values, onComplete) {
-        if (isMultiPath(values)) {
-            multiPathUpdateDB(values);
-        }
-        else {
-            updateDB(this.path, values);
-        }
-        if (onComplete) {
-            onComplete(null);
-        }
-        return networkDelay();
-    }
-    setPriority(priority, onComplete) {
-        return networkDelay();
-    }
-    setWithPriority(newVal, newPriority, onComplete) {
-        return networkDelay();
-    }
-    transaction(transactionUpdate, onComplete, applyLocally) {
-        return Promise.resolve({
-            committed: true,
-            snapshot: null,
-            toJSON() {
-                return {};
-            }
-        });
-    }
-    onDisconnect() {
-        return {};
-    }
-    toString() {
-        return slashNotation(join("https://mockdb.local", this.path, this.key));
     }
 }
 
@@ -798,10 +712,12 @@ class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     process() {
-        // typically a hash/object but could be a JS native type (string/number/boolean)
+        // typically a hash/object but could be a scalar type (string/number/boolean)
         const input = lodash.get(db, join(this.path), undefined);
+        const hashOfHashes = typeof input === "object" &&
+            Object.keys(input).every(i => typeof input[i] === "object");
         let snap;
-        if (typeof input !== "object") {
+        if (!hashOfHashes) {
             snap = new SnapShot(leafNode(this.path), input);
         }
         else {
@@ -851,6 +767,92 @@ class Query {
                 break;
         }
         return sort;
+    }
+}
+
+function isMultiPath(data) {
+    Object.keys(data).map((d) => {
+        if (!d) {
+            data[d] = "/";
+        }
+    });
+    const indexesAreStrings = Object.keys(data).every(i => typeof i === "string");
+    const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
+    return indexesAreStrings && indexesLookLikeAPath ? true : false;
+}
+class Reference extends Query {
+    get key() {
+        return this.path.split(".").pop();
+    }
+    get parent() {
+        const r = parts(this.path)
+            .slice(-1)
+            .join(".");
+        return new Reference(r, lodash.get(db, r));
+    }
+    child(path) {
+        const r = parts(this.path)
+            .concat([path])
+            .join(".");
+        return new Reference(r, lodash.get(db, r));
+    }
+    get root() {
+        return new Reference("/", db);
+    }
+    push(value, onComplete) {
+        const id = pushDB(this.path, value);
+        this.path = join(this.path, id);
+        if (onComplete) {
+            onComplete(null);
+        }
+        return networkDelay(this); // TODO: try and get this typed appropriately
+    }
+    remove(onComplete) {
+        removeDB(this.path);
+        if (onComplete) {
+            onComplete(null);
+        }
+        return networkDelay();
+    }
+    set(value, onComplete) {
+        setDB(this.path, value);
+        if (onComplete) {
+            onComplete(null);
+        }
+        return networkDelay();
+    }
+    update(values, onComplete) {
+        if (isMultiPath(values)) {
+            multiPathUpdateDB(values);
+        }
+        else {
+            updateDB(this.path, values);
+        }
+        if (onComplete) {
+            onComplete(null);
+        }
+        return networkDelay();
+    }
+    setPriority(priority, onComplete) {
+        return networkDelay();
+    }
+    setWithPriority(newVal, newPriority, onComplete) {
+        return networkDelay();
+    }
+    transaction(transactionUpdate, onComplete, applyLocally) {
+        return Promise.resolve({
+            committed: true,
+            snapshot: null,
+            toJSON() {
+                return {};
+            }
+        });
+    }
+    onDisconnect() {
+        return {};
+    }
+    toString() {
+        return slashNotation(join("https://mockdb.local", this.path, this.key));
     }
 }
 

@@ -1,6 +1,6 @@
 import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
-import { Query } from ".";
+import Query from "./query";
 import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
 export default class Reference<T = any> extends Query<T> implements IReference {
     readonly key: string | null;

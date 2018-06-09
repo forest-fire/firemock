@@ -1,4 +1,4 @@
-import { Query } from ".";
+import Query from "./query";
 import { get } from "lodash";
 import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
 import { parts, join, slashNotation, networkDelay } from "./util";

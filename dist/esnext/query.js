@@ -169,10 +169,12 @@ export default class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     process() {
-        // typically a hash/object but could be a JS native type (string/number/boolean)
+        // typically a hash/object but could be a scalar type (string/number/boolean)
         const input = get(db, join(this.path), undefined);
+        const hashOfHashes = typeof input === "object" &&
+            Object.keys(input).every(i => typeof input[i] === "object");
         let snap;
-        if (typeof input !== "object") {
+        if (!hashOfHashes) {
             snap = new SnapShot(leafNode(this.path), input);
         }
         else {
