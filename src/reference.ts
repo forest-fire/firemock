@@ -15,8 +15,6 @@ import {
   slashNotation,
   networkDelay
 } from "./util";
-// tslint:disable-next-line:no-submodule-imports
-import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
 
 function isMultiPath(data: IDictionary) {
   Object.keys(data).map((d: any) => {
@@ -28,33 +26,33 @@ function isMultiPath(data: IDictionary) {
   const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
   return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
-export default class Reference<T = any> extends Query<T> implements IReference {
+export default class Reference<T = any> extends Query<T> implements rtdb.IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
   }
 
-  public get parent(): IReference | null {
+  public get parent(): rtdb.IReference | null {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
     return new Reference(r, get(db, r));
   }
 
-  public child<C = any>(path: string): IReference {
+  public child<C = any>(path: string): rtdb.IReference {
     const r = parts(this.path)
       .concat([path])
       .join(".");
     return new Reference<C>(r, get(db, r));
   }
 
-  public get root(): IReference {
+  public get root(): rtdb.IReference {
     return new Reference("/", db);
   }
 
   public push(
     value?: any,
     onComplete?: (a: Error | null) => any
-  ): IThenableReference<IReference<T>> {
+  ): rtdb.IThenableReference<rtdb.IReference<T>> {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {

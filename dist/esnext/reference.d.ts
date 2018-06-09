@@ -1,13 +1,12 @@
 import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
 import Query from "./query";
-import { IThenableReference, IReference } from "firebase-api-surface/lib/rtdb";
-export default class Reference<T = any> extends Query<T> implements IReference {
+export default class Reference<T = any> extends Query<T> implements rtdb.IReference {
     readonly key: string | null;
-    readonly parent: IReference | null;
-    child<C = any>(path: string): IReference;
-    readonly root: IReference;
-    push(value?: any, onComplete?: (a: Error | null) => any): IThenableReference<IReference<T>>;
+    readonly parent: rtdb.IReference | null;
+    child<C = any>(path: string): rtdb.IReference;
+    readonly root: rtdb.IReference;
+    push(value?: any, onComplete?: (a: Error | null) => any): rtdb.IThenableReference<rtdb.IReference<T>>;
     remove(onComplete?: (a: Error | null) => any): Promise<void>;
     set(value: any, onComplete?: (a: Error | null) => any): Promise<void>;
     update(values: IDictionary, onComplete?: (a: Error | null) => any): Promise<void>;
