@@ -31,7 +31,7 @@
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "common-types": "^1.7.35",
+    "common-types": "^1.7.36",
     "firebase-api-surface": "^0.8.0",
     "firebase-key": "^2.0.1",
     "lodash": "^4.17.10",
