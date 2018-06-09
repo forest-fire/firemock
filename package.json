@@ -12,12 +12,12 @@
     "testing"
   ],
   "files": [
-    "lib"
+    "dist"
   ],
-  "main": "dist/index.cjs.js",
-  "browser": "dist/index.min.js",
-  "module": "lib/index.js",
-  "typings": "lib/index.d.ts",
+  "module": "dist/esnext/index.js",
+  "typings": "dist/esnext/index.d.ts",
+  "browser": "dist/abstracted-firebase.umd.js",
+  "main": "dist/abstracted-firebase.cjs.js",
   "scripts": {
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
