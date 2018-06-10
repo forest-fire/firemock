@@ -5,7 +5,7 @@ import { IListener } from "./query";
 import { set, get } from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
-import { SnapShot } from ".";
+import { SnapShot } from "./index";
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];

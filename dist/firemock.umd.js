@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('.'), require('typed-conversions')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', '.', 'typed-conversions'], factory) :
-    (factory((global.AbstractedFirebase = {}),global.lodash,global.fbKey,global._,global.convert));
-}(this, (function (exports,lodash,fbKey,_,convert) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('typed-conversions')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', 'typed-conversions'], factory) :
+    (factory((global.FireMock = {}),global.lodash,global.fbKey,global.convert));
+}(this, (function (exports,lodash,fbKey,convert) { 'use strict';
 
     function normalizeRef(r) {
         r = r.replace("/", ".");
@@ -213,18 +213,18 @@
                 else {
                     lodash.set(result, pathDiff(dotPath, l.path), newValue);
                 }
-                return l.callback(new _.SnapShot(join(l.path), result));
+                return l.callback(new SnapShot(join(l.path), result));
             });
             if (newValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                    return l.callback(new _.SnapShot(key, newValue));
+                    return l.callback(new SnapShot(key, newValue));
                 });
             }
             else if (oldValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                    return l.callback(new _.SnapShot(key, newValue));
+                    return l.callback(new SnapShot(key, newValue));
                 });
             }
         }
@@ -253,18 +253,18 @@
         return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
     }
     /** Clears the DB and removes all listeners */
-    function reset() {
+    function reset$$1() {
         removeAllListeners();
         clearDatabase();
     }
 
     /* tslint:disable:max-classes-per-file */
-    class Mock {
+    class Mock$$1 {
         constructor(raw) {
-            this._schemas = new _.Queue("schemas").clear();
-            this._relationships = new _.Queue("relationships").clear();
-            this._queues = new _.Queue("queues").clear();
-            _.Queue.clearAll();
+            this._schemas = new Queue("schemas").clear();
+            this._relationships = new Queue("relationships").clear();
+            this._queues = new Queue("queues").clear();
+            Queue.clearAll();
             clearDatabase();
             if (raw) {
                 this.updateDB(raw);
@@ -280,29 +280,29 @@
             return db;
         }
         addSchema(schema, mock) {
-            const s = new _.Schema(schema);
+            const s = new Schema(schema);
             if (mock) {
                 s.mock(mock);
             }
-            return new _.Schema(schema);
+            return new Schema(schema);
         }
         /** Set the network delay for queries with "once" */
         setDelay(d) {
             setNetworkDelay(d);
         }
         get deploy() {
-            return new _.Deployment();
+            return new Deployment();
         }
         queueSchema(schemaId, quantity = 1, overrides = {}) {
-            const d = new _.Deployment();
+            const d = new Deployment();
             d.queueSchema(schemaId, quantity, overrides);
             return d;
         }
         generate() {
-            return new _.Deployment().generate();
+            return new Deployment().generate();
         }
         ref(dbPath) {
-            return new _.Reference(dbPath);
+            return new Reference(dbPath);
         }
     }
 
@@ -1137,7 +1137,7 @@
         }
     }
 
-    exports.Mock = Mock;
+    exports.Mock = Mock$$1;
     exports.SchemaHelper = SchemaHelper;
     exports.Reference = Reference;
     exports.Query = Query;
@@ -1145,8 +1145,9 @@
     exports.Queue = Queue;
     exports.Schema = Schema;
     exports.Deployment = Deployment;
-    exports.resetDatabase = reset;
+    exports.resetDatabase = reset$$1;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+//# sourceMappingURL=firemock.umd.js.map
