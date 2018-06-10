@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { Schema, SchemaHelper, Reference, Deployment } from ".";
+import { Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
 export interface ISchema {
     id: string;

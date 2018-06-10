@@ -1,4 +1,4 @@
-import { Queue, Schema, Reference, Deployment } from ".";
+import { Queue, Schema, Reference, Deployment } from "./index";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { setNetworkDelay } from "./util";
 /* tslint:disable:max-classes-per-file */

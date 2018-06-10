@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.17.2",
+  "version": "0.17.4",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -21,7 +21,7 @@
   "scripts": {
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",
-    "build": "tslint src/**/*.ts && tsc -P tsconfig.esnext.json && rollup -c rollup.cjs.js && rollup -c rollup.umd.js",
+    "build": "tslint src/**/*.ts && tsc -P tsconfig.esnext.json && rollup -c rollup.config.js",
     "test": "ts-node ./scripts/test.ts",
     "coverage": "nyc --reporter=text --reporter=html mocha --compilers ts:ts-node/register",
     "watch": "ts-node ./scripts/watch.ts",
