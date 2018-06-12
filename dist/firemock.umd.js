@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('typed-conversions')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', 'typed-conversions'], factory) :
-    (factory((global.FireMock = {}),global.lodash,global.fbKey,global.convert));
-}(this, (function (exports,lodash,fbKey,convert) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('.'), require('typed-conversions')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', '.', 'typed-conversions'], factory) :
+    (factory((global.FireMock = {}),global.lodash,global.fbKey,null,global.convert));
+}(this, (function (exports,lodash,fbKey,_,convert) { 'use strict';
 
     function normalizeRef(r) {
         r = r.replace("/", ".");
@@ -213,18 +213,18 @@
                 else {
                     lodash.set(result, pathDiff(dotPath, l.path), newValue);
                 }
-                return l.callback(new SnapShot(join(l.path), result));
+                return l.callback(new _.SnapShot(join(l.path), result));
             });
             if (newValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                    return l.callback(new SnapShot(key, newValue));
+                    return l.callback(new _.SnapShot(key, newValue));
                 });
             }
             else if (oldValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                    return l.callback(new SnapShot(key, newValue));
+                    return l.callback(new _.SnapShot(key, newValue));
                 });
             }
         }
@@ -253,7 +253,7 @@
         return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
     }
     /** Clears the DB and removes all listeners */
-    function reset$$1() {
+    function reset() {
         removeAllListeners();
         clearDatabase();
     }
@@ -678,10 +678,17 @@
             return this;
         }
         toJSON() {
-            return JSON.stringify(this);
+            return {
+                identity: this.toString(),
+                delay: this._delay,
+                ordering: this._order,
+                numListeners: this._listeners.length,
+                queryFilters: this._queryFilters.length > 0 ? this._queryFilters : "none",
+                limitFilters: this._limitFilters.length > 0 ? this._limitFilters : "none"
+            };
         }
         toString() {
-            return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
+            return `FireMock::Query@${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
         }
         /**
          * This is an undocumented API endpoint that is within the
@@ -849,7 +856,9 @@
             return {};
         }
         toString() {
-            return slashNotation(join("https://mockdb.local", this.path, this.key));
+            return this.path
+                ? slashNotation(join("FireMock::Reference@", this.path, this.key))
+                : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
         }
     }
 
@@ -1137,6 +1146,20 @@
         }
     }
 
+    class MockHelper {
+        constructor(context) {
+            this.context = context;
+        }
+        get faker() {
+            const faker = require("faker");
+            return faker;
+        }
+        get chance() {
+            const chance = require("chance");
+            return chance();
+        }
+    }
+
     exports.Mock = Mock$$1;
     exports.SchemaHelper = SchemaHelper;
     exports.Reference = Reference;
@@ -1145,7 +1168,8 @@
     exports.Queue = Queue;
     exports.Schema = Schema;
     exports.Deployment = Deployment;
-    exports.resetDatabase = reset$$1;
+    exports.resetDatabase = reset;
+    exports.MockHelper = MockHelper;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

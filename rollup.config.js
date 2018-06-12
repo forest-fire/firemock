@@ -11,7 +11,12 @@ export default {
       file: "dist/firemock.umd.js",
       format: "umd",
       name: "FireMock",
-      sourcemap: true
+      sourcemap: true,
+      globals: {
+        lodash: "lodash",
+        "firebase-key": "fbKey",
+        "typed-conversions": "convert"
+      }
     }
   ],
   external: ["firebase-api-surface", "typed-conversions"]

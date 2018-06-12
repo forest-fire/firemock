@@ -67,7 +67,14 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
     orderByKey(): rtdb.IQuery<T>;
     /** NOT IMPLEMENTED */
     orderByPriority(): rtdb.IQuery<T>;
-    toJSON(): string;
+    toJSON(): {
+        identity: string;
+        delay: DelayType;
+        ordering: IOrdering;
+        numListeners: any;
+        queryFilters: string | IQueryFilter<T>[];
+        limitFilters: string | IQueryFilter<T>[];
+    };
     toString(): string;
     /**
      * This is an undocumented API endpoint that is within the
