@@ -15,7 +15,8 @@ export default {
       globals: {
         lodash: "lodash",
         "firebase-key": "fbKey",
-        "typed-conversions": "convert"
+        "typed-conversions": "convert",
+        "abstracted-firebase": "abstracted-firebase"
       }
     }
   ],
