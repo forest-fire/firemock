@@ -1,6 +1,7 @@
 import { IDictionary } from "common-types";
 import { Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
+import { MockHelper } from "./MockHelper";
 export interface ISchema {
     id: string;
     /** path to the database which is the root for given schema list */
@@ -51,6 +52,7 @@ export default class Mock {
      * Update the mock DB with a raw JS object/hash
      */
     updateDB(state: IDictionary): void;
+    getMockHelper(): MockHelper;
     readonly db: IDictionary<any>;
     addSchema<S = any>(schema: string, mock?: SchemaCallback): Schema<S>;
     /** Set the network delay for queries with "once" */

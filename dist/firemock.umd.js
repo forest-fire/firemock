@@ -258,6 +258,20 @@
         clearDatabase();
     }
 
+    class MockHelper {
+        constructor(context) {
+            this.context = context;
+        }
+        get faker() {
+            const faker = require("faker");
+            return faker;
+        }
+        get chance() {
+            const chance = require("chance");
+            return chance();
+        }
+    }
+
     /* tslint:disable:max-classes-per-file */
     class Mock$$1 {
         constructor(raw) {
@@ -275,6 +289,9 @@
          */
         updateDB(state) {
             updateDatabase(state);
+        }
+        getMockHelper() {
+            return new MockHelper();
         }
         get db() {
             return db;
@@ -1143,20 +1160,6 @@
                     }
                 });
             });
-        }
-    }
-
-    class MockHelper {
-        constructor(context) {
-            this.context = context;
-        }
-        get faker() {
-            const faker = require("faker");
-            return faker;
-        }
-        get chance() {
-            const chance = require("chance");
-            return chance();
         }
     }
 
