@@ -2,6 +2,7 @@ import { IDictionary } from "common-types";
 import { Queue, Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { DelayType, setNetworkDelay } from "./util";
+import { MockHelper } from "./MockHelper";
 
 export interface ISchema {
   id: string;
@@ -67,6 +68,10 @@ export default class Mock {
    */
   public updateDB(state: IDictionary) {
     updateDatabase(state);
+  }
+
+  public getMockHelper() {
+    return new MockHelper();
   }
 
   public get db() {

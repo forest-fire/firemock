@@ -127,6 +127,8 @@ export default class Reference<T = any> extends Query<T> implements rtdb.IRefere
   }
 
   public toString() {
-    return slashNotation(join("https://mockdb.local", this.path, this.key));
+    return this.path
+      ? slashNotation(join("FireMock::Reference@", this.path, this.key))
+      : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
   }
 }

@@ -138,10 +138,17 @@ export default class Query {
         return this;
     }
     toJSON() {
-        return JSON.stringify(this);
+        return {
+            identity: this.toString(),
+            delay: this._delay,
+            ordering: this._order,
+            numListeners: this._listeners.length,
+            queryFilters: this._queryFilters.length > 0 ? this._queryFilters : "none",
+            limitFilters: this._limitFilters.length > 0 ? this._limitFilters : "none"
+        };
     }
     toString() {
-        return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
+        return `FireMock::Query@${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
     }
     /**
      * This is an undocumented API endpoint that is within the

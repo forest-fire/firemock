@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.17.4",
+  "version": "0.17.9",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -16,8 +16,8 @@
   ],
   "module": "dist/esnext/index.js",
   "typings": "dist/esnext/index.d.ts",
-  "browser": "dist/abstracted-firebase.umd.js",
-  "main": "dist/abstracted-firebase.cjs.js",
+  "browser": "dist/firemock.umd.js",
+  "main": "dist/firemock.cjs.js",
   "scripts": {
     "clean": "rimraf lib",
     "lint": "tslint --force --format verbose \"src/**/*.ts\"",

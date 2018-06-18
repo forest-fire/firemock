@@ -258,6 +258,20 @@
         clearDatabase();
     }
 
+    class MockHelper {
+        constructor(context) {
+            this.context = context;
+        }
+        get faker() {
+            const faker = require("faker");
+            return faker;
+        }
+        get chance() {
+            const chance = require("chance");
+            return chance();
+        }
+    }
+
     /* tslint:disable:max-classes-per-file */
     class Mock$$1 {
         constructor(raw) {
@@ -275,6 +289,9 @@
          */
         updateDB(state) {
             updateDatabase(state);
+        }
+        getMockHelper() {
+            return new MockHelper();
         }
         get db() {
             return db;
@@ -678,10 +695,17 @@
             return this;
         }
         toJSON() {
-            return JSON.stringify(this);
+            return {
+                identity: this.toString(),
+                delay: this._delay,
+                ordering: this._order,
+                numListeners: this._listeners.length,
+                queryFilters: this._queryFilters.length > 0 ? this._queryFilters : "none",
+                limitFilters: this._limitFilters.length > 0 ? this._limitFilters : "none"
+            };
         }
         toString() {
-            return `${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
+            return `FireMock::Query@${process.env.FIREBASE_DATA_ROOT_URL}/${this.path}`;
         }
         /**
          * This is an undocumented API endpoint that is within the
@@ -849,7 +873,9 @@
             return {};
         }
         toString() {
-            return slashNotation(join("https://mockdb.local", this.path, this.key));
+            return this.path
+                ? slashNotation(join("FireMock::Reference@", this.path, this.key))
+                : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
         }
     }
 
@@ -1146,6 +1172,7 @@
     exports.Schema = Schema;
     exports.Deployment = Deployment;
     exports.resetDatabase = reset$$1;
+    exports.MockHelper = MockHelper;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

@@ -84,6 +84,8 @@ export default class Reference extends Query {
         return {};
     }
     toString() {
-        return slashNotation(join("https://mockdb.local", this.path, this.key));
+        return this.path
+            ? slashNotation(join("FireMock::Reference@", this.path, this.key))
+            : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
     }
 }

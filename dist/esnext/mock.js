@@ -1,6 +1,7 @@
 import { Queue, Schema, Reference, Deployment } from "./index";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { setNetworkDelay } from "./util";
+import { MockHelper } from "./MockHelper";
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
     constructor(raw) {
@@ -18,6 +19,9 @@ export default class Mock {
      */
     updateDB(state) {
         updateDatabase(state);
+    }
+    getMockHelper() {
+        return new MockHelper();
     }
     get db() {
         return db;
