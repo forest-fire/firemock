@@ -1,7 +1,7 @@
 import { IDictionary } from "common-types";
 import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
-import { SnapShot } from ".";
+import { SnapShot } from "./index";
 export declare let db: IDictionary;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;

@@ -1,8 +1,8 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('.'), require('typed-conversions')) :
-    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', '.', 'typed-conversions'], factory) :
-    (factory((global.FireMock = {}),global.lodash,global.fbKey,null,global.convert));
-}(this, (function (exports,lodash,fbKey,_,convert) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('typed-conversions')) :
+    typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', 'typed-conversions'], factory) :
+    (factory((global.FireMock = {}),global.lodash,global.fbKey,global.convert));
+}(this, (function (exports,lodash,fbKey,convert) { 'use strict';
 
     function normalizeRef(r) {
         r = r.replace("/", ".");
@@ -213,18 +213,18 @@
                 else {
                     lodash.set(result, pathDiff(dotPath, l.path), newValue);
                 }
-                return l.callback(new _.SnapShot(join(l.path), result));
+                return l.callback(new SnapShot(join(l.path), result));
             });
             if (newValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                    return l.callback(new _.SnapShot(key, newValue));
+                    return l.callback(new SnapShot(key, newValue));
                 });
             }
             else if (oldValue === undefined) {
                 const { parent, key } = keyAndParent(dotPath);
                 findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                    return l.callback(new _.SnapShot(key, newValue));
+                    return l.callback(new SnapShot(key, newValue));
                 });
             }
         }
@@ -253,7 +253,7 @@
         return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
     }
     /** Clears the DB and removes all listeners */
-    function reset() {
+    function reset$$1() {
         removeAllListeners();
         clearDatabase();
     }
@@ -1171,7 +1171,7 @@
     exports.Queue = Queue;
     exports.Schema = Schema;
     exports.Deployment = Deployment;
-    exports.resetDatabase = reset;
+    exports.resetDatabase = reset$$1;
     exports.MockHelper = MockHelper;
 
     Object.defineProperty(exports, '__esModule', { value: true });

@@ -4,7 +4,6 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 var lodash = require('lodash');
 var fbKey = require('firebase-key');
-var _ = require('.');
 var convert = require('typed-conversions');
 
 function normalizeRef(r) {
@@ -216,18 +215,18 @@ function notify(dotPath, newValue, oldValue) {
             else {
                 lodash.set(result, pathDiff(dotPath, l.path), newValue);
             }
-            return l.callback(new _.SnapShot(join(l.path), result));
+            return l.callback(new SnapShot(join(l.path), result));
         });
         if (newValue === undefined) {
             const { parent, key } = keyAndParent(dotPath);
             findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                return l.callback(new _.SnapShot(key, newValue));
+                return l.callback(new SnapShot(key, newValue));
             });
         }
         else if (oldValue === undefined) {
             const { parent, key } = keyAndParent(dotPath);
             findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                return l.callback(new _.SnapShot(key, newValue));
+                return l.callback(new SnapShot(key, newValue));
             });
         }
     }
@@ -256,7 +255,7 @@ function findValueListeners(path) {
     return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
 }
 /** Clears the DB and removes all listeners */
-function reset() {
+function reset$$1() {
     removeAllListeners();
     clearDatabase();
 }
@@ -1174,6 +1173,6 @@ exports.SnapShot = SnapShot;
 exports.Queue = Queue;
 exports.Schema = Schema;
 exports.Deployment = Deployment;
-exports.resetDatabase = reset;
+exports.resetDatabase = reset$$1;
 exports.MockHelper = MockHelper;
 //# sourceMappingURL=firemock.cjs.js.map
