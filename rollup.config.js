@@ -1,5 +1,7 @@
+import typescript from "rollup-plugin-typescript2";
+
 export default {
-  input: "dist/esnext/index.js",
+  input: "src/index.ts",
   output: [
     {
       file: "dist/firemock.cjs.js",
@@ -20,5 +22,10 @@ export default {
       // }
     }
   ],
-  external: ["firebase-api-surface", "typed-conversions"]
+  external: ["firebase-api-surface", "typed-conversions"],
+  plugins: [
+    typescript({
+      tsconfig: "tsconfig.esnext.json"
+    })
+  ]
 };
