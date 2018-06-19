@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.17.10",
+  "version": "0.17.11",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -15,7 +15,7 @@
     "dist"
   ],
   "module": "dist/esnext/index.js",
-  "typings": "dist/esnext/index.d.ts",
+  "typings": "dist/index.d.ts",
   "browser": "dist/firemock.umd.js",
   "main": "dist/firemock.cjs.js",
   "scripts": {
