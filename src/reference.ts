@@ -71,6 +71,8 @@ export default class Reference<T = any> extends Query<T> implements rtdb.IRefere
   }
 
   public set(value: any, onComplete?: (a: Error | null) => any): Promise<void> {
+    console.log(value);
+
     setDB(this.path, value);
     if (onComplete) {
       onComplete(null);

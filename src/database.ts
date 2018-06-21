@@ -25,7 +25,13 @@ export function setDB(path: string, value: any) {
   const dotPath = join(path);
   const oldValue = get(db, dotPath);
 
-  set(db, dotPath, value);
+  if (value === null) {
+    console.log(dotPath);
+
+    removeDB(dotPath);
+  } else {
+    set(db, dotPath, value);
+  }
   notify(dotPath, value, oldValue);
 }
 
@@ -48,6 +54,7 @@ export function removeDB(path: string) {
   const oldValue = get(db, dotPath);
 
   const parentValue: any = get(db, getParent(dotPath));
+
   if (typeof parentValue === "object") {
     delete parentValue[getKey(dotPath)];
     set(db, getParent(dotPath), parentValue);

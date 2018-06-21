@@ -126,7 +126,7 @@ export default class Deployment {
 
     const mock = schema.fn();
     const path = schema.path();
-    const key = fbKey.key();
+    const key = overrides.id || fbKey.key();
 
     set(
       db,
