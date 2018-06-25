@@ -93,7 +93,7 @@ export default class Deployment {
         const schema = this._schemas.find(schemaId);
         const mock = schema.fn();
         const path = schema.path();
-        const key = fbKey.key();
+        const key = overrides.id || fbKey.key();
         set(db, dotNotation(path) + `.${key}`, typeof mock === "object"
             ? Object.assign({}, mock, overrides) : overrides && typeof overrides !== "object"
             ? overrides

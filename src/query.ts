@@ -79,8 +79,9 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
       return resultset.slice(0, num);
     };
     this._limitFilters.push(filter);
+    console.log(this._limitFilters.length);
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
   public equalTo(value: QueryValue, key?: Extract<keyof T, string>): rtdb.IQuery<T> {
@@ -250,13 +251,28 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
   private process(): SnapShot<T> {
     // typically a hash/object but could be a scalar type (string/number/boolean)
     const input = get(db, join(this.path), undefined);
+
     const hashOfHashes =
       typeof input === "object" &&
       Object.keys(input).every(i => typeof input[i] === "object");
 
+    console.log(hashOfHashes);
+
     let snap;
     if (!hashOfHashes) {
-      snap = new SnapShot<T>(leafNode(this.path), input);
+      const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(input, {
+        key: "id"
+      });
+      const sorted: any[] = this.processSorting(mockDatabaseResults);
+      const remainingIds = new Set(
+        this.processFilters(sorted).map((f: any) => (typeof f === "object" ? f.id : f))
+      );
+      const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
+
+      snap = new SnapShot<T>(
+        leafNode(this.path),
+        convert.keyValueArrayToDictionary(resultset, { key: "id" })
+      );
     } else {
       const mockDatabaseResults: any[] = convert.hashToArray(input);
       const sorted: any[] = this.processSorting(mockDatabaseResults);

@@ -36,6 +36,7 @@ export default class Query {
             return resultset.slice(0, num);
         };
         this._limitFilters.push(filter);
+        console.log(this._limitFilters.length);
         return this;
     }
     equalTo(value, key) {
@@ -180,9 +181,16 @@ export default class Query {
         const input = get(db, join(this.path), undefined);
         const hashOfHashes = typeof input === "object" &&
             Object.keys(input).every(i => typeof input[i] === "object");
+        console.log(hashOfHashes);
         let snap;
         if (!hashOfHashes) {
-            snap = new SnapShot(leafNode(this.path), input);
+            const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
+                key: "id"
+            });
+            const sorted = this.processSorting(mockDatabaseResults);
+            const remainingIds = new Set(this.processFilters(sorted).map((f) => (typeof f === "object" ? f.id : f)));
+            const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
+            snap = new SnapShot(leafNode(this.path), resultset);
         }
         else {
             const mockDatabaseResults = convert.hashToArray(input);

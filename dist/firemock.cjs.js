@@ -138,7 +138,13 @@ function updateDatabase(state) {
 function setDB(path, value) {
     const dotPath = join(path);
     const oldValue = lodash.get(db, dotPath);
-    lodash.set(db, dotPath, value);
+    if (value === null) {
+        console.log(dotPath);
+        removeDB(dotPath);
+    }
+    else {
+        lodash.set(db, dotPath, value);
+    }
     notify(dotPath, value, oldValue);
 }
 /** single-path update */
@@ -595,6 +601,7 @@ class Query {
             return resultset.slice(0, num);
         };
         this._limitFilters.push(filter);
+        console.log(this._limitFilters.length);
         return this;
     }
     equalTo(value, key) {
@@ -739,9 +746,16 @@ class Query {
         const input = lodash.get(db, join(this.path), undefined);
         const hashOfHashes = typeof input === "object" &&
             Object.keys(input).every(i => typeof input[i] === "object");
+        console.log(hashOfHashes);
         let snap;
         if (!hashOfHashes) {
-            snap = new SnapShot(leafNode(this.path), input);
+            const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
+                key: "id"
+            });
+            const sorted = this.processSorting(mockDatabaseResults);
+            const remainingIds = new Set(this.processFilters(sorted).map((f) => (typeof f === "object" ? f.id : f)));
+            const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
+            snap = new SnapShot(leafNode(this.path), resultset);
         }
         else {
             const mockDatabaseResults = convert.hashToArray(input);
@@ -838,6 +852,7 @@ class Reference extends Query {
         return networkDelay();
     }
     set(value, onComplete) {
+        console.log(value);
         setDB(this.path, value);
         if (onComplete) {
             onComplete(null);
@@ -1084,7 +1099,7 @@ class Deployment {
         const schema = this._schemas.find(schemaId);
         const mock = schema.fn();
         const path = schema.path();
-        const key = fbKey.key();
+        const key = overrides.id || fbKey.key();
         lodash.set(db, dotNotation(path) + `.${key}`, typeof mock === "object"
             ? Object.assign({}, mock, overrides) : overrides && typeof overrides !== "object"
             ? overrides

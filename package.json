@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.17.11",
+  "version": "0.18.0",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -37,7 +37,7 @@
     "firebase-key": "^2.0.1",
     "lodash": "^4.17.10",
     "moment": "^2.20.1",
-    "typed-conversions": "^0.8.3"
+    "typed-conversions": "^0.8.8"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
