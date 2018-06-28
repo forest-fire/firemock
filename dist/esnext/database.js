@@ -13,7 +13,13 @@ export function updateDatabase(state) {
 export function setDB(path, value) {
     const dotPath = join(path);
     const oldValue = get(db, dotPath);
-    set(db, dotPath, value);
+    if (value === null) {
+        console.log(dotPath);
+        removeDB(dotPath);
+    }
+    else {
+        set(db, dotPath, value);
+    }
     notify(dotPath, value, oldValue);
 }
 /** single-path update */

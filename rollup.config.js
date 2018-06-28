@@ -1,5 +1,7 @@
+import typescript from "rollup-plugin-typescript2";
+
 export default {
-  input: "dist/esnext/index.js",
+  input: "src/index.ts",
   output: [
     {
       file: "dist/firemock.cjs.js",
@@ -11,14 +13,18 @@ export default {
       file: "dist/firemock.umd.js",
       format: "umd",
       name: "FireMock",
-      sourcemap: true
-      // globals: {
-      //   lodash: "lodash",
-      //   "firebase-key": "fbKey",
-      //   "typed-conversions": "convert",
-      //   "abstracted-firebase": "abstractedFirebase"
-      // }
+      sourcemap: true,
+      globals: {
+        lodash: "lodash",
+        "firebase-key": "fbKey",
+        "typed-conversions": "convert"
+      }
     }
   ],
-  external: ["firebase-api-surface", "typed-conversions"]
+  external: ["firebase-api-surface", "typed-conversions"],
+  plugins: [
+    typescript({
+      tsconfig: "tsconfig.esnext.json"
+    })
+  ]
 };

@@ -587,6 +587,8 @@ describe("Reference functions", () => {
       updated["/people/abcd/lastUpdated"] = now;
       await m.ref("/").update(updated);
       const person = (await m.ref("/people/abcd").once("value")).val();
+      console.log(person);
+
       expect(person.age).to.equal(35);
       expect(person.lastUpdated).to.equal(now);
       expect(person.foo.bar).to.equal(5);
