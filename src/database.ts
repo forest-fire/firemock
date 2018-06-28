@@ -131,7 +131,7 @@ function cancelCallback(removed: IListener[]): number {
   let count = 0;
   removed.forEach(l => {
     if (typeof l.cancelCallbackOrContext === "function") {
-      l.cancelCallbackOrContext();
+      (l.cancelCallbackOrContext as () => any)();
       count++;
     }
   });

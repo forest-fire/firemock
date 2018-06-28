@@ -269,10 +269,10 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
       );
       const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
 
-      snap = new SnapShot<T>(
-        leafNode(this.path),
-        convert.keyValueArrayToDictionary(resultset, { key: "id" })
-      );
+      snap = new SnapShot<T>(leafNode(this.path), convert.keyValueArrayToDictionary(
+        resultset,
+        { key: "id" }
+      ) as T);
     } else {
       const mockDatabaseResults: any[] = convert.hashToArray(input);
       const sorted: any[] = this.processSorting(mockDatabaseResults);

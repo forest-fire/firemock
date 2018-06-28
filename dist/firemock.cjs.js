@@ -755,7 +755,7 @@ class Query {
             const sorted = this.processSorting(mockDatabaseResults);
             const remainingIds = new Set(this.processFilters(sorted).map((f) => (typeof f === "object" ? f.id : f)));
             const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
-            snap = new SnapShot(leafNode(this.path), resultset);
+            snap = new SnapShot(leafNode(this.path), convert.keyValueArrayToDictionary(resultset, { key: "id" }));
         }
         else {
             const mockDatabaseResults = convert.hashToArray(input);
