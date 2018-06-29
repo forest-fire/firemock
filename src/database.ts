@@ -26,8 +26,6 @@ export function setDB(path: string, value: any) {
   const oldValue = get(db, dotPath);
 
   if (value === null) {
-    console.log(dotPath);
-
     removeDB(dotPath);
   } else {
     set(db, dotPath, value);

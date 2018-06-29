@@ -47,7 +47,6 @@ export default class Reference extends Query {
         return networkDelay();
     }
     set(value, onComplete) {
-        console.log(value);
         setDB(this.path, value);
         if (onComplete) {
             onComplete(null);

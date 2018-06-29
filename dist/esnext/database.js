@@ -14,7 +14,6 @@ export function setDB(path, value) {
     const dotPath = join(path);
     const oldValue = get(db, dotPath);
     if (value === null) {
-        console.log(dotPath);
         removeDB(dotPath);
     }
     else {

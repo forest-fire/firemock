@@ -139,7 +139,6 @@ function setDB(path, value) {
     const dotPath = join(path);
     const oldValue = lodash.get(db, dotPath);
     if (value === null) {
-        console.log(dotPath);
         removeDB(dotPath);
     }
     else {
@@ -601,7 +600,6 @@ class Query {
             return resultset.slice(0, num);
         };
         this._limitFilters.push(filter);
-        console.log(this._limitFilters.length);
         return this;
     }
     equalTo(value, key) {
@@ -746,9 +744,11 @@ class Query {
         const input = lodash.get(db, join(this.path), undefined);
         const hashOfHashes = typeof input === "object" &&
             Object.keys(input).every(i => typeof input[i] === "object");
-        console.log(hashOfHashes);
         let snap;
         if (!hashOfHashes) {
+            if (typeof input !== "object") {
+                return new SnapShot(leafNode(this.path), input);
+            }
             const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
                 key: "id"
             });
@@ -852,7 +852,6 @@ class Reference extends Query {
         return networkDelay();
     }
     set(value, onComplete) {
-        console.log(value);
         setDB(this.path, value);
         if (onComplete) {
             onComplete(null);

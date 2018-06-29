@@ -79,7 +79,6 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
       return resultset.slice(0, num);
     };
     this._limitFilters.push(filter);
-    console.log(this._limitFilters.length);
 
     return this;
   }
@@ -256,10 +255,11 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
       typeof input === "object" &&
       Object.keys(input).every(i => typeof input[i] === "object");
 
-    console.log(hashOfHashes);
-
     let snap;
     if (!hashOfHashes) {
+      if (typeof input !== "object") {
+        return new SnapShot<T>(leafNode(this.path), input);
+      }
       const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(input, {
         key: "id"
       });
