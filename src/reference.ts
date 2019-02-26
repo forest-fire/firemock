@@ -1,5 +1,3 @@
-// tslint:disable:no-implicit-dependencies
-import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
 import Query from "./query";
 import { get } from "lodash";
@@ -107,7 +105,7 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     transactionUpdate: (a: Partial<T>) => Partial<T>,
     onComplete?: (a: Error | null, b: boolean, c: DataSnapshot | null) => any,
     applyLocally?: boolean
-  ): Promise<rtdb.ITransactionResult> {
+  ) {
     return Promise.resolve({
       committed: true,
       snapshot: null,
