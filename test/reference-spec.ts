@@ -336,7 +336,7 @@ describe("Reference functions", () => {
     const personMock = (h: SchemaHelper) => () => ({
       name: h.faker.name.firstName() + " " + h.faker.name.lastName(),
       age: h.faker.random.number({ min: 1, max: 80 }),
-      inUSA: h.chance.bool()
+      inUSA: h.faker.random.boolean()
     });
 
     const numbers = [123, 456, 7878, 9999, 10491, 15000, 18345, 20000];

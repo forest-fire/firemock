@@ -3,18 +3,15 @@ import { rtdb } from "firebase-api-surface";
 import { IDictionary } from "common-types";
 import Query from "./query";
 import { get } from "lodash";
+import {
+  Reference as IReference,
+  ThenableReference as IThenableReference,
+  DataSnapshot,
+  ThenableReference
+} from "@firebase/database-types";
 
 import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
-import {
-  parts,
-  normalizeRef,
-  leafNode,
-  getRandomInt,
-  removeKeys,
-  join,
-  slashNotation,
-  networkDelay
-} from "./util";
+import { parts, join, slashNotation, networkDelay } from "./util";
 
 function isMultiPath(data: IDictionary) {
   Object.keys(data).map((d: any) => {
@@ -26,40 +23,38 @@ function isMultiPath(data: IDictionary) {
   const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
   return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
-export default class Reference<T = any> extends Query<T> implements rtdb.IReference {
+export default class Reference<T = any> extends Query<T> implements IReference {
   public get key(): string | null {
     return this.path.split(".").pop();
   }
 
-  public get parent(): rtdb.IReference | null {
+  public get parent(): IReference | null {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
     return new Reference(r, get(db, r));
   }
 
-  public child<C = any>(path: string): rtdb.IReference {
+  public child<C = any>(path: string): Reference {
     const r = parts(this.path)
       .concat([path])
       .join(".");
     return new Reference<C>(r, get(db, r));
   }
 
-  public get root(): rtdb.IReference {
+  public get root(): Reference {
     return new Reference("/", db);
   }
 
-  public push(
-    value?: any,
-    onComplete?: (a: Error | null) => any
-  ): rtdb.IThenableReference<rtdb.IReference<T>> {
+  public push(value?: any, onComplete?: (a: Error | null) => any): IThenableReference {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {
       onComplete(null);
     }
 
-    return networkDelay<T>(this) as any; // TODO: try and get this typed appropriately
+    // TODO: try and get this typed appropriately
+    return networkDelay<T>(this) as any;
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {
@@ -110,7 +105,7 @@ export default class Reference<T = any> extends Query<T> implements rtdb.IRefere
 
   public transaction(
     transactionUpdate: (a: Partial<T>) => Partial<T>,
-    onComplete?: (a: Error | null, b: boolean, c: rtdb.IDataSnapshot<T> | null) => any,
+    onComplete?: (a: Error | null, b: boolean, c: DataSnapshot | null) => any,
     applyLocally?: boolean
   ): Promise<rtdb.ITransactionResult> {
     return Promise.resolve({

@@ -271,10 +271,6 @@
           const faker = require("faker");
           return faker;
       }
-      get chance() {
-          const chance = require("chance");
-          return chance();
-      }
   }
 
   /* tslint:disable:max-classes-per-file */
@@ -335,10 +331,6 @@
       get faker() {
           const faker = require("faker");
           return faker;
-      }
-      get chance() {
-          const chance = require("chance");
-          return chance();
       }
   }
 
@@ -840,7 +832,8 @@
           if (onComplete) {
               onComplete(null);
           }
-          return networkDelay(this); // TODO: try and get this typed appropriately
+          // TODO: try and get this typed appropriately
+          return networkDelay(this);
       }
       remove(onComplete) {
           removeDB(this.path);
