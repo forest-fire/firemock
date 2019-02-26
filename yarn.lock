@@ -10,13 +10,14 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@firebase/database-types/-/database-types-0.1.2.tgz#c6a23b8aa721ca16951c752430167ee764659916"
 
+"@firebase/database-types@^0.3.5":
+  version "0.3.5"
+  resolved "https://registry.yarnpkg.com/@firebase/database-types/-/database-types-0.3.5.tgz#9c4937e16b44b4b458e1c2ad70a7dd15cf9bf3f4"
+  integrity sha512-MB98w9DsZtTN45sf651s5z4f2zdn5gPi2SMaZk32HLihPDgKv5pepzZ+grxioM7z5ZU1EvjjXRL7oM81OH3mZQ==
+
 "@types/chai@^4.1.2":
   version "4.1.4"
   resolved "https://registry.yarnpkg.com/@types/chai/-/chai-4.1.4.tgz#5ca073b330d90b4066d6ce18f60d57f2084ce8ca"
-
-"@types/chance@^0.7.33":
-  version "0.7.36"
-  resolved "https://registry.yarnpkg.com/@types/chance/-/chance-0.7.36.tgz#1c3e14b9b11463d454182393ebcd8e977f1daff5"
 
 "@types/commander@^2.12.2":
   version "2.12.2"
@@ -28,9 +29,10 @@
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@types/events/-/events-1.2.0.tgz#81a6731ce4df43619e5c8c945383b3e62a89ea86"
 
-"@types/faker@^4.1.0":
-  version "4.1.2"
-  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-4.1.2.tgz#f8ab50c9f9af68c160dd71b63f83e24b712d0df5"
+"@types/faker@^4.1.5":
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/@types/faker/-/faker-4.1.5.tgz#8f620f9c9a67150aa0a32b4e8a407da43fca61d4"
+  integrity sha512-YSDqoBEWYGdNk53xSkkb6REaUaVSlIjxIAGjj/nbLzlZOit7kUU+nA2zC2qQkIVO4MQ+3zl4Sz7aw+kbpHHHUQ==
 
 "@types/glob@*":
   version "5.0.35"
@@ -413,10 +415,6 @@ chalk@^2.3.0, chalk@^2.3.2:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chance@^1.0.16:
-  version "1.0.16"
-  resolved "https://registry.yarnpkg.com/chance/-/chance-1.0.16.tgz#bd61912716b0010c3dca8e3948a960efcaa7bb1b"
-
 check-error@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/check-error/-/check-error-1.0.2.tgz#574d312edd88bb5dd8912e9286dd6c0aed4aac82"
@@ -480,6 +478,11 @@ commander@*, commander@2.15.1, commander@^2.12.1, commander@^2.15.0, commander@^
 common-types@^1.7.36:
   version "1.8.2"
   resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.8.2.tgz#e5bbe6468882243e9e917ec879c298306edb8921"
+
+common-types@^1.9.6:
+  version "1.9.6"
+  resolved "https://registry.yarnpkg.com/common-types/-/common-types-1.9.6.tgz#ec94d6466e4bd2876fb734297d7f8abf665f4aa3"
+  integrity sha512-JyMYuxDJgrhgqBh1D+A0C7ghCiVw+vxrxwNt/FcgoMhGzh/KqX8vOVwQBA6no5onsXAYcepAwUxrYYjpvrBChA==
 
 commondir@^1.0.1:
   version "1.0.1"
@@ -775,9 +778,10 @@ find-up@^2.1.0:
   dependencies:
     locate-path "^2.0.0"
 
-firebase-api-surface@^0.8.3:
-  version "0.8.3"
-  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.8.3.tgz#b991f2a7b135661699b57387b51d1a72358721dd"
+firebase-api-surface@^0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/firebase-api-surface/-/firebase-api-surface-0.8.5.tgz#5928f963233d669c5fe49d9ceeab86076a8a0bb0"
+  integrity sha512-IOWHOVDmteiRqW6G49rcIWpXa1OEP0frCACOD0numbOoPTb7Ddrv5teDnyPrQl74Hfbf+tJUpyLiM0EsqZnQFA==
   dependencies:
     "@firebase/app-types" "^0.1.1"
     "@firebase/database-types" "^0.1.1"
@@ -1529,9 +1533,10 @@ mocha@^5.2.0:
     mkdirp "0.5.1"
     supports-color "5.4.0"
 
-moment@^2.20.1:
-  version "2.22.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
+moment@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+  integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
 
 ms@2.0.0:
   version "2.0.0"
@@ -2293,9 +2298,10 @@ type-detect@^4.0.0:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/type-detect/-/type-detect-4.0.8.tgz#7646fb5f18871cfbb7749e69bd39a6388eb7450c"
 
-typed-conversions@^0.8.8:
-  version "0.8.8"
-  resolved "https://registry.yarnpkg.com/typed-conversions/-/typed-conversions-0.8.8.tgz#25e57f9a5435b8ec81a459b4981a19050a211a2c"
+typed-conversions@^0.8.9:
+  version "0.8.13"
+  resolved "https://registry.yarnpkg.com/typed-conversions/-/typed-conversions-0.8.13.tgz#715772bf7bb51758767560989a0b2fb6579f884c"
+  integrity sha512-QScfNw4FS7H5qsleIWCWnyrnstpnb2B8tmS2OUDFPCFrdGEfR3HwEQ47l6I/j8FJbnkDJV863uIHE1fGBe6QQA==
   dependencies:
     common-types "^1.7.36"
     lodash.get "^4.4.2"

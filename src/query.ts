@@ -1,23 +1,16 @@
-import { IDictionary } from "common-types";
-// tslint:disable-next-line:no-implicit-dependencies
-import { rtdb } from "firebase-api-surface";
+import {
+  DataSnapshot,
+  Query as IQuery,
+  EventType,
+  Reference as IReference
+} from "@firebase/database-types";
 import { db, addListener } from "./database";
 import { get } from "lodash";
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";
 import Reference from "./reference";
-import {
-  parts,
-  join,
-  leafNode,
-  getRandomInt,
-  removeKeys,
-  DelayType,
-  Delays,
-  networkDelay,
-  setNetworkDelay
-} from "./util";
+import { join, leafNode, DelayType, networkDelay } from "./util";
 
 export type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
 export type GenericEventHandler = (snap: SnapShot, key?: string) => void;
@@ -42,8 +35,8 @@ export interface IOrdering {
 export interface IListener {
   path: string;
 
-  eventType: rtdb.EventType;
-  callback: (a: rtdb.IDataSnapshot | null, b?: string) => any;
+  eventType: EventType;
+  callback: (a: DataSnapshot | null, b?: string) => any;
   cancelCallbackOrContext?: object | null;
   context?: object | null;
 }
@@ -51,7 +44,7 @@ export interface IListener {
 export type IQueryFilter<T> = (resultset: T[]) => T[];
 
 /** tslint:ignore:member-ordering */
-export default class Query<T = any> implements rtdb.IQuery<T> {
+export default class Query<T = any> implements IQuery {
   protected _order: IOrdering = { type: OrderingType.byKey, value: null };
   protected _listeners = new Queue<IListener>("listeners");
   protected _limitFilters: Array<IQueryFilter<T>> = [];
@@ -61,30 +54,29 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
 
   constructor(public path: string, protected _delay: DelayType = 5) {}
 
-  public get ref(): rtdb.IReference<T> {
-    return new Reference<T>(this.path, this._delay) as rtdb.IReference<T>;
+  public get ref(): Reference<T> {
+    return new Reference<T>(this.path, this._delay);
   }
 
-  public limitToLast(num: number): rtdb.IQuery<T> {
+  public limitToLast(num: number): Query<T> {
     const filter: IQueryFilter<T> = resultset => {
       return resultset.slice(resultset.length - num);
     };
     this._limitFilters.push(filter);
 
-    return this as rtdb.IQuery<T>;
+    return this as Query<T>;
   }
 
-  public limitToFirst(num: number): rtdb.IQuery<T> {
+  public limitToFirst(num: number): Query<T> {
     const filter: IQueryFilter<T> = resultset => {
       return resultset.slice(0, num);
     };
     this._limitFilters.push(filter);
-    console.log(this._limitFilters.length);
 
     return this;
   }
 
-  public equalTo(value: QueryValue, key?: Extract<keyof T, string>): rtdb.IQuery<T> {
+  public equalTo(value: QueryValue, key?: Extract<keyof T, string>): Query<T> {
     if (key && this._order.type === OrderingType.byKey) {
       throw new Error("You can not use equalTo's key property when using a key sort!");
     }
@@ -112,10 +104,10 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
     };
     this._queryFilters.push(filter);
 
-    return this as rtdb.IQuery<T>;
+    return this as Query<T>;
   }
   /** Creates a Query with the specified starting point. */
-  public startAt(value: QueryValue, key?: string): rtdb.IQuery<T> {
+  public startAt(value: QueryValue, key?: string): Query<T> {
     key = key ? key : this._order.value;
     const filter: IQueryFilter<T> = resultset => {
       return resultset.filter((record: any) => {
@@ -124,10 +116,10 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
     };
     this._queryFilters.push(filter);
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
-  public endAt(value: QueryValue, key?: string): rtdb.IQuery<T> {
+  public endAt(value: QueryValue, key?: string): Query<T> {
     key = key ? key : this._order.value;
     const filter: IQueryFilter<T> = resultset => {
       return resultset.filter((record: any) => {
@@ -136,22 +128,22 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
     };
     this._queryFilters.push(filter);
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
   public on(
-    eventType: rtdb.EventType,
-    callback: (a: rtdb.IDataSnapshot<T> | null, b?: string) => any,
+    eventType: EventType,
+    callback: (a: DataSnapshot | null, b?: string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: rtdb.IDataSnapshot | null, b?: string) => any {
+  ): (a: DataSnapshot | null, b?: string) => any {
     addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
 
     return null;
   }
 
   public once(eventType: "value") {
-    return networkDelay(this.process()) as Promise<rtdb.IDataSnapshot<T>>;
+    return networkDelay(this.process()) as Promise<DataSnapshot>;
   }
 
   public off() {
@@ -159,7 +151,7 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
   }
 
   /** NOT IMPLEMENTED YET */
-  public isEqual(other: rtdb.IQuery) {
+  public isEqual(other: Query) {
     return false;
   }
 
@@ -168,43 +160,43 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
    * specific property. Note: if this happens a lot then it's best to explicitly
    * index on this property in the database's config.
    */
-  public orderByChild(prop: string): rtdb.IQuery<T> {
+  public orderByChild(prop: string): Query<T> {
     this._order = {
       type: OrderingType.byChild,
       value: prop
     };
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
   /**
    * When the children of a query are all scalar values (string, number, boolean), you
    * can order the results by their (ascending) values
    */
-  public orderByValue(): rtdb.IQuery<T> {
+  public orderByValue(): Query<T> {
     this._order = {
       type: OrderingType.byValue,
       value: null
     };
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
   /**
    * This is the default sort
    */
-  public orderByKey(): rtdb.IQuery<T> {
+  public orderByKey(): Query<T> {
     this._order = {
       type: OrderingType.byKey,
       value: null
     };
 
-    return this as rtdb.IQuery<T>;
+    return this;
   }
 
   /** NOT IMPLEMENTED */
-  public orderByPriority(): rtdb.IQuery<T> {
-    return this as rtdb.IQuery<T>;
+  public orderByPriority(): Query<T> {
+    return this;
   }
 
   public toJSON() {
@@ -233,14 +225,14 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
    * This is an undocumented API endpoint that is within the
    * typing provided by Google
    */
-  protected getParent(): rtdb.IReference | null {
+  protected getParent(): IReference | null {
     return null;
   }
   /**
    * This is an undocumented API endpoint that is within the
    * typing provided by Google
    */
-  protected getRoot(): rtdb.IReference {
+  protected getRoot(): IReference {
     return null;
   }
 
@@ -256,10 +248,11 @@ export default class Query<T = any> implements rtdb.IQuery<T> {
       typeof input === "object" &&
       Object.keys(input).every(i => typeof input[i] === "object");
 
-    console.log(hashOfHashes);
-
     let snap;
     if (!hashOfHashes) {
+      if (typeof input !== "object") {
+        return new SnapShot<T>(leafNode(this.path), input);
+      }
       const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(input, {
         key: "id"
       });

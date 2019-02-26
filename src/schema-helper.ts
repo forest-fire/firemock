@@ -7,8 +7,4 @@ export default class SchemaHelper {
     const faker = require("faker");
     return faker;
   }
-  public get chance(): Chance.Chance {
-    const chance = require("chance");
-    return chance();
-  }
 }

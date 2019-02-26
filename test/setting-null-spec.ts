@@ -9,7 +9,7 @@ const expect = chai.expect;
 const animalMock: SchemaCallback = h => () => ({
   name: h.faker.name.firstName(),
   age: h.faker.helpers.randomize([1, 2, 4]),
-  home: h.chance.address()
+  home: h.faker.address.streetAddress()
 });
 
 describe("Setting null to db path →", () => {

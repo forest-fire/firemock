@@ -9,6 +9,7 @@ import { firstProp, lastProp, firstKey, lastKey, Delays } from "../src/util";
 import * as convert from "typed-conversions";
 
 import "mocha";
+import { IDictionary } from "../node_modules/common-types/dist";
 
 const expect = chai.expect;
 
@@ -335,7 +336,7 @@ describe("Reference functions", () => {
     const personMock = (h: SchemaHelper) => () => ({
       name: h.faker.name.firstName() + " " + h.faker.name.lastName(),
       age: h.faker.random.number({ min: 1, max: 80 }),
-      inUSA: h.chance.bool()
+      inUSA: h.faker.random.boolean()
     });
 
     const numbers = [123, 456, 7878, 9999, 10491, 15000, 18345, 20000];
@@ -557,7 +558,7 @@ describe("Reference functions", () => {
           }
         }
       });
-      const updated = {};
+      const updated: IDictionary = {};
       updated["/people/abcd/age"] = 40;
       updated["/people/abcd/lastUpdated"] = now;
       await m.ref("/").update(updated);
@@ -582,12 +583,11 @@ describe("Reference functions", () => {
           }
         }
       });
-      const updated = {};
+      const updated: IDictionary = {};
       updated["/people/abcd/foo"] = { bar: 5 };
       updated["/people/abcd/lastUpdated"] = now;
       await m.ref("/").update(updated);
       const person = (await m.ref("/people/abcd").once("value")).val();
-      console.log(person);
 
       expect(person.age).to.equal(35);
       expect(person.lastUpdated).to.equal(now);

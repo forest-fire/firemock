@@ -6,6 +6,9 @@ import { set, get } from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import { SnapShot } from "./index";
+import { DataSnapshot } from "@firebase/database-types";
+
+export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];
@@ -26,8 +29,6 @@ export function setDB(path: string, value: any) {
   const oldValue = get(db, dotPath);
 
   if (value === null) {
-    console.log(dotPath);
-
     removeDB(dotPath);
   } else {
     set(db, dotPath, value);
@@ -75,7 +76,7 @@ export function pushDB(path: string, value: any): string {
 export function addListener(
   path: string,
   eventType: rtdb.EventType,
-  callback: (snap: rtdb.IDataSnapshot, key?: string) => void,
+  callback: (snap: DataSnapshot, key?: string) => void,
   cancelCallbackOrContext?: (err?: Error) => void,
   context?: IDictionary
 ) {
@@ -90,7 +91,7 @@ export function addListener(
 
 export function removeListener(
   eventType?: rtdb.EventType,
-  callback?: (snap: SnapShot, key?: string) => void,
+  callback?: (snap: DataSnapshot, key?: string) => void,
   context?: IDictionary
 ): number {
   if (!eventType) {

@@ -35,7 +35,7 @@ m.addSchema('customer', (h) => () => {
 
 m.addSchema('pet', (h) => () => {
     name: h.faker.name.firstName(),
-    age: chance.integer({min: 1, max: 15}),
+    age: h.faker.random.integer({min: 1, max:15})    ,
     gender: chance.gender()
   })
   .hasMany('appointment')
@@ -141,10 +141,10 @@ This additional configuration has made a few notable changes:
 
 You may have noticed that in the examples so far when we generate a schema it gets placed into the mock database off the root of the database and its name is the plural version of: 
 
-  | schema | DB path |
-  | :----: | :----- |
-  | customer | /customers |  
-  | pet | /pets |
+  |   schema    | DB path       |
+  | :---------: | :------------ |
+  |  customer   | /customers    |
+  |     pet     | /pets         |
   | appointment | /appointments |
 
 This default makes sense for a lot of situations but we will need some flexibilty to modify this for edge cases. This flexibility is provided in several forms:

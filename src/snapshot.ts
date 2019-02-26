@@ -5,6 +5,7 @@ import Reference from "./reference";
 import { rtdb } from "firebase-api-surface";
 import * as convert from "typed-conversions";
 import { getParent, getKey, join } from "./util";
+import { DataSnapshot } from "@firebase/database-types";
 
 /**
  * Each record in the forEach iteration will be passed
@@ -13,7 +14,7 @@ import { getParent, getKey, join } from "./util";
  */
 export type Action = (record: SnapShot) => boolean | void;
 
-export default class SnapShot<T = any> implements rtdb.IDataSnapshot {
+export default class SnapShot<T = any> implements DataSnapshot {
   private _sortingFunction: SortingFunction;
   constructor(private _key: string, private _value: T[] | T) {}
 
@@ -22,7 +23,7 @@ export default class SnapShot<T = any> implements rtdb.IDataSnapshot {
   }
 
   public get ref() {
-    return new Reference<T>(this._key) as rtdb.IReference;
+    return new Reference<T>(this._key);
   }
 
   public val() {
@@ -33,7 +34,7 @@ export default class SnapShot<T = any> implements rtdb.IDataSnapshot {
     return JSON.stringify(this._value);
   }
 
-  public child<TC = IDictionary>(path: string): rtdb.IDataSnapshot {
+  public child<TC = IDictionary>(path: string) {
     const value = get(this._value, path, null);
     return value ? new SnapShot<TC>(path, value) : null;
   }

@@ -137,7 +137,6 @@
       const dotPath = join(path);
       const oldValue = lodash.get(db, dotPath);
       if (value === null) {
-          console.log(dotPath);
           removeDB(dotPath);
       }
       else {
@@ -272,10 +271,6 @@
           const faker = require("faker");
           return faker;
       }
-      get chance() {
-          const chance = require("chance");
-          return chance();
-      }
   }
 
   /* tslint:disable:max-classes-per-file */
@@ -336,10 +331,6 @@
       get faker() {
           const faker = require("faker");
           return faker;
-      }
-      get chance() {
-          const chance = require("chance");
-          return chance();
       }
   }
 
@@ -599,7 +590,6 @@
               return resultset.slice(0, num);
           };
           this._limitFilters.push(filter);
-          console.log(this._limitFilters.length);
           return this;
       }
       equalTo(value, key) {
@@ -744,9 +734,11 @@
           const input = lodash.get(db, join(this.path), undefined);
           const hashOfHashes = typeof input === "object" &&
               Object.keys(input).every(i => typeof input[i] === "object");
-          console.log(hashOfHashes);
           let snap;
           if (!hashOfHashes) {
+              if (typeof input !== "object") {
+                  return new SnapShot(leafNode(this.path), input);
+              }
               const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
                   key: "id"
               });
@@ -840,7 +832,8 @@
           if (onComplete) {
               onComplete(null);
           }
-          return networkDelay(this); // TODO: try and get this typed appropriately
+          // TODO: try and get this typed appropriately
+          return networkDelay(this);
       }
       remove(onComplete) {
           removeDB(this.path);
@@ -850,7 +843,6 @@
           return networkDelay();
       }
       set(value, onComplete) {
-          console.log(value);
           setDB(this.path, value);
           if (onComplete) {
               onComplete(null);

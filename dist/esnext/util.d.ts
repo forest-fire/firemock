@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { rtdb } from "firebase-api-surface";
+import { DataSnapshot } from "@firebase/database-types";
 export declare function normalizeRef(r: string): string;
 export declare function parts(r: string): string[];
 /**
@@ -21,7 +21,7 @@ export declare function removeKeys(obj: IDictionary, remove: string[]): {};
  */
 export declare function join(...paths: string[]): string;
 export declare function pathDiff(longPath: string, pathSubset: string): string;
-export declare function orderedSnapToJS<T = any>(snap: rtdb.IDataSnapshot): IDictionary<T>;
+export declare function orderedSnapToJS<T = any>(snap: DataSnapshot): IDictionary<T>;
 /**
  * Given a path, returns the parent path and child key
  */

@@ -10,7 +10,7 @@ describe("Deployment", () => {
   const animalMock: SchemaCallback = h => () => ({
     name: h.faker.name.firstName(),
     age: h.faker.helpers.randomize([1, 2, 4]),
-    home: h.chance.address()
+    home: h.faker.address.streetAddress()
   });
 
   it("Overriding the mock at deployment works", async () => {
