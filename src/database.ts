@@ -1,12 +1,11 @@
 // tslint:disable:no-implicit-dependencies
 import { IDictionary } from "common-types";
-import { rtdb } from "firebase-api-surface";
 import { IListener } from "./query";
 import { set, get } from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import { SnapShot } from "./index";
-import { DataSnapshot } from "@firebase/database-types";
+import { DataSnapshot, EventType } from "@firebase/database-types";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
@@ -75,7 +74,7 @@ export function pushDB(path: string, value: any): string {
 
 export function addListener(
   path: string,
-  eventType: rtdb.EventType,
+  eventType: EventType,
   callback: (snap: DataSnapshot, key?: string) => void,
   cancelCallbackOrContext?: (err?: Error) => void,
   context?: IDictionary
@@ -90,7 +89,7 @@ export function addListener(
 }
 
 export function removeListener(
-  eventType?: rtdb.EventType,
+  eventType?: EventType,
   callback?: (snap: DataSnapshot, key?: string) => void,
   context?: IDictionary
 ): number {
@@ -145,11 +144,11 @@ export function removeAllListeners(): number {
   return howMany;
 }
 
-export function listenerCount(type?: rtdb.EventType) {
+export function listenerCount(type?: EventType) {
   return type ? _listeners.filter(l => l.eventType === type).length : _listeners.length;
 }
 
-export function listenerPaths(type?: rtdb.EventType) {
+export function listenerPaths(type?: EventType) {
   return type
     ? _listeners.filter(l => l.eventType === type).map(l => l.path)
     : _listeners.map(l => l.path);
@@ -198,7 +197,7 @@ function notify(dotPath: string, newValue: any, oldValue: any) {
  * @param path the parent path that children are detected off of
  * @param eventType <optional> the specific child event to filter down to
  */
-export function findChildListeners(path: string, ...eventType: rtdb.EventType[]) {
+export function findChildListeners(path: string, ...eventType: EventType[]) {
   const correctPath = _listeners.filter(
     l => l.path === join(path) && l.eventType !== "value"
   );

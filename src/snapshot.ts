@@ -1,10 +1,8 @@
 import { IDictionary, SortingFunction } from "common-types";
 import { get } from "lodash";
 import Reference from "./reference";
-// tslint:disable-next-line:no-implicit-dependencies
-import { rtdb } from "firebase-api-surface";
 import * as convert from "typed-conversions";
-import { getParent, getKey, join } from "./util";
+import { getKey, join } from "./util";
 import { DataSnapshot } from "@firebase/database-types";
 
 /**

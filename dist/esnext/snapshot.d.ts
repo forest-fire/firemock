@@ -14,7 +14,7 @@ export default class SnapShot<T = any> implements DataSnapshot {
     constructor(_key: string, _value: T[] | T);
     readonly key: string;
     readonly ref: Reference<T>;
-    val(): T | import("../../../../../../Users/ken/mine/forest-fire/firemock/node_modules/firebase-api-surface/node_modules/common-types/dist/basics").IDictionary<T>;
+    val(): T | IDictionary<T>;
     toJSON(): string;
     child<TC = IDictionary>(path: string): SnapShot<TC>;
     hasChild(path: string): boolean;
@@ -23,7 +23,7 @@ export default class SnapShot<T = any> implements DataSnapshot {
     exists(): boolean;
     forEach(actionCb: Action): boolean;
     /** NOTE: mocking proxies this call through to val(), no use of "priority" */
-    exportVal(): T | import("../../../../../../Users/ken/mine/forest-fire/firemock/node_modules/firebase-api-surface/node_modules/common-types/dist/basics").IDictionary<T>;
+    exportVal(): T | IDictionary<T>;
     getPriority(): string | number | null;
     /**
      * Used by Query objects to instruct the snapshot the sorting function to use
