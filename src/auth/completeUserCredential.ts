@@ -4,7 +4,7 @@ import {
   AuthProvider,
   ActionCodeSettings
 } from "@firebase/auth-types";
-import { getAnonymousUid } from "../auth";
+import { authAdminApi } from "./authAdmin";
 
 /**
  * takes a partial user auth and adds enough to make it officially
@@ -108,7 +108,7 @@ const fakeUserCredential: UserCredential = {
     providerData: [],
     providerId: "",
     refreshToken: "",
-    uid: getAnonymousUid()
+    uid: authAdminApi.getAnonymousUid()
   },
   additionalUserInfo: {
     isNewUser: false,

@@ -1,16 +1,19 @@
 import { IAuthConfig, IEmailLogin } from "./types";
 import { authApi } from "../auth";
-
-let validEmailLogins: IEmailLogin[] = [];
-let authConfig: IAuthConfig = {};
+let authConfig: IAuthConfig = {
+  allowAnonymous: true
+};
 let ANONYMOUS_USER_ID = "123456";
 
 export type IMockAdminApi = typeof authAdminApi;
 
 export const authAdminApi = {
   configureAuth(config: IAuthConfig) {
-    authConfig = config;
-    validEmailLogins = config.validEmailLogins ? config.validEmailLogins : [];
+    authConfig = { ...authConfig, ...config };
+  },
+
+  getValidEmails() {
+    return authConfig.validEmailLogins || [];
   },
 
   getAuthConfig() {

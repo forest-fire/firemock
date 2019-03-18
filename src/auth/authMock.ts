@@ -107,6 +107,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   languageCode: "",
   async updateCurrentUser() {
     return;
+  },
+  settings: {
+    appVerificationDisabledForTesting: false
   }
 };
 
