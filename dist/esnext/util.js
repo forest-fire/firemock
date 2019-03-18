@@ -108,7 +108,7 @@ let _delay = 5;
 export function setNetworkDelay(value) {
     _delay = value;
 }
-export function networkDelay(returnValue) {
+export async function networkDelay(returnValue) {
     return new Promise(resolve => {
         setTimeout(() => {
             if (returnValue) {

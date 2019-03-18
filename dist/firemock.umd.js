@@ -1,8 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('firebase-key'), require('typed-conversions')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'firebase-key', 'typed-conversions'], factory) :
-  (factory((global.FireMock = {}),global.lodash,global.fbKey,global.convert));
-}(this, (function (exports,lodash,fbKey,convert) { 'use strict';
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('lodash'), require('common-types'), require('firebase-key'), require('typed-conversions')) :
+  typeof define === 'function' && define.amd ? define(['exports', 'lodash', 'common-types', 'firebase-key', 'typed-conversions'], factory) :
+  (factory((global.FireMock = {}),global.lodash,null,global.fbKey,global.convert));
+}(this, (function (exports,lodash,commonTypes,fbKey,convert) { 'use strict';
 
   function normalizeRef(r) {
       r = r.replace("/", ".");
@@ -84,7 +84,7 @@
   function setNetworkDelay(value) {
       _delay = value;
   }
-  function networkDelay(returnValue) {
+  async function networkDelay(returnValue) {
       return new Promise(resolve => {
           setTimeout(() => {
               if (returnValue) {
@@ -123,6 +123,16 @@
           return getRandomInt(10, 100);
       }
       throw new Error("Delay property is of unknown format: " + delay);
+  }
+
+  let validEmailLogins = [];
+  function configureAuth(config = {
+      allowAnonymous: true,
+      allowEmailLogins: false,
+      allowEmailLinks: false,
+      allowPhoneLogins: false
+  }) {
+      validEmailLogins = config.validEmailLogins ? config.validEmailLogins : [];
   }
 
   let db = [];
@@ -275,7 +285,7 @@
 
   /* tslint:disable:max-classes-per-file */
   class Mock$$1 {
-      constructor(raw) {
+      constructor(raw, authConfig = {}) {
           this._schemas = new Queue("schemas").clear();
           this._relationships = new Queue("relationships").clear();
           this._queues = new Queue("queues").clear();
@@ -284,6 +294,7 @@
           if (raw) {
               this.updateDB(raw);
           }
+          configureAuth(authConfig);
       }
       /**
        * Update the mock DB with a raw JS object/hash

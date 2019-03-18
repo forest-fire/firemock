@@ -3,6 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var lodash = require('lodash');
+require('common-types');
 var fbKey = require('firebase-key');
 var convert = require('typed-conversions');
 
@@ -86,7 +87,7 @@ let _delay = 5;
 function setNetworkDelay(value) {
     _delay = value;
 }
-function networkDelay(returnValue) {
+async function networkDelay(returnValue) {
     return new Promise(resolve => {
         setTimeout(() => {
             if (returnValue) {
@@ -125,6 +126,16 @@ function calcDelay() {
         return getRandomInt(10, 100);
     }
     throw new Error("Delay property is of unknown format: " + delay);
+}
+
+let validEmailLogins = [];
+function configureAuth(config = {
+    allowAnonymous: true,
+    allowEmailLogins: false,
+    allowEmailLinks: false,
+    allowPhoneLogins: false
+}) {
+    validEmailLogins = config.validEmailLogins ? config.validEmailLogins : [];
 }
 
 let db = [];
@@ -277,7 +288,7 @@ class MockHelper {
 
 /* tslint:disable:max-classes-per-file */
 class Mock$$1 {
-    constructor(raw) {
+    constructor(raw, authConfig = {}) {
         this._schemas = new Queue("schemas").clear();
         this._relationships = new Queue("relationships").clear();
         this._queues = new Queue("queues").clear();
@@ -286,6 +297,7 @@ class Mock$$1 {
         if (raw) {
             this.updateDB(raw);
         }
+        configureAuth(authConfig);
     }
     /**
      * Update the mock DB with a raw JS object/hash

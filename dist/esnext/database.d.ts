@@ -5,6 +5,19 @@ export declare type FirebaseDatabase = import("@firebase/database-types").Fireba
 export declare let db: IDictionary;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;
+export declare function auth(): Promise<{
+    signInAnonymously: () => Promise<import("./auth").IPartialUserCredential>;
+    signInWithEmailAndPassword(email: string, password: string): Promise<{
+        user: {
+            email: string;
+            uid: string;
+        };
+    }>;
+    createUserWithEmailAndPassword(email: string, password: string): Promise<void>;
+    sendPasswordReset(): Promise<void>;
+    confirmPasswordReset(): Promise<void>;
+    signOut(): Promise<void>;
+}>;
 export declare function setDB(path: string, value: any): void;
 /** single-path update */
 export declare function updateDB(path: string, value: any): void;

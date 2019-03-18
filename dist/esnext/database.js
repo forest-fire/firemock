@@ -2,6 +2,7 @@ import { set, get } from "lodash";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import { SnapShot } from "./index";
+import { auth as mockedAuth } from "./auth";
 export let db = [];
 let _listeners = [];
 export function clearDatabase() {
@@ -9,6 +10,9 @@ export function clearDatabase() {
 }
 export function updateDatabase(state) {
     db = Object.assign({}, db, state);
+}
+export async function auth() {
+    return mockedAuth();
 }
 export function setDB(path, value) {
     const dotPath = join(path);

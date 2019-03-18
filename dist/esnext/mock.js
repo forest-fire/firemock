@@ -2,9 +2,10 @@ import { Queue, Schema, Reference, Deployment } from "./index";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
+import { configureAuth } from "./auth";
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
-    constructor(raw) {
+    constructor(raw, authConfig = {}) {
         this._schemas = new Queue("schemas").clear();
         this._relationships = new Queue("relationships").clear();
         this._queues = new Queue("queues").clear();
@@ -13,6 +14,7 @@ export default class Mock {
         if (raw) {
             this.updateDB(raw);
         }
+        configureAuth(authConfig);
     }
     /**
      * Update the mock DB with a raw JS object/hash
