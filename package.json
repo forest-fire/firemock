@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.19.1",
+  "version": "0.20.0",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -30,13 +30,15 @@
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "@firebase/app-types": "^0.3.4",
-    "@firebase/database-types": "^0.3.5",
-    "common-types": "^1.9.6",
+    "@firebase/app-types": "^0.3.6",
+    "@firebase/auth-types": "^0.5.4",
+    "@firebase/database-types": "^0.3.7",
+    "@firebase/util": "^0.2.10",
+    "common-types": "^1.9.7",
     "faker": "^4.1.0",
     "firebase-key": "^2.0.1",
     "lodash": "^4.17.10",
-    "typed-conversions": "^0.8.9"
+    "typed-conversions": "^0.10.1"
   },
   "devDependencies": {
     "@types/chai": "^4.1.2",
@@ -64,7 +66,7 @@
     "ts-node": "^8.0.2",
     "tslint": "^5.13.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.3.3"
+    "typescript": "^3.4.0-dev.20190316"
   },
   "engines": {
     "node": ">=6.0.0"

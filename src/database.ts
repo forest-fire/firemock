@@ -6,6 +6,7 @@ import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import { SnapShot } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
+import { auth as mockedAuth } from "./auth";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
@@ -21,6 +22,10 @@ export function updateDatabase(state: any) {
     ...db,
     ...state
   };
+}
+
+export async function auth() {
+  return mockedAuth();
 }
 
 export function setDB(path: string, value: any) {

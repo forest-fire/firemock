@@ -136,7 +136,7 @@ export function setNetworkDelay(value: IDictionary | number | number[] | Delays)
   _delay = value;
 }
 
-export function networkDelay<T = any>(returnValue?: any): Promise<T> {
+export async function networkDelay<T = any>(returnValue?: any): Promise<T> {
   return new Promise(resolve => {
     setTimeout(() => {
       if (returnValue) {

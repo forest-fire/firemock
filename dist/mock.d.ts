@@ -2,6 +2,7 @@ import { IDictionary } from "common-types";
 import { Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
+import { IAuthConfig } from "./auth/types";
 export interface ISchema {
     id: string;
     /** path to the database which is the root for given schema list */
@@ -47,11 +48,12 @@ export default class Mock {
     private _schemas;
     private _relationships;
     private _queues;
-    constructor(raw?: IDictionary);
+    constructor(raw?: IDictionary, authConfig?: IAuthConfig);
     /**
      * Update the mock DB with a raw JS object/hash
      */
     updateDB(state: IDictionary): void;
+    auth(): Promise<import("./auth/types").IMockAuth>;
     getMockHelper(): MockHelper;
     readonly db: IDictionary<any>;
     addSchema<S = any>(schema: string, mock?: SchemaCallback): Schema<S>;

@@ -3,6 +3,9 @@ import { Queue, Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { db, clearDatabase, updateDatabase } from "./database";
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
+import { auth as fireAuth } from "./auth";
+import { IAuthConfig } from "./auth/types";
+import { authAdminApi } from "./auth/authAdmin";
 
 export interface ISchema {
   id: string;
@@ -55,12 +58,21 @@ export default class Mock {
   private _relationships = new Queue<IRelationship>("relationships").clear();
   private _queues = new Queue<IQueue>("queues").clear();
 
-  constructor(raw?: IDictionary) {
+  constructor(
+    raw?: IDictionary,
+    authConfig: IAuthConfig = {
+      allowAnonymous: true,
+      allowEmailLogins: false,
+      allowEmailLinks: false,
+      allowPhoneLogins: false
+    }
+  ) {
     Queue.clearAll();
     clearDatabase();
     if (raw) {
       this.updateDB(raw);
     }
+    authAdminApi.configureAuth(authConfig);
   }
 
   /**
@@ -68,6 +80,10 @@ export default class Mock {
    */
   public updateDB(state: IDictionary) {
     updateDatabase(state);
+  }
+
+  public async auth() {
+    return fireAuth();
   }
 
   public getMockHelper() {

@@ -3,6 +3,7 @@
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var lodash = require('lodash');
+var commonTypes = require('common-types');
 var fbKey = require('firebase-key');
 var convert = require('typed-conversions');
 
@@ -86,7 +87,7 @@ let _delay = 5;
 function setNetworkDelay(value) {
     _delay = value;
 }
-function networkDelay(returnValue) {
+async function networkDelay(returnValue) {
     return new Promise(resolve => {
         setTimeout(() => {
             if (returnValue) {
@@ -126,6 +127,318 @@ function calcDelay() {
     }
     throw new Error("Delay property is of unknown format: " + delay);
 }
+
+let authConfig = {
+    allowAnonymous: true
+};
+let ANONYMOUS_USER_ID = "123456";
+const authAdminApi = {
+    configureAuth(config) {
+        authConfig = Object.assign({}, authConfig, config);
+    },
+    getValidEmails() {
+        return authConfig.validEmailLogins || [];
+    },
+    getAuthConfig() {
+        return authConfig;
+    },
+    setAnonymousUser(uid) {
+        ANONYMOUS_USER_ID = uid;
+        return authApi;
+    },
+    getAnonymousUid() {
+        return ANONYMOUS_USER_ID;
+    }
+};
+
+/**
+ * takes a partial user auth and adds enough to make it officially
+ * a full UserCrediental
+ */
+function completeUserCredential(partial) {
+    const combined = Object.assign({}, fakeUserCredential, partial);
+    return combined;
+}
+const fakeUserCredential = {
+    user: {
+        async delete() {
+            return;
+        },
+        emailVerified: false,
+        async getIdTokenResult() {
+            return {
+                token: "abc",
+                expirationTime: "format?",
+                authTime: "format?",
+                issuedAtTime: "format?",
+                signInProvider: "fake",
+                claims: {
+                    foobar: "abc"
+                }
+            };
+        },
+        async getIdToken() {
+            return "abc";
+        },
+        async linkAndRetrieveDataWithCredential(credential) {
+            return completeUserCredential({});
+        },
+        async linkWithCredential(credential) {
+            return completeUserCredential({}).user;
+        },
+        async linkWithPhoneNumber(phoneNUmber, applicationVerificer) {
+            return fakeApplicationVerifier;
+        },
+        async linkWithPopup(provider) {
+            return completeUserCredential({});
+        },
+        async linkWithRedirect(provider) {
+            return;
+        },
+        async reauthenticateAndRetrieveDataWithCredential(credential) {
+            return completeUserCredential({});
+        },
+        async reauthenticateWithCredential(credential) {
+            return;
+        },
+        async reauthenticateWithPhoneNumber(phoneNumber, applicationVerifier) {
+            return fakeApplicationVerifier;
+        },
+        async reauthenticateWithPopup(provider) {
+            return completeUserCredential({});
+        },
+        async reauthenticateWithRedirect(provider) {
+            return;
+        },
+        async reload() {
+            return;
+        },
+        async sendEmailVerification(actionCodeSettings) {
+            return;
+        },
+        toJSON() {
+            return {};
+        },
+        async unlink(provider) {
+            return completeUserCredential({}).user;
+        },
+        async updateEmail(newEmail) {
+            return;
+        },
+        async updatePassword(newPassword) {
+            return;
+        },
+        async updatePhoneNumber(phoneCredential) {
+            return;
+        },
+        async updateProfile(profile) {
+            return;
+        },
+        displayName: "",
+        email: "",
+        isAnonymous: true,
+        metadata: {},
+        phoneNumber: "",
+        photoURL: "",
+        providerData: [],
+        providerId: "",
+        refreshToken: "",
+        uid: authAdminApi.getAnonymousUid()
+    },
+    additionalUserInfo: {
+        isNewUser: false,
+        profile: "",
+        providerId: "",
+        username: "fake"
+    },
+    operationType: "",
+    credential: {
+        signInMethod: "fake",
+        providerId: "fake"
+    }
+};
+const fakeApplicationVerifier = {
+    async confirm(verificationCode) {
+        return completeUserCredential({});
+    },
+    verificationId: "verification"
+};
+
+const notImplemented = {
+    async applyActionCode(code) {
+        return;
+    },
+    async checkActionCode(code) {
+        return {
+            data: {},
+            operation: ""
+        };
+    },
+    async createUserAndRetrieveDataWithEmailAndPassword() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async fetchProvidersForEmail() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async fetchSignInMethodsForEmail() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async getRedirectResult() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    isSignInWithEmailLink() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    onAuthStateChanged() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    onIdTokenChanged() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async sendSignInLinkToEmail() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async setPersistence() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInAndRetrieveDataWithCredential() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInAndRetrieveDataWithCustomToken() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInAndRetrieveDataWithEmailAndPassword() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInAnonymouslyAndRetrieveData() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithCredential() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithCustomToken() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithEmailLink() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithPhoneNumber() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithPopup() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async signInWithRedirect() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async useDeviceLanguage() {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    },
+    async verifyPasswordResetCode(code) {
+        throw commonTypes.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
+    }
+};
+
+const implemented = {
+    app: {
+        name: "mocked-app",
+        options: {},
+        async delete() {
+            return;
+        },
+        automaticDataCollectionEnabled: false
+    },
+    signInAnonymously: async () => {
+        await networkDelay();
+        const authConfig = authAdminApi.getAuthConfig();
+        if (authConfig.allowAnonymous) {
+            const user = {
+                isAnonymous: true,
+                uid: authAdminApi.getAnonymousUid(),
+                emailVerified: true,
+                phoneNumber: ""
+            };
+            const credential = {
+                signInMethod: "anonymous",
+                providerId: "anonymous"
+            };
+            const credentials = {
+                user,
+                credential
+            };
+            return completeUserCredential(credentials);
+        }
+        else {
+            throw commonTypes.createError("auth/operation-not-allowed", "you must enable anonymous auth in the Firebase Console");
+        }
+    },
+    async signInWithEmailAndPassword(email, password) {
+        await networkDelay();
+        const found = authAdminApi
+            .getAuthConfig()
+            .validEmailLogins.find(i => i.email === email);
+        if (!found) {
+            throw commonTypes.createError(`auth/invalid-email`, `The email provided "${email}" is not a valid email in mocked auth module. If you think it should be, make sure you set it with configureAuth() or setValidEmails()`);
+        }
+        const partial = {
+            user: {
+                email: found.email,
+                isAnonymous: false
+            },
+            credential: {
+                signInMethod: "signInWithEmailAndPassword",
+                providerId: ""
+            }
+        };
+        return completeUserCredential(partial);
+    },
+    async createUserWithEmailAndPassword(email, password) {
+        await networkDelay();
+        const partial = {
+            user: {
+                email,
+                isAnonymous: false
+            },
+            credential: {
+                signInMethod: "signInWithEmailAndPassword",
+                providerId: ""
+            }
+        };
+        return completeUserCredential(partial);
+    },
+    async confirmPasswordReset(code, newPassword) {
+        return;
+    },
+    async sendPasswordResetEmail(email, actionCodeSetting) {
+        return;
+    },
+    async signOut() {
+        return;
+    },
+    get currentUser() {
+        return completeUserCredential({}).user;
+    },
+    languageCode: "",
+    async updateCurrentUser() {
+        return;
+    },
+    settings: {
+        appVerificationDisabledForTesting: false
+    }
+};
+const authMockApi = Object.assign({}, notImplemented, implemented);
+
+let hasConnectedToAuthService = false;
+const auth = async () => {
+    if (hasConnectedToAuthService) {
+        return authApi;
+    }
+    await networkDelay();
+    hasConnectedToAuthService = true;
+    return authApi;
+};
+// tslint:disable-next-line:no-object-literal-type-assertion
+const authApi = Object.assign({}, authMockApi, authAdminApi);
 
 let db = [];
 let _listeners = [];
@@ -277,7 +590,12 @@ class MockHelper {
 
 /* tslint:disable:max-classes-per-file */
 class Mock$$1 {
-    constructor(raw) {
+    constructor(raw, authConfig = {
+        allowAnonymous: true,
+        allowEmailLogins: false,
+        allowEmailLinks: false,
+        allowPhoneLogins: false
+    }) {
         this._schemas = new Queue("schemas").clear();
         this._relationships = new Queue("relationships").clear();
         this._queues = new Queue("queues").clear();
@@ -286,12 +604,16 @@ class Mock$$1 {
         if (raw) {
             this.updateDB(raw);
         }
+        authAdminApi.configureAuth(authConfig);
     }
     /**
      * Update the mock DB with a raw JS object/hash
      */
     updateDB(state) {
         updateDatabase(state);
+    }
+    async auth() {
+        return auth();
     }
     getMockHelper() {
         return new MockHelper();
