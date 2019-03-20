@@ -34,7 +34,7 @@ export interface IPartialUserCredential {
 }
 /**
  * Provides a full FirebaseAuth implementation (although many
- * parts are false implementations currently) as well as extending
+ * parts are un-implementated currently) as well as extending
  * to add an "administrative" API for mocking
  */
 export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
