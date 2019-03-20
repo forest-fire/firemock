@@ -1501,6 +1501,8 @@
   exports.Deployment = Deployment;
   exports.resetDatabase = reset$$1;
   exports.MockHelper = MockHelper;
+  exports.auth = auth;
+  exports.authApi = authApi;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
