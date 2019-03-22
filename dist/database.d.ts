@@ -12,6 +12,10 @@ export declare function updateDB(path: string, value: any): void;
 export declare function multiPathUpdateDB(data: IDictionary): void;
 export declare function removeDB(path: string): void;
 export declare function pushDB(path: string, value: any): string;
+/**
+ * adds a listener for watched events; setup by
+ * the "on" API
+ */
 export declare function addListener(path: string, eventType: EventType, callback: (snap: DataSnapshot, key?: string) => void, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): void;
 export declare function removeListener(eventType?: EventType, callback?: (snap: DataSnapshot, key?: string) => void, context?: IDictionary): number;
 export declare function removeAllListeners(): number;

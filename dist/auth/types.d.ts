@@ -1,4 +1,5 @@
 import { IMockAdminApi } from "./authAdmin";
+import { Mock } from "..";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;
 export declare type AuthSettings = import("@firebase/auth-types").AuthSettings;
@@ -10,7 +11,7 @@ export interface IEmailLogin {
     email: string;
     password: string;
 }
-export interface IAuthConfig {
+export interface IMockAuthConfig {
     /**
      * a list of email logins which are already setup as valid
      * in the mock authentication module; this will be used for
@@ -26,6 +27,7 @@ export interface IAuthConfig {
     /** allow logins via a code sent via SMS */
     allowPhoneLogins?: boolean;
 }
+export declare type IMockSetup = (mock: Mock) => () => Promise<void>;
 export interface IPartialUserCredential {
     additionalUserInfo?: Partial<AdditionalUserInfo>;
     credential?: Partial<AuthCredential> | null;

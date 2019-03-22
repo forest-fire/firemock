@@ -489,6 +489,10 @@ function pushDB(path, value) {
     setDB(fullPath, value);
     return pushId;
 }
+/**
+ * adds a listener for watched events; setup by
+ * the "on" API
+ */
 function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
     _listeners.push({
         path: join(path),
@@ -590,7 +594,14 @@ class MockHelper {
 
 /* tslint:disable:max-classes-per-file */
 class Mock$$1 {
-    constructor(raw, authConfig = {
+    constructor(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock, authConfig = {
         allowAnonymous: true,
         allowEmailLogins: false,
         allowEmailLinks: false,
@@ -601,8 +612,11 @@ class Mock$$1 {
         this._queues = new Queue("queues").clear();
         Queue.clearAll();
         clearDatabase();
-        if (raw) {
-            this.updateDB(raw);
+        if (dataOrMock && typeof dataOrMock === "object") {
+            this.updateDB(dataOrMock);
+        }
+        if (dataOrMock && typeof dataOrMock === "function") {
+            this._mockInitializer = dataOrMock(this);
         }
         authAdminApi.configureAuth(authConfig);
     }

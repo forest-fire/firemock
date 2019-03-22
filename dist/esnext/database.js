@@ -55,6 +55,10 @@ export function pushDB(path, value) {
     setDB(fullPath, value);
     return pushId;
 }
+/**
+ * adds a listener for watched events; setup by
+ * the "on" API
+ */
 export function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
     _listeners.push({
         path: join(path),
