@@ -1,17 +1,29 @@
-import * as fbKey from "firebase-key";
+"use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const fbKey = __importStar(require("firebase-key"));
 // import { set, get, first } from "lodash";
-import set from "lodash.set";
-import get from "lodash.get";
-import first from "lodash.first";
-import { getRandomInt, dotNotation } from "./util";
-import Queue from "./queue";
-import pluralize from "./pluralize";
-import { db } from "./database";
-export default class Deployment {
+const lodash_set_1 = __importDefault(require("lodash.set"));
+const lodash_get_1 = __importDefault(require("lodash.get"));
+const lodash_first_1 = __importDefault(require("lodash.first"));
+const util_1 = require("./util");
+const queue_1 = __importDefault(require("./queue"));
+const pluralize_1 = __importDefault(require("./pluralize"));
+const database_1 = require("./database");
+class Deployment {
     constructor() {
-        this._queue = new Queue("queue");
-        this._schemas = new Queue("schemas");
-        this._relationships = new Queue("relationships");
+        this._queue = new queue_1.default("queue");
+        this._schemas = new queue_1.default("schemas");
+        this._relationships = new queue_1.default("relationships");
     }
     /**
      * Queue a schema for deployment to the mock DB
@@ -58,7 +70,7 @@ export default class Deployment {
         else {
             const queue = this._queue.find(this.queueId);
             this._queue.update(this.queueId, {
-                hasMany: Object.assign({}, queue.hasMany, { [pluralize(targetSchema)]: quantity })
+                hasMany: Object.assign({}, queue.hasMany, { [pluralize_1.default(targetSchema)]: quantity })
             });
         }
         return this;
@@ -69,7 +81,7 @@ export default class Deployment {
      */
     fulfillBelongsTo(targetSchema) {
         const schema = this._schemas.find(this.schemaId);
-        const relationship = first(this._relationships
+        const relationship = lodash_first_1.default(this._relationships
             .filter(r => r.source === this.schemaId)
             .filter(r => r.target === targetSchema));
         const sourceProperty = schema.path();
@@ -97,7 +109,7 @@ export default class Deployment {
         const mock = schema.fn();
         const path = schema.path();
         const key = overrides.id || fbKey.key();
-        set(db, dotNotation(path) + `.${key}`, typeof mock === "object"
+        lodash_set_1.default(database_1.db, util_1.dotNotation(path) + `.${key}`, typeof mock === "object"
             ? Object.assign({}, mock, overrides) : overrides && typeof overrides !== "object"
             ? overrides
             : mock);
@@ -116,11 +128,11 @@ export default class Deployment {
             let getID;
             if (fulfill) {
                 const mockAvailable = this._schemas.find(r.target) ? true : false;
-                const available = Object.keys(db[pluralize(r.target)] || {});
+                const available = Object.keys(database_1.db[pluralize_1.default(r.target)] || {});
                 const generatedAvailable = available.length > 0;
-                const numChoices = (db[r.target] || []).length;
+                const numChoices = (database_1.db[r.target] || []).length;
                 const choice = () => generatedAvailable
-                    ? available[getRandomInt(0, available.length - 1)]
+                    ? available[util_1.getRandomInt(0, available.length - 1)]
                     : this.insertMockIntoDB(r.target, {});
                 getID = () => mockAvailable
                     ? generatedAvailable
@@ -133,9 +145,9 @@ export default class Deployment {
             }
             const property = r.sourceProperty;
             const path = source.path();
-            const recordList = get(db, dotNotation(source.path()), {});
+            const recordList = lodash_get_1.default(database_1.db, util_1.dotNotation(source.path()), {});
             Object.keys(recordList).forEach(key => {
-                set(db, `${dotNotation(source.path())}.${key}.${property}`, getID());
+                lodash_set_1.default(database_1.db, `${util_1.dotNotation(source.path())}.${key}.${property}`, getID());
             });
         });
         hasMany.forEach(r => {
@@ -146,13 +158,13 @@ export default class Deployment {
             let getID;
             if (fulfill) {
                 const mockAvailable = this._schemas.find(r.target) ? true : false;
-                const available = Object.keys(db[pluralize(r.target)] || {});
+                const available = Object.keys(database_1.db[pluralize_1.default(r.target)] || {});
                 const used = [];
                 const generatedAvailable = available.length > 0;
-                const numChoices = (db[pluralize(r.target)] || []).length;
+                const numChoices = (database_1.db[pluralize_1.default(r.target)] || []).length;
                 const choice = (pool) => {
                     if (pool.length > 0) {
-                        const chosen = pool[getRandomInt(0, pool.length - 1)];
+                        const chosen = pool[util_1.getRandomInt(0, pool.length - 1)];
                         used.push(chosen);
                         return chosen;
                     }
@@ -167,12 +179,14 @@ export default class Deployment {
             }
             const property = r.sourceProperty;
             const path = source.path();
-            const sourceRecords = get(db, dotNotation(source.path()), {});
+            const sourceRecords = lodash_get_1.default(database_1.db, util_1.dotNotation(source.path()), {});
             Object.keys(sourceRecords).forEach(key => {
                 for (let i = 1; i <= howMany; i++) {
-                    set(db, `${dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
+                    lodash_set_1.default(database_1.db, `${util_1.dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
                 }
             });
         });
     }
 }
+exports.default = Deployment;
+//# sourceMappingURL=Deployment.js.map

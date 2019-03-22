@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { first } from "lodash";
+import first from "lodash.first";
 import * as fbKey from "firebase-key";
 
 export type Key = string | number;

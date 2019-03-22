@@ -1,6 +1,9 @@
 import { IDictionary } from "common-types";
 import * as fbKey from "firebase-key";
-import { set, get, first } from "lodash";
+// import { set, get, first } from "lodash";
+import set from "lodash.set";
+import get from "lodash.get";
+import first from "lodash.first";
 import { IRelationship, ISchema, IQueue } from "./mock";
 import { getRandomInt, dotNotation } from "./util";
 import Queue from "./queue";
@@ -134,8 +137,8 @@ export default class Deployment {
       typeof mock === "object"
         ? { ...mock, ...overrides }
         : overrides && typeof overrides !== "object"
-          ? overrides
-          : mock
+        ? overrides
+        : mock
     );
 
     return key;

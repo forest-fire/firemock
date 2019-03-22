@@ -1,0 +1,1 @@
+{"version":3,"file":"MockHelper.js","sourceRoot":"","sources":["../../src/MockHelper.ts"],"names":[],"mappings":";;AAEA,MAAa,UAAU;IACrB,YAAmB,OAAqB;QAArB,YAAO,GAAP,OAAO,CAAc;IAAG,CAAC;IAE5C,IAAW,KAAK;QACd,MAAM,KAAK,GAAG,OAAO,CAAC,OAAO,CAAC,CAAC;QAC/B,OAAO,KAAK,CAAC;IACf,CAAC;CACF;AAPD,gCAOC"}

@@ -6,13 +6,13 @@ export default {
     {
       file: "dist/firemock.cjs.js",
       format: "cjs",
-      name: "FireMock",
+      name: "firemock",
       sourcemap: true
     },
     {
       file: "dist/firemock.umd.js",
       format: "umd",
-      name: "FireMock",
+      name: "firemock",
       sourcemap: true,
       globals: {
         lodash: "lodash",

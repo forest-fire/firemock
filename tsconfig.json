@@ -7,9 +7,11 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "noImplicitAny": true,
-    "outDir": "./lib",
+    "outDir": "./dist/cjs",
     "removeComments": false,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*-spec.ts"]

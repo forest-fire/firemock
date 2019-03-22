@@ -1,76 +1,90 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 // import { set, get } from "lodash";
-import set from "lodash.set";
-import get from "lodash.get";
-import { key as fbKey } from "firebase-key";
-import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
-import { SnapShot } from "./index";
-import { auth as mockedAuth } from "./auth";
-export let db = [];
+const lodash_set_1 = __importDefault(require("lodash.set"));
+const lodash_get_1 = __importDefault(require("lodash.get"));
+const firebase_key_1 = require("firebase-key");
+const util_1 = require("./util");
+const index_1 = require("./index");
+const auth_1 = require("./auth");
+exports.db = [];
 let _listeners = [];
-export function clearDatabase() {
-    db = {};
+function clearDatabase() {
+    exports.db = {};
 }
-export function updateDatabase(state) {
-    db = Object.assign({}, db, state);
+exports.clearDatabase = clearDatabase;
+function updateDatabase(state) {
+    exports.db = Object.assign({}, exports.db, state);
 }
-export async function auth() {
-    return mockedAuth();
+exports.updateDatabase = updateDatabase;
+async function auth() {
+    return auth_1.auth();
 }
-export function setDB(path, value) {
-    const dotPath = join(path);
-    const oldValue = get(db, dotPath);
+exports.auth = auth;
+function setDB(path, value) {
+    const dotPath = util_1.join(path);
+    const oldValue = lodash_get_1.default(exports.db, dotPath);
     if (value === null) {
         removeDB(dotPath);
     }
     else {
-        set(db, dotPath, value);
+        lodash_set_1.default(exports.db, dotPath, value);
     }
     notify(dotPath, value, oldValue);
 }
+exports.setDB = setDB;
 /** single-path update */
-export function updateDB(path, value) {
-    const dotPath = join(path);
-    const oldValue = get(db, dotPath);
+function updateDB(path, value) {
+    const dotPath = util_1.join(path);
+    const oldValue = lodash_get_1.default(exports.db, dotPath);
     const newValue = typeof oldValue === "object" ? Object.assign({}, oldValue, value) : value;
-    set(db, dotPath, newValue);
+    lodash_set_1.default(exports.db, dotPath, newValue);
     notify(dotPath, newValue, oldValue);
 }
-export function multiPathUpdateDB(data) {
+exports.updateDB = updateDB;
+function multiPathUpdateDB(data) {
     Object.keys(data).map(key => setDB(key, data[key]));
 }
-export function removeDB(path) {
-    const dotPath = join(path);
-    const oldValue = get(db, dotPath);
-    const parentValue = get(db, getParent(dotPath));
+exports.multiPathUpdateDB = multiPathUpdateDB;
+function removeDB(path) {
+    const dotPath = util_1.join(path);
+    const oldValue = lodash_get_1.default(exports.db, dotPath);
+    const parentValue = lodash_get_1.default(exports.db, util_1.getParent(dotPath));
     if (typeof parentValue === "object") {
-        delete parentValue[getKey(dotPath)];
-        set(db, getParent(dotPath), parentValue);
+        delete parentValue[util_1.getKey(dotPath)];
+        lodash_set_1.default(exports.db, util_1.getParent(dotPath), parentValue);
     }
     else {
-        set(db, dotPath, undefined);
+        lodash_set_1.default(exports.db, dotPath, undefined);
     }
     notify(dotPath, undefined, oldValue);
 }
-export function pushDB(path, value) {
-    const pushId = fbKey();
-    const fullPath = join(path, pushId);
+exports.removeDB = removeDB;
+function pushDB(path, value) {
+    const pushId = firebase_key_1.key();
+    const fullPath = util_1.join(path, pushId);
     setDB(fullPath, value);
     return pushId;
 }
+exports.pushDB = pushDB;
 /**
  * adds a listener for watched events; setup by
  * the "on" API
  */
-export function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
+function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
     _listeners.push({
-        path: join(path),
+        path: util_1.join(path),
         eventType,
         callback,
         cancelCallbackOrContext,
         context
     });
 }
-export function removeListener(eventType, callback, context) {
+exports.addListener = addListener;
+function removeListener(eventType, callback, context) {
     if (!eventType) {
         return removeAllListeners();
     }
@@ -95,6 +109,7 @@ export function removeListener(eventType, callback, context) {
         return cancelCallback(removed);
     }
 }
+exports.removeListener = removeListener;
 function cancelCallback(removed) {
     let count = 0;
     removed.forEach(l => {
@@ -105,19 +120,22 @@ function cancelCallback(removed) {
     });
     return count;
 }
-export function removeAllListeners() {
+function removeAllListeners() {
     const howMany = cancelCallback(_listeners);
     _listeners = [];
     return howMany;
 }
-export function listenerCount(type) {
+exports.removeAllListeners = removeAllListeners;
+function listenerCount(type) {
     return type ? _listeners.filter(l => l.eventType === type).length : _listeners.length;
 }
-export function listenerPaths(type) {
+exports.listenerCount = listenerCount;
+function listenerPaths(type) {
     return type
         ? _listeners.filter(l => l.eventType === type).map(l => l.path)
         : _listeners.map(l => l.path);
 }
+exports.listenerPaths = listenerPaths;
 /**
  * Notifies all appropriate "child" event listeners when changes
  * in state happen
@@ -130,26 +148,26 @@ function notify(dotPath, newValue, oldValue) {
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
         findValueListeners(dotPath).map(l => {
             let result = {};
-            const listeningRoot = get(db, l.path);
+            const listeningRoot = lodash_get_1.default(exports.db, l.path);
             if (typeof listeningRoot === "object" && !newValue) {
-                result = get(db, l.path);
-                delete result[getKey(dotPath)];
+                result = lodash_get_1.default(exports.db, l.path);
+                delete result[util_1.getKey(dotPath)];
             }
             else {
-                set(result, pathDiff(dotPath, l.path), newValue);
+                lodash_set_1.default(result, util_1.pathDiff(dotPath, l.path), newValue);
             }
-            return l.callback(new SnapShot(join(l.path), result));
+            return l.callback(new index_1.SnapShot(util_1.join(l.path), result));
         });
         if (newValue === undefined) {
-            const { parent, key } = keyAndParent(dotPath);
+            const { parent, key } = util_1.keyAndParent(dotPath);
             findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                return l.callback(new SnapShot(key, newValue));
+                return l.callback(new index_1.SnapShot(key, newValue));
             });
         }
         else if (oldValue === undefined) {
-            const { parent, key } = keyAndParent(dotPath);
+            const { parent, key } = util_1.keyAndParent(dotPath);
             findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                return l.callback(new SnapShot(key, newValue));
+                return l.callback(new index_1.SnapShot(key, newValue));
             });
         }
     }
@@ -161,12 +179,13 @@ function notify(dotPath, newValue, oldValue) {
  * @param path the parent path that children are detected off of
  * @param eventType <optional> the specific child event to filter down to
  */
-export function findChildListeners(path, ...eventType) {
-    const correctPath = _listeners.filter(l => l.path === join(path) && l.eventType !== "value");
+function findChildListeners(path, ...eventType) {
+    const correctPath = _listeners.filter(l => l.path === util_1.join(path) && l.eventType !== "value");
     return eventType.length > 0
         ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
         : correctPath;
 }
+exports.findChildListeners = findChildListeners;
 /**
  * Finds all value listeners on a given path or below.
  * Unlike child listeners, Value listeners listen to changes at
@@ -174,11 +193,14 @@ export function findChildListeners(path, ...eventType) {
  *
  * @param path path to root listening point
  */
-export function findValueListeners(path) {
-    return _listeners.filter(l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value");
+function findValueListeners(path) {
+    return _listeners.filter(l => util_1.join(path).indexOf(util_1.join(l.path)) !== -1 && l.eventType === "value");
 }
+exports.findValueListeners = findValueListeners;
 /** Clears the DB and removes all listeners */
-export function reset() {
+function reset() {
     removeAllListeners();
     clearDatabase();
 }
+exports.reset = reset;
+//# sourceMappingURL=database.js.map

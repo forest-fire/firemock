@@ -1,28 +1,40 @@
-import { db, addListener } from "./database";
-import get from "lodash.get";
-import SnapShot from "./snapshot";
-import Queue from "./queue";
-import * as convert from "typed-conversions";
-import Reference from "./reference";
-import { join, leafNode, networkDelay } from "./util";
-export var OrderingType;
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const database_1 = require("./database");
+const lodash_get_1 = __importDefault(require("lodash.get"));
+const snapshot_1 = __importDefault(require("./snapshot"));
+const queue_1 = __importDefault(require("./queue"));
+const convert = __importStar(require("typed-conversions"));
+const reference_1 = __importDefault(require("./reference"));
+const util_1 = require("./util");
+var OrderingType;
 (function (OrderingType) {
     OrderingType["byChild"] = "child";
     OrderingType["byKey"] = "key";
     OrderingType["byValue"] = "value";
-})(OrderingType || (OrderingType = {}));
+})(OrderingType = exports.OrderingType || (exports.OrderingType = {}));
 /** tslint:ignore:member-ordering */
-export default class Query {
+class Query {
     constructor(path, _delay = 5) {
         this.path = path;
         this._delay = _delay;
         this._order = { type: OrderingType.byKey, value: null };
-        this._listeners = new Queue("listeners");
+        this._listeners = new queue_1.default("listeners");
         this._limitFilters = [];
         this._queryFilters = [];
     }
     get ref() {
-        return new Reference(this.path, this._delay);
+        return new reference_1.default(this.path, this._delay);
     }
     limitToLast(num) {
         const filter = resultset => {
@@ -87,11 +99,11 @@ export default class Query {
         return this;
     }
     on(eventType, callback, cancelCallbackOrContext, context) {
-        addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
+        database_1.addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
-        return networkDelay(this.process());
+        return util_1.networkDelay(this.process());
     }
     off() {
         console.log("off() not implemented yet");
@@ -177,13 +189,13 @@ export default class Query {
      */
     process() {
         // typically a hash/object but could be a scalar type (string/number/boolean)
-        const input = get(db, join(this.path), undefined);
+        const input = lodash_get_1.default(database_1.db, util_1.join(this.path), undefined);
         const hashOfHashes = typeof input === "object" &&
             Object.keys(input).every(i => typeof input[i] === "object");
         let snap;
         if (!hashOfHashes) {
             if (typeof input !== "object") {
-                return new SnapShot(leafNode(this.path), input);
+                return new snapshot_1.default(util_1.leafNode(this.path), input);
             }
             const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
                 key: "id"
@@ -191,13 +203,13 @@ export default class Query {
             const sorted = this.processSorting(mockDatabaseResults);
             const remainingIds = new Set(this.processFilters(sorted).map((f) => (typeof f === "object" ? f.id : f)));
             const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
-            snap = new SnapShot(leafNode(this.path), convert.keyValueArrayToDictionary(resultset, { key: "id" }));
+            snap = new snapshot_1.default(util_1.leafNode(this.path), convert.keyValueArrayToDictionary(resultset, { key: "id" }));
         }
         else {
             const mockDatabaseResults = convert.hashToArray(input);
             const sorted = this.processSorting(mockDatabaseResults);
             const remainingIds = this.processFilters(sorted).map((f) => typeof f === "object" ? f.id : f);
-            snap = new SnapShot(leafNode(this.path), mockDatabaseResults.filter((record) => remainingIds.indexOf(record.id) !== -1));
+            snap = new snapshot_1.default(util_1.leafNode(this.path), mockDatabaseResults.filter((record) => remainingIds.indexOf(record.id) !== -1));
         }
         snap.sortingFunction(this.getSortingFunction(this._order));
         return snap;
@@ -242,3 +254,5 @@ export default class Query {
         return sort;
     }
 }
+exports.default = Query;
+//# sourceMappingURL=query.js.map
