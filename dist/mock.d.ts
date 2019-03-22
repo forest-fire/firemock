@@ -2,7 +2,7 @@ import { IDictionary } from "common-types";
 import { Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
-import { IAuthConfig } from "./auth/types";
+import { IMockAuthConfig, IMockSetup } from "./auth/types";
 export interface ISchema {
     id: string;
     /** path to the database which is the root for given schema list */
@@ -48,7 +48,15 @@ export default class Mock {
     private _schemas;
     private _relationships;
     private _queues;
-    constructor(raw?: IDictionary, authConfig?: IAuthConfig);
+    private _mockInitializer;
+    constructor(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock?: IDictionary | IMockSetup, authConfig?: IMockAuthConfig);
     /**
      * Update the mock DB with a raw JS object/hash
      */

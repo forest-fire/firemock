@@ -6,7 +6,14 @@ import { auth as fireAuth } from "./auth";
 import { authAdminApi } from "./auth/authAdmin";
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
-    constructor(raw, authConfig = {
+    constructor(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock, authConfig = {
         allowAnonymous: true,
         allowEmailLogins: false,
         allowEmailLinks: false,
@@ -17,8 +24,11 @@ export default class Mock {
         this._queues = new Queue("queues").clear();
         Queue.clearAll();
         clearDatabase();
-        if (raw) {
-            this.updateDB(raw);
+        if (dataOrMock && typeof dataOrMock === "object") {
+            this.updateDB(dataOrMock);
+        }
+        if (dataOrMock && typeof dataOrMock === "function") {
+            this._mockInitializer = dataOrMock(this);
         }
         authAdminApi.configureAuth(authConfig);
     }

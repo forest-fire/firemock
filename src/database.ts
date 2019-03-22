@@ -77,6 +77,10 @@ export function pushDB(path: string, value: any): string {
   return pushId;
 }
 
+/**
+ * adds a listener for watched events; setup by
+ * the "on" API
+ */
 export function addListener(
   path: string,
   eventType: EventType,

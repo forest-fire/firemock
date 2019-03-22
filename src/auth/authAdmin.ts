@@ -1,6 +1,6 @@
-import { IAuthConfig, IEmailLogin } from "./types";
+import { IMockAuthConfig, IEmailLogin } from "./types";
 import { authApi } from "../auth";
-let authConfig: IAuthConfig = {
+let authConfig: IMockAuthConfig = {
   allowAnonymous: true
 };
 let ANONYMOUS_USER_ID = "123456";
@@ -8,7 +8,7 @@ let ANONYMOUS_USER_ID = "123456";
 export type IMockAdminApi = typeof authAdminApi;
 
 export const authAdminApi = {
-  configureAuth(config: IAuthConfig) {
+  configureAuth(config: IMockAuthConfig) {
     authConfig = { ...authConfig, ...config };
   },
 

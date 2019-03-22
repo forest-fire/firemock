@@ -4,7 +4,7 @@ import { db, clearDatabase, updateDatabase } from "./database";
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { IAuthConfig } from "./auth/types";
+import { IMockAuthConfig, IMockSetup } from "./auth/types";
 import { authAdminApi } from "./auth/authAdmin";
 
 export interface ISchema {
@@ -57,10 +57,17 @@ export default class Mock {
   private _schemas = new Queue<ISchema>("schemas").clear();
   private _relationships = new Queue<IRelationship>("relationships").clear();
   private _queues = new Queue<IQueue>("queues").clear();
+  private _mockInitializer: IMockSetup;
 
   constructor(
-    raw?: IDictionary,
-    authConfig: IAuthConfig = {
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock?: IDictionary | IMockSetup,
+    authConfig: IMockAuthConfig = {
       allowAnonymous: true,
       allowEmailLogins: false,
       allowEmailLinks: false,
@@ -69,9 +76,13 @@ export default class Mock {
   ) {
     Queue.clearAll();
     clearDatabase();
-    if (raw) {
-      this.updateDB(raw);
+    if (dataOrMock && typeof dataOrMock === "object") {
+      this.updateDB(dataOrMock);
     }
+    if (dataOrMock && typeof dataOrMock === "function") {
+      this._mockInitializer = dataOrMock(this) as IMockSetup;
+    }
+
     authAdminApi.configureAuth(authConfig);
   }
 
