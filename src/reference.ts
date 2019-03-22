@@ -1,6 +1,6 @@
 import { IDictionary } from "common-types";
 import Query from "./query";
-import { get } from "lodash";
+import get from "lodash.get";
 import {
   Reference as IReference,
   ThenableReference as IThenableReference,

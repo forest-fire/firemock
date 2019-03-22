@@ -1,17 +1,29 @@
-import get from "lodash.get";
-import Reference from "./reference";
-import * as convert from "typed-conversions";
-import { getKey, join } from "./util";
-export default class SnapShot {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_get_1 = __importDefault(require("lodash.get"));
+const reference_1 = __importDefault(require("./reference"));
+const convert = __importStar(require("typed-conversions"));
+const util_1 = require("./util");
+class SnapShot {
     constructor(_key, _value) {
         this._key = _key;
         this._value = _value;
     }
     get key() {
-        return getKey(join(this._key));
+        return util_1.getKey(util_1.join(this._key));
     }
     get ref() {
-        return new Reference(this._key);
+        return new reference_1.default(this._key);
     }
     val() {
         return Array.isArray(this._value) ? convert.arrayToHash(this._value) : this._value;
@@ -20,7 +32,7 @@ export default class SnapShot {
         return JSON.stringify(this._value);
     }
     child(path) {
-        const value = get(this._value, path, null);
+        const value = lodash_get_1.default(this._value, path, null);
         return value ? new SnapShot(path, value) : null;
     }
     hasChild(path) {
@@ -72,3 +84,5 @@ export default class SnapShot {
         return this;
     }
 }
+exports.default = SnapShot;
+//# sourceMappingURL=snapshot.js.map

@@ -1,5 +1,5 @@
 import { IDictionary, SortingFunction } from "common-types";
-import { get } from "lodash";
+import get from "lodash.get";
 import Reference from "./reference";
 import * as convert from "typed-conversions";
 import { getKey, join } from "./util";

@@ -1,5 +1,17 @@
-import first from "lodash.first";
-import * as fbKey from "firebase-key";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_first_1 = __importDefault(require("lodash.first"));
+const fbKey = __importStar(require("firebase-key"));
 /**
  * Queue Class
  *
@@ -7,7 +19,7 @@ import * as fbKey from "firebase-key";
  * this is used as a container for schemas, deployment queues,
  * and relationships
  */
-export default class Queue {
+class Queue {
     constructor(_name) {
         this._name = _name;
         this.pkProperty = "id";
@@ -55,7 +67,7 @@ export default class Queue {
             throw new Error(`Queue ${this._name} is empty. Can not dequeue ${key}.`);
         }
         Queue._queues[this._name] =
-            typeof first(queue) === "object"
+            typeof lodash_first_1.default(queue) === "object"
                 ? queue.filter((item) => item[this.pkProperty] !== key)
                 : queue.filter((item) => item !== key);
         return this;
@@ -112,7 +124,7 @@ export default class Queue {
         if (!queue || queue.length === 0) {
             return new Object();
         }
-        return typeof first(queue) === "object"
+        return typeof lodash_first_1.default(queue) === "object"
             ? queue.reduce((obj, item) => {
                 const pk = item[this.pkProperty];
                 // tslint:disable-next-line
@@ -138,7 +150,7 @@ export default class Queue {
     }
     _find(key) {
         const queue = Queue._queues[this._name];
-        const objectPayload = typeof first(queue) === "object";
+        const objectPayload = typeof lodash_first_1.default(queue) === "object";
         let index = 0;
         let result = [null, -1];
         for (const item of queue) {
@@ -153,3 +165,5 @@ export default class Queue {
     }
 }
 Queue._queues = {};
+exports.default = Queue;
+//# sourceMappingURL=queue.js.map

@@ -5,7 +5,7 @@ import {
   Reference as IReference
 } from "@firebase/database-types";
 import { db, addListener } from "./database";
-import { get } from "lodash";
+import get from "lodash.get";
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";
@@ -269,8 +269,8 @@ export default class Query<T = any> implements IQuery {
     } else {
       const mockDatabaseResults: any[] = convert.hashToArray(input);
       const sorted: any[] = this.processSorting(mockDatabaseResults);
-      const remainingIds = this.processFilters(sorted).map(
-        (f: any) => (typeof f === "object" ? f.id : f)
+      const remainingIds = this.processFilters(sorted).map((f: any) =>
+        typeof f === "object" ? f.id : f
       );
       snap = new SnapShot<T>(
         leafNode(this.path),

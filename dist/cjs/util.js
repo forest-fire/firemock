@@ -1,41 +1,55 @@
-import first from "lodash.first";
-import last from "lodash.last";
-export function normalizeRef(r) {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_first_1 = __importDefault(require("lodash.first"));
+const lodash_last_1 = __importDefault(require("lodash.last"));
+function normalizeRef(r) {
     r = r.replace("/", ".");
     r = r.slice(0, 1) === "." ? r.slice(1) : r;
     return r;
 }
-export function parts(r) {
+exports.normalizeRef = normalizeRef;
+function parts(r) {
     return normalizeRef(r).split(".");
 }
+exports.parts = parts;
 /**
  * return the last component of the path
  * which typically would represent the 'id'
  * of a list-node
  */
-export function leafNode(r) {
+function leafNode(r) {
     return parts(r).pop();
 }
-export function getRandomInt(min, max) {
+exports.leafNode = leafNode;
+function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-export function firstProp(listOf) {
+exports.getRandomInt = getRandomInt;
+function firstProp(listOf) {
     return listOf ? listOf[firstKey(listOf)] : {};
 }
-export function lastProp(listOf) {
+exports.firstProp = firstProp;
+function lastProp(listOf) {
     return listOf[lastKey(listOf)];
 }
-export function objectIndex(obj, index) {
+exports.lastProp = lastProp;
+function objectIndex(obj, index) {
     const keys = Object.keys(obj);
     return keys ? obj[keys[index - 1]] : null;
 }
-export function firstKey(listOf) {
-    return first(Object.keys(listOf));
+exports.objectIndex = objectIndex;
+function firstKey(listOf) {
+    return lodash_first_1.default(Object.keys(listOf));
 }
-export function lastKey(listOf) {
-    return last(Object.keys(listOf));
+exports.firstKey = firstKey;
+function lastKey(listOf) {
+    return lodash_last_1.default(Object.keys(listOf));
 }
-export function removeKeys(obj, remove) {
+exports.lastKey = lastKey;
+function removeKeys(obj, remove) {
     return Object.keys(obj).reduce((agg, v) => {
         if (remove.indexOf(v) === -1) {
             agg[v] = obj[v];
@@ -43,11 +57,12 @@ export function removeKeys(obj, remove) {
         return agg;
     }, {});
 }
+exports.removeKeys = removeKeys;
 /**
  * Joins a set of paths together and converts into
  * correctly formatted "dot notation" directory path
  */
-export function join(...paths) {
+function join(...paths) {
     return paths
         .map(p => {
         return p.replace(/[\/\\]/gm, ".");
@@ -56,7 +71,8 @@ export function join(...paths) {
         .map(p => (p.slice(0, 1) === "." ? p.slice(1) : p))
         .join(".");
 }
-export function pathDiff(longPath, pathSubset) {
+exports.join = join;
+function pathDiff(longPath, pathSubset) {
     const subset = pathSubset.split(".");
     const long = longPath.split(".");
     if (subset.length > long.length ||
@@ -67,49 +83,57 @@ export function pathDiff(longPath, pathSubset) {
         ? ""
         : long.slice(subset.length - long.length).join(".");
 }
-export function orderedSnapToJS(snap) {
+exports.pathDiff = pathDiff;
+function orderedSnapToJS(snap) {
     const jsObject = {};
     snap.forEach(record => (jsObject[record.key] = record.val()));
     return jsObject;
 }
+exports.orderedSnapToJS = orderedSnapToJS;
 /**
  * Given a path, returns the parent path and child key
  */
-export function keyAndParent(dotPath) {
+function keyAndParent(dotPath) {
     const sections = dotPath.split(".");
     const key = sections.pop();
     const parent = sections.join(".");
     return { parent, key };
 }
+exports.keyAndParent = keyAndParent;
 /** converts a '/' delimited path to a '.' delimited one */
-export function dotNotation(path) {
+function dotNotation(path) {
     path = path.slice(0, 1) === "/" ? path.slice(1) : path;
     return path ? path.replace(/\//g, ".") : undefined;
 }
-export function slashNotation(path) {
+exports.dotNotation = dotNotation;
+function slashNotation(path) {
     return path.replace(/\./g, "/");
 }
+exports.slashNotation = slashNotation;
 /** Get the parent DB path */
-export function getParent(dotPath) {
+function getParent(dotPath) {
     return keyAndParent(dotPath).parent;
 }
+exports.getParent = getParent;
 /** Get the Key from the end of a path string */
-export function getKey(dotPath) {
+function getKey(dotPath) {
     return keyAndParent(dotPath).key;
 }
+exports.getKey = getKey;
 /** named network delays */
-export var Delays;
+var Delays;
 (function (Delays) {
     Delays["random"] = "random";
     Delays["weak"] = "weak-mobile";
     Delays["mobile"] = "mobile";
     Delays["WiFi"] = "WIFI";
-})(Delays || (Delays = {}));
+})(Delays = exports.Delays || (exports.Delays = {}));
 let _delay = 5;
-export function setNetworkDelay(value) {
+function setNetworkDelay(value) {
     _delay = value;
 }
-export async function networkDelay(returnValue) {
+exports.setNetworkDelay = setNetworkDelay;
+async function networkDelay(returnValue) {
     return new Promise(resolve => {
         setTimeout(() => {
             if (returnValue) {
@@ -121,6 +145,7 @@ export async function networkDelay(returnValue) {
         }, calcDelay());
     });
 }
+exports.networkDelay = networkDelay;
 function calcDelay() {
     const delay = _delay;
     if (typeof delay === "number") {
@@ -149,3 +174,4 @@ function calcDelay() {
     }
     throw new Error("Delay property is of unknown format: " + delay);
 }
+//# sourceMappingURL=util.js.map

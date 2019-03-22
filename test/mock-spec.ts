@@ -4,7 +4,7 @@ import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import Mock, { SchemaCallback } from "../src/mock";
 import SchemaHelper from "../src/schema-helper";
-import { first } from "lodash";
+import first from "lodash.first";
 import { firstProp, lastProp } from "../src/util";
 
 const expect = chai.expect;

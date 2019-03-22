@@ -8,7 +8,9 @@
     "outDir": "./dist/esnext",
     "preserveConstEnums": true,
     "removeComments": false,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*.ts"]
 }

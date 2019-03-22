@@ -1,7 +1,9 @@
 // tslint:disable:no-implicit-dependencies
 import { IDictionary } from "common-types";
 import { IListener } from "./query";
-import { set, get } from "lodash";
+// import { set, get } from "lodash";
+import set from "lodash.set";
+import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
 import { SnapShot } from "./index";

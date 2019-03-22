@@ -1,4 +1,5 @@
-import { first, last } from "lodash";
+import first from "lodash.first";
+import last from "lodash.last";
 import { IDictionary } from "common-types";
 import { DataSnapshot } from "@firebase/database-types";
 
