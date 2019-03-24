@@ -52,7 +52,7 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     }
 
     // TODO: try and get this typed appropriately
-    return networkDelay<T>(this) as any;
+    return networkDelay<Reference<T>>(this) as any;
   }
 
   public remove(onComplete?: (a: Error | null) => any): Promise<void> {

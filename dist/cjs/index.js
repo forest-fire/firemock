@@ -23,5 +23,5 @@ var database_1 = require("./database");
 exports.resetDatabase = database_1.reset;
 var MockHelper_1 = require("./MockHelper");
 exports.MockHelper = MockHelper_1.MockHelper;
-__export(require("./auth"));
+__export(require("./auth/index"));
 //# sourceMappingURL=index.js.map

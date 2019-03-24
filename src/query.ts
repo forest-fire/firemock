@@ -142,8 +142,8 @@ export default class Query<T = any> implements IQuery {
     return null;
   }
 
-  public once(eventType: "value") {
-    return networkDelay(this.process()) as Promise<DataSnapshot>;
+  public once(eventType: "value"): Promise<DataSnapshot> {
+    return networkDelay<DataSnapshot>(this.process()) as Promise<DataSnapshot>;
   }
 
   public off() {

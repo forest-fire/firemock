@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_first_1 = __importDefault(require("lodash.first"));
 const lodash_last_1 = __importDefault(require("lodash.last"));
+const common_types_1 = require("common-types");
 function normalizeRef(r) {
     r = r.replace("/", ".");
     r = r.slice(0, 1) === "." ? r.slice(1) : r;
@@ -134,16 +135,8 @@ function setNetworkDelay(value) {
 }
 exports.setNetworkDelay = setNetworkDelay;
 async function networkDelay(returnValue) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            if (returnValue) {
-                resolve(returnValue);
-            }
-            else {
-                resolve();
-            }
-        }, calcDelay());
-    });
+    await common_types_1.wait(calcDelay());
+    return returnValue;
 }
 exports.networkDelay = networkDelay;
 function calcDelay() {
