@@ -1,7 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import get from "lodash.get";
+import set from "lodash.set";
 import { Mock, SchemaCallback } from "../src/index";
 import {
   db,

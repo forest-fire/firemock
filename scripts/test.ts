@@ -1,9 +1,9 @@
 // tslint:disable:no-implicit-dependencies
 import chalk from "chalk";
 import { exec } from "shelljs";
-import * as rm from "rimraf";
+import rm from "rimraf";
 import * as process from "process";
-import * as program from "commander";
+import program from "commander";
 import "../test/testing/test-console";
 
 process.env.TS_NODE_COMPILER_OPTIONS = '{ "noImplicitAny": false }';
@@ -39,7 +39,7 @@ function getScope(files: string): string {
  */
 function cleanJSTests() {
   return new Promise((resolve, reject) => {
-    rm("test/**/*.js", e => {
+    rm("test/**/*.js", (e: Error) => {
       if (e) {
         reject(e);
       } else {

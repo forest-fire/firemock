@@ -1,5 +1,6 @@
 import first from "lodash.first";
 import last from "lodash.last";
+import { wait } from "common-types";
 export function normalizeRef(r) {
     r = r.replace("/", ".");
     r = r.slice(0, 1) === "." ? r.slice(1) : r;
@@ -110,16 +111,8 @@ export function setNetworkDelay(value) {
     _delay = value;
 }
 export async function networkDelay(returnValue) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            if (returnValue) {
-                resolve(returnValue);
-            }
-            else {
-                resolve();
-            }
-        }, calcDelay());
-    });
+    await wait(calcDelay());
+    return returnValue;
 }
 function calcDelay() {
     const delay = _delay;

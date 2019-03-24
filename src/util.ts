@@ -1,6 +1,6 @@
 import first from "lodash.first";
 import last from "lodash.last";
-import { IDictionary } from "common-types";
+import { IDictionary, wait } from "common-types";
 import { DataSnapshot } from "@firebase/database-types";
 
 export function normalizeRef(r: string): string {
@@ -137,16 +137,9 @@ export function setNetworkDelay(value: IDictionary | number | number[] | Delays)
   _delay = value;
 }
 
-export async function networkDelay<T = any>(returnValue?: any): Promise<T> {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      if (returnValue) {
-        resolve(returnValue as T);
-      } else {
-        resolve();
-      }
-    }, calcDelay());
-  });
+export async function networkDelay<T = any>(returnValue?: T): Promise<T> {
+  await wait(calcDelay());
+  return returnValue;
 }
 
 function calcDelay(): number {

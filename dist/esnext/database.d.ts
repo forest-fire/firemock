@@ -5,7 +5,7 @@ export declare type FirebaseDatabase = import("@firebase/database-types").Fireba
 export declare let db: IDictionary;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;
-export declare function auth(): Promise<import("./auth").IMockAuth>;
+export declare function auth(): Promise<import(".").IMockAuth>;
 export declare function setDB(path: string, value: any): void;
 /** single-path update */
 export declare function updateDB(path: string, value: any): void;

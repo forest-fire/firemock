@@ -61,7 +61,7 @@ export default class Mock {
      * Update the mock DB with a raw JS object/hash
      */
     updateDB(state: IDictionary): void;
-    auth(): Promise<import("./auth/types").IMockAuth>;
+    auth(): Promise<import(".").IMockAuth>;
     getMockHelper(): MockHelper;
     readonly db: IDictionary<any>;
     addSchema<S = any>(schema: string, mock?: SchemaCallback): Schema<S>;
