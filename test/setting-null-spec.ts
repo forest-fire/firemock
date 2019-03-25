@@ -14,7 +14,7 @@ const animalMock: SchemaCallback = h => () => ({
 
 describe("Setting null to db path →", () => {
   it("when set() to null path should be removed", async () => {
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.addSchema("animal", animalMock);
     m.queueSchema("animal", 1, { id: "1234" });
     m.queueSchema("animal", 2, { age: 12 });

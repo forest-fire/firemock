@@ -260,27 +260,29 @@ describe("Database", () => {
       });
     });
 
-    it('"value" responds to UPDATED child', done => {
+    it('"value" responds to UPDATED child', async () => {
       reset();
-      const m = new Mock();
-      m.addSchema("person", personMock);
-      m.queueSchema("person", 10);
-      m.generate();
-      m.ref("/people")
-        .once("value")
-        .then(people => {
-          const firstKey = helpers.firstKey(people.val());
-          const firstRecord = helpers.firstRecord(people.val());
-          const callback: HandleValueEvent = snap => {
-            const list = snap.val();
-            const first = helpers.firstRecord(list);
-            expect(first.age).to.equal(firstRecord.age + 1);
-            done();
-          };
-          addListener("/people", "value", callback);
-          expect(listenerCount()).to.equal(1);
-          updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
-        });
+      const m = await Mock.prepare();
+      return new Promise((resolve, reject) => {
+        m.addSchema("person", personMock);
+        m.queueSchema("person", 10);
+        m.generate();
+        m.ref("/people")
+          .once("value")
+          .then(people => {
+            const firstKey = helpers.firstKey(people.val());
+            const firstRecord = helpers.firstRecord(people.val());
+            const callback: HandleValueEvent = snap => {
+              const list = snap.val();
+              const first = helpers.firstRecord(list);
+              expect(first.age).to.equal(firstRecord.age + 1);
+              resolve();
+            };
+            addListener("/people", "value", callback);
+            expect(listenerCount()).to.equal(1);
+            updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
+          });
+      });
     });
 
     it('"value" responds to deeply nested CHANGE', done => {
@@ -299,26 +301,28 @@ describe("Database", () => {
       });
     });
 
-    it('"value" responds to REMOVED child', done => {
+    it('"value" responds to REMOVED child', async () => {
       reset();
-      const m = new Mock();
-      m.addSchema("person", personMock);
-      m.queueSchema("person", 10);
-      m.generate();
-      m.ref("/people")
-        .once("value")
-        .then(people => {
-          const firstKey = helpers.firstKey(people.val());
-          const callback: HandleValueEvent = snap => {
-            const list = snap.val();
-            expect(snap.numChildren()).to.equal(9);
-            expect(Object.keys(list)).to.not.include(firstKey);
-            done();
-          };
-          addListener("/people", "value", callback);
-          expect(listenerCount()).to.equal(1);
-          removeDB(`/people/${firstKey}`);
-        });
+      const m = await Mock.prepare();
+      return new Promise(resolve => {
+        m.addSchema("person", personMock);
+        m.queueSchema("person", 10);
+        m.generate();
+        m.ref("/people")
+          .once("value")
+          .then(people => {
+            const firstKey = helpers.firstKey(people.val());
+            const callback: HandleValueEvent = snap => {
+              const list = snap.val();
+              expect(snap.numChildren()).to.equal(9);
+              expect(Object.keys(list)).to.not.include(firstKey);
+              resolve();
+            };
+            addListener("/people", "value", callback);
+            expect(listenerCount()).to.equal(1);
+            removeDB(`/people/${firstKey}`);
+          });
+      });
     });
 
     it('"value" responds to scalar value set', done => {

@@ -14,7 +14,7 @@ describe("Deployment", () => {
   });
 
   it("Overriding the mock at deployment works", async () => {
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.addSchema("animal", animalMock);
     m.queueSchema("animal", 2, { age: 12 });
     m.queueSchema("animal", 2, { age: 14 });
@@ -37,7 +37,7 @@ describe("Deployment", () => {
     // as the sorting is all done on the server and then the filtering is applied
     // the actually returned resultset may not be sorted by the stated criteria.
     // This test is meant to represent this.
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.addSchema("animal", animalMock);
     m.queueSchema("animal", 10, { age: 16 });
     m.queueSchema("animal", 10, { age: 14 });
@@ -59,8 +59,8 @@ describe("Deployment", () => {
     });
     // the order of the returned list, however, does not follow the sort
     const sequence = Object.keys(animals).map(animal => animals[animal].age);
-    const sorted = sequence.reduce(
-      (prev, curr) => (typeof prev === "number" && curr < prev ? curr : false)
+    const sorted = sequence.reduce((prev, curr) =>
+      typeof prev === "number" && curr < prev ? curr : false
     );
     expect(sorted).to.equal(false);
   });
@@ -70,7 +70,7 @@ describe("Deployment", () => {
     // as the sorting is all done on the server and then the filtering is applied
     // the actually returned resultset may not be sorted by the stated criteria.
     // This test is meant to represent this.
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.addSchema("animal", animalMock);
     m.queueSchema("animal", 10, { age: 16 });
     m.queueSchema("animal", 10, { age: 14 });
@@ -91,14 +91,14 @@ describe("Deployment", () => {
     });
     // the order of the returned list, however, does not follow the sort
     const sequence = Object.keys(animals).map(animal => animals[animal].age);
-    const sorted = sequence.reduce(
-      (prev, curr) => (typeof prev === "number" && curr < prev ? curr : false)
+    const sorted = sequence.reduce((prev, curr) =>
+      typeof prev === "number" && curr < prev ? curr : false
     );
     expect(sorted).to.equal(false);
   });
 
-  it("using modelName() changes path in DB", () => {
-    const m = new Mock();
+  it("using modelName() changes path in DB", async () => {
+    const m = await Mock.prepare();
     m.addSchema("cat", animalMock);
     m.addSchema("dog", animalMock).modelName("animal");
     m.queueSchema("cat", 10);
@@ -109,8 +109,8 @@ describe("Deployment", () => {
     expect(length(m.db.animals)).to.equal(10);
   });
 
-  it("offset property is incorporated into DB path", () => {
-    const m = new Mock();
+  it("offset property is incorporated into DB path", async () => {
+    const m = await Mock.prepare();
     m.addSchema("cat", animalMock)
       .modelName("animal")
       .pathPrefix("auth/anonymous");

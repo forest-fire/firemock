@@ -4,6 +4,7 @@ import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
 import { authAdminApi } from "./auth/authAdmin";
+export let faker;
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
     constructor(
@@ -32,6 +33,33 @@ export default class Mock {
         }
         authAdminApi.configureAuth(authConfig);
     }
+    get db() {
+        return db;
+    }
+    get deploy() {
+        return new Deployment();
+    }
+    /**
+     * returns a Mock object while also ensuring that the
+     * Faker library has been asynchronously imported.
+     */
+    static async prepare(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock, authConfig = {
+        allowAnonymous: true,
+        allowEmailLogins: false,
+        allowEmailLinks: false,
+        allowPhoneLogins: false
+    }) {
+        const obj = new Mock(dataOrMock, authConfig);
+        await obj.importFakerLibrary();
+        return obj;
+    }
     /**
      * Update the mock DB with a raw JS object/hash
      */
@@ -41,11 +69,16 @@ export default class Mock {
     async auth() {
         return fireAuth();
     }
-    getMockHelper() {
-        return new MockHelper();
+    async importFakerLibrary() {
+        if (!faker) {
+            faker = await import("faker");
+        }
     }
-    get db() {
-        return db;
+    async getMockHelper() {
+        if (!faker) {
+            faker = await import("faker");
+        }
+        return new MockHelper();
     }
     addSchema(schema, mock) {
         const s = new Schema(schema);
@@ -57,9 +90,6 @@ export default class Mock {
     /** Set the network delay for queries with "once" */
     setDelay(d) {
         setNetworkDelay(d);
-    }
-    get deploy() {
-        return new Deployment();
     }
     queueSchema(schemaId, quantity = 1, overrides = {}) {
         const d = new Deployment();
