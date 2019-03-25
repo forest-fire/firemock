@@ -1,6 +1,5 @@
 import { IDictionary } from "common-types";
 import * as fbKey from "firebase-key";
-// import { set, get, first } from "lodash";
 import set from "lodash.set";
 import get from "lodash.get";
 import first from "lodash.first";

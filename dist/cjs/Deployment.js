@@ -11,7 +11,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fbKey = __importStar(require("firebase-key"));
-// import { set, get, first } from "lodash";
 const lodash_set_1 = __importDefault(require("lodash.set"));
 const lodash_get_1 = __importDefault(require("lodash.get"));
 const lodash_first_1 = __importDefault(require("lodash.first"));
