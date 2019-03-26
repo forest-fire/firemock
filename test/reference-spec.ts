@@ -1,3 +1,4 @@
+// tslint:disable:no-shadowed-variable
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
@@ -30,8 +31,8 @@ describe("Reference functions", () => {
       reset();
     });
 
-    it.skip("with default 5ms delay, querying returns an asynchronous result", () => {
-      const m = new Mock();
+    it.skip("with default 5ms delay, querying returns an asynchronous result", async () => {
+      const m = await Mock.prepare();
       m.addSchema<IMocker>("foo", mocker);
       m.queueSchema("foo", 5).generate();
       return m
@@ -45,7 +46,7 @@ describe("Reference functions", () => {
     });
 
     it.skip("with numeric delay, querying returns an asynchronous result", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("foo", mocker);
       m.addSchema("bar", mocker);
       m.queueSchema("foo", 5)
@@ -58,8 +59,8 @@ describe("Reference functions", () => {
       expect(helpers.firstRecord(results.val()).age).to.be.a("number");
     });
 
-    it.skip("with named delay, querying returns an asynchronous result", () => {
-      const m = new Mock();
+    it.skip("with named delay, querying returns an asynchronous result", async () => {
+      const m = await Mock.prepare();
 
       m.addSchema("foo", mocker);
       m.addSchema("bar", mocker);
@@ -78,8 +79,8 @@ describe("Reference functions", () => {
         });
     });
 
-    it.skip("with delay range, querying returns an asynchronous result", () => {
-      const m = new Mock();
+    it.skip("with delay range, querying returns an asynchronous result", async () => {
+      const m = await Mock.prepare();
       m.addSchema("foo", mocker);
       m.addSchema("bar", mocker);
       m.queueSchema("foo", 5)
@@ -98,7 +99,7 @@ describe("Reference functions", () => {
 
     // TODO: Fix up the forEach mocking
     // it.skip("querying results can be iterated over with forEach()", () => {
-    //   const m = new Mock();
+    //   const m = await Mock.prepare();
     //   m.addSchema("user").mock(h => () => ({
     //     name: h.faker.name.firstName() + " " + h.faker.name.lastName(),
     //     gender: h.faker.helpers.randomize(["male", "female"])
@@ -127,7 +128,7 @@ describe("Reference functions", () => {
      * the end of the list (wrt to natural sort order).
      */
     it("query list with limitToFirst() set", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("monkey").mock(mocker);
       m.queueSchema("monkey", 15).generate();
       const snap = await m
@@ -152,7 +153,7 @@ describe("Reference functions", () => {
     });
 
     it("limitToFirst() an equalTo() query", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("monkey").mock(mocker);
       m.queueSchema("monkey", 15);
       m.queueSchema("monkey", 3, { name: "Space Monkey" });
@@ -180,8 +181,8 @@ describe("Reference functions", () => {
      * Note: limitToLast is cullening the key's which are smallest/oldest which is
      * the start of the list.
      */
-    it("query list with limitToLast() set", () => {
-      const m = new Mock();
+    it("query list with limitToLast() set", async () => {
+      const m = await Mock.prepare();
       m.addSchema("monkey").mock(mocker);
       m.deploy.queueSchema("monkey", 15).generate();
       return m
@@ -198,8 +199,9 @@ describe("Reference functions", () => {
         });
     });
 
-    it("equalTo() and orderByChild() work", () => {
-      const m = new Mock();
+    it("equalTo() and orderByChild() work", async () => {
+      const m = await Mock.prepare();
+      await m.getMockHelper(); // imports faker lib
       const young = (h: SchemaHelper) => () => ({
         first: h.faker.name.firstName(),
         age: 12
@@ -226,7 +228,7 @@ describe("Reference functions", () => {
     });
 
     it("startAt() filters a numeric property", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
         age: 3,
@@ -253,7 +255,7 @@ describe("Reference functions", () => {
     });
 
     it("startAt() filters a string property", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
         born: "2014-09-08T08:02:17-05:00"
@@ -281,7 +283,7 @@ describe("Reference functions", () => {
     it.skip("startAt() filters sort by value when using value sort");
     it.skip("endAt() filters result by key by default");
     it("endAt() filters a numeric property", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
         age: 1
@@ -302,7 +304,7 @@ describe("Reference functions", () => {
     });
     it.skip("endAt() filters sort by value when using value sort");
     it("startAt() combined with endAt() filters correctly", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("dog", h => () => ({
         name: h.faker.name.firstName,
         age: 1
@@ -343,7 +345,8 @@ describe("Reference functions", () => {
     const strings = ["abc", "def", "fgh", "123", "999", "ABC", "DEF"];
 
     it("orderByChild() -- where child is a string -- sorts correctly", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
@@ -364,7 +367,8 @@ describe("Reference functions", () => {
     });
 
     it("orderByChild() -- where child is a boolean -- sorts correctly", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
@@ -388,7 +392,7 @@ describe("Reference functions", () => {
     });
 
     it("orderByKey() sorts correctly", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
@@ -406,7 +410,8 @@ describe("Reference functions", () => {
     });
 
     it.skip("orderByValue() sorts on server correctly", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 10 }));
       m.addSchema("number2", h => () =>
         h.faker.random.number({ min: 20, max: 30 })
@@ -433,7 +438,8 @@ describe("Reference functions", () => {
     });
 
     it('orderByChild() combines with limitToFirst() for "server-side" selection', async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.queueSchema("person", 10, { age: 99 });
@@ -450,7 +456,8 @@ describe("Reference functions", () => {
       });
     });
     it('orderByChild() combines with limitToLast() for "server-side" selection', async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.queueSchema("person", 10, { age: 1 });
@@ -474,7 +481,7 @@ describe("Reference functions", () => {
     });
 
     it("push() can push record", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       await m.ref("/people").push({
         name: "Happy Jack",
         age: 26
@@ -485,14 +492,16 @@ describe("Reference functions", () => {
     });
 
     it("push() can push scalar", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       await m.ref("/data").push(444);
       const data = (await m.ref("/data").once("value")).val();
       expect(helpers.firstRecord(data)).to.equal(444);
     });
 
     it("push() will call callback after pushing to DB", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
+      await m.getMockHelper();
       let count = 0;
       const callback = () => count++;
       await m.ref("/data").push(444, callback);
@@ -502,7 +511,7 @@ describe("Reference functions", () => {
     });
 
     it("set() will set referenced path", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       await m.ref("/people/abcd").set({
         name: "Happy Jack",
         age: 26
@@ -514,7 +523,7 @@ describe("Reference functions", () => {
     });
 
     it("set() will call callback after setting referenced path ", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       let count = 0;
       const callback = () => count++;
       await m.ref("/people/abcd").set(
@@ -530,7 +539,7 @@ describe("Reference functions", () => {
     });
 
     it("update() will update referenced path", async () => {
-      const m = new Mock({
+      const m = await Mock.prepare({
         people: {
           abcd: {
             name: "Happy Jack",
@@ -550,7 +559,7 @@ describe("Reference functions", () => {
 
     it("multi-path updates are reconized and set correctly", async () => {
       const now = new Date().toISOString();
-      const m = new Mock({
+      const m = await Mock.prepare({
         people: {
           abcd: {
             name: "Happy Jack",
@@ -571,7 +580,7 @@ describe("Reference functions", () => {
 
     it("multi-path 'updates' behaves destructively like 'set' operations", async () => {
       const now = new Date().toISOString();
-      const m = new Mock({
+      const m = await Mock.prepare({
         people: {
           abcd: {
             name: "Happy Jack",
@@ -596,7 +605,7 @@ describe("Reference functions", () => {
     });
 
     it("remove() will remove data at referenced path", async () => {
-      const m = new Mock({
+      const m = await Mock.prepare({
         people: {
           abcd: {
             name: "Happy Jack",

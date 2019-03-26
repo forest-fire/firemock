@@ -52,8 +52,41 @@ export interface IQueue {
 /** A Schema's mock callback generator must conform to this type signature */
 export type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
 
+export let faker: Faker.FakerStatic;
+
 /* tslint:disable:max-classes-per-file */
 export default class Mock {
+  public get db() {
+    return db;
+  }
+
+  public get deploy() {
+    return new Deployment();
+  }
+
+  /**
+   * returns a Mock object while also ensuring that the
+   * Faker library has been asynchronously imported.
+   */
+  public static async prepare(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock?: IDictionary | IMockSetup,
+    authConfig: IMockAuthConfig = {
+      allowAnonymous: true,
+      allowEmailLogins: false,
+      allowEmailLinks: false,
+      allowPhoneLogins: false
+    }
+  ) {
+    const obj = new Mock(dataOrMock, authConfig);
+    await obj.importFakerLibrary();
+    return obj;
+  }
   private _schemas = new Queue<ISchema>("schemas").clear();
   private _relationships = new Queue<IRelationship>("relationships").clear();
   private _queues = new Queue<IQueue>("queues").clear();
@@ -97,12 +130,17 @@ export default class Mock {
     return fireAuth();
   }
 
-  public getMockHelper() {
-    return new MockHelper();
+  public async importFakerLibrary() {
+    if (!faker) {
+      faker = await import("faker");
+    }
   }
 
-  public get db() {
-    return db;
+  public async getMockHelper() {
+    if (!faker) {
+      faker = await import("faker");
+    }
+    return new MockHelper();
   }
 
   public addSchema<S = any>(schema: string, mock?: SchemaCallback) {
@@ -116,10 +154,6 @@ export default class Mock {
   /** Set the network delay for queries with "once" */
   public setDelay(d: DelayType) {
     setNetworkDelay(d);
-  }
-
-  public get deploy() {
-    return new Deployment();
   }
 
   public queueSchema<T = any>(

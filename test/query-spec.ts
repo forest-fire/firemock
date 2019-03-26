@@ -16,7 +16,7 @@ const ages = () => ({
 
 describe("Query →", () => {
   it("limit queries with orderByKey() on scalar valued dictionary", async () => {
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.updateDB({ ages: ages() });
     const result = await m
       .ref("ages")
@@ -32,7 +32,7 @@ describe("Query →", () => {
   });
 
   it("limit queries with orderByValue() on scalar valued dictionary", async () => {
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.updateDB({ ages: ages() });
     const result = await m
       .ref("ages")
@@ -48,7 +48,7 @@ describe("Query →", () => {
   });
 
   it("getValue() of a scalar returns a scalar", async () => {
-    const m = new Mock();
+    const m = await Mock.prepare();
     m.updateDB({
       foo: 5,
       bar: 10,

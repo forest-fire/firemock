@@ -1,3 +1,4 @@
+/// <reference types="faker" />
 import { IDictionary } from "common-types";
 import { Schema, SchemaHelper, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
@@ -44,7 +45,22 @@ export interface IQueue {
 }
 /** A Schema's mock callback generator must conform to this type signature */
 export declare type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
+export declare let faker: Faker.FakerStatic;
 export default class Mock {
+    readonly db: IDictionary<any>;
+    readonly deploy: Deployment;
+    /**
+     * returns a Mock object while also ensuring that the
+     * Faker library has been asynchronously imported.
+     */
+    static prepare(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock?: IDictionary | IMockSetup, authConfig?: IMockAuthConfig): Promise<Mock>;
     private _schemas;
     private _relationships;
     private _queues;
@@ -62,12 +78,11 @@ export default class Mock {
      */
     updateDB(state: IDictionary): void;
     auth(): Promise<import(".").IMockAuth>;
-    getMockHelper(): MockHelper;
-    readonly db: IDictionary<any>;
+    importFakerLibrary(): Promise<void>;
+    getMockHelper(): Promise<MockHelper>;
     addSchema<S = any>(schema: string, mock?: SchemaCallback): Schema<S>;
     /** Set the network delay for queries with "once" */
     setDelay(d: DelayType): void;
-    readonly deploy: Deployment;
     queueSchema<T = any>(schemaId: string, quantity?: number, overrides?: IDictionary): Deployment;
     generate(): void;
     ref<T = any>(dbPath: string): Reference<T>;

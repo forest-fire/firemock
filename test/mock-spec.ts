@@ -16,8 +16,8 @@ const employeeMocker: SchemaCallback = (h: SchemaHelper) => () => ({
 });
 
 describe("Mock class()", () => {
-  it("Mock → Schema API structured correctly", () => {
-    const m = new Mock();
+  it("Mock → Schema API structured correctly", async () => {
+    const m = await Mock.prepare();
     const schemaApi = m.addSchema("foo");
     expect(schemaApi.mock).is.a("function");
     expect(schemaApi.belongsTo).is.a("function");
@@ -26,8 +26,8 @@ describe("Mock class()", () => {
     // expect(schemaApi.databasePrefix).is.a('function');
   });
 
-  it("Mock → Deployment API structured correctly", () => {
-    const m = new Mock();
+  it("Mock → Deployment API structured correctly", async () => {
+    const m = await Mock.prepare();
     m.addSchema("foo").mock((h: SchemaHelper) => () => "testing");
     const deployApi = m.deploy.queueSchema("foo");
 
@@ -39,7 +39,7 @@ describe("Mock class()", () => {
 
   describe("Building and basic config of database", () => {
     it("Sending in raw data to constructor allows manual setting of database state", async () => {
-      const m = new Mock({
+      const m = await Mock.prepare({
         monkeys: {
           a: { name: "abbey" },
           b: { name: "bobby" },
@@ -54,7 +54,7 @@ describe("Mock class()", () => {
     });
 
     it("Adding a call to updateDB() allows additional state in conjunction with API additions", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("owner").mock(h => () => ({
         name: h.faker.name.firstName()
       }));
@@ -78,8 +78,8 @@ describe("Mock class()", () => {
       expect(owners.numChildren()).to.equal(10);
     });
 
-    it("Simple mock-to-generate populates DB correctly", () => {
-      const m = new Mock();
+    it("Simple mock-to-generate populates DB correctly", async () => {
+      const m = await Mock.prepare();
       m.addSchema("foo").mock((h: SchemaHelper) => () => {
         return {
           first: h.faker.name.firstName(),
@@ -98,8 +98,8 @@ describe("Mock class()", () => {
       expect(keys.length).is.equal(5);
     });
 
-    it("using pluralName() modifier changes a schema's database path", () => {
-      const m = new Mock();
+    it("using pluralName() modifier changes a schema's database path", async () => {
+      const m = await Mock.prepare();
       m.addSchema("foo")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .pluralName("fooie")
@@ -120,8 +120,8 @@ describe("Mock class()", () => {
       expect(m.db.fungi).is.an("object");
     });
 
-    it("using modelName() modifier changes db path appropriately", () => {
-      const m = new Mock();
+    it("using modelName() modifier changes db path appropriately", async () => {
+      const m = await Mock.prepare();
       m.addSchema("foo")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .modelName("car");
@@ -134,7 +134,7 @@ describe("Mock class()", () => {
     });
 
     it("using pathPrefix the generated data is appropriately offset", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("car")
         .mock((h: SchemaHelper) => () => ({ result: "result" }))
         .pathPrefix("authenticated");
@@ -144,7 +144,7 @@ describe("Mock class()", () => {
     });
 
     it("Mocking function that returns a scalar works as intended", async () => {
-      const m = new Mock();
+      const m = await Mock.prepare();
       m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 1000 }));
       m.addSchema("string", h => () => h.faker.random.words(3));
       m.queueSchema("number", 10);
@@ -159,8 +159,8 @@ describe("Mock class()", () => {
   });
 
   describe("Relationships", () => {
-    it("Adding belongsTo relationship adds FK property with empty value", () => {
-      const m = new Mock();
+    it("Adding belongsTo relationship adds FK property with empty value", async () => {
+      const m = await Mock.prepare();
       m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
@@ -171,8 +171,8 @@ describe("Mock class()", () => {
       expect(firstProp(m.db.users)).has.property("companyId");
       expect(firstProp(m.db.users).companyId).is.equal("");
     });
-    it("Adding belongsTo relationship adds fulfilled shadow FK property when external schema not present", () => {
-      const m = new Mock();
+    it("Adding belongsTo relationship adds fulfilled shadow FK property when external schema not present", async () => {
+      const m = await Mock.prepare();
       m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
@@ -191,8 +191,8 @@ describe("Mock class()", () => {
       );
     });
 
-    it("Adding belongsTo relationship adds fulfilled real FK property when external schema is present but not deployed", () => {
-      const m = new Mock();
+    it("Adding belongsTo relationship adds fulfilled real FK property when external schema is present but not deployed", async () => {
+      const m = await Mock.prepare();
       m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
@@ -214,8 +214,8 @@ describe("Mock class()", () => {
       expect(companyIds.indexOf(companyFK)).is.not.equal(-1);
     });
 
-    it("Adding belongsTo relationship adds fulfilled real FK property when available in DB", () => {
-      const m = new Mock();
+    it("Adding belongsTo relationship adds fulfilled real FK property when available in DB", async () => {
+      const m = await Mock.prepare();
       m.addSchema("user")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.name.firstName() };
@@ -238,8 +238,8 @@ describe("Mock class()", () => {
       expect(companyIds.indexOf(firstCompanyId)).is.not.equal(-1);
     });
 
-    it("Adding hasMany relationship does not add FK property without quantifyHasMany()", () => {
-      const m = new Mock();
+    it("Adding hasMany relationship does not add FK property without quantifyHasMany()", async () => {
+      const m = await Mock.prepare();
       m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
@@ -250,8 +250,8 @@ describe("Mock class()", () => {
       expect(firstProp(m.db.companies).employees).is.equal(undefined);
     });
 
-    it("Adding hasMany with quantifyHasMany() produces ghost references when FK reference is not a defined schema", () => {
-      const m = new Mock();
+    it("Adding hasMany with quantifyHasMany() produces ghost references when FK reference is not a defined schema", async () => {
+      const m = await Mock.prepare();
       m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
@@ -266,8 +266,8 @@ describe("Mock class()", () => {
       expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
       expect(m.db.employees).to.not.be.an("object");
     });
-    it("Adding hasMany with quantifyHasMany() produces real references when FK reference is a defined schema", () => {
-      const m = new Mock();
+    it("Adding hasMany with quantifyHasMany() produces real references when FK reference is a defined schema", async () => {
+      const m = await Mock.prepare();
       m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
@@ -289,8 +289,8 @@ describe("Mock class()", () => {
       expect(m.db.employees).to.not.equal(undefined);
     });
 
-    it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist", () => {
-      const m = new Mock();
+    it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist", async () => {
+      const m = await Mock.prepare();
       m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
@@ -315,8 +315,8 @@ describe("Mock class()", () => {
       expect(Object.keys(m.db.employees).length).to.equal(25);
     });
 
-    it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist, adds more when runs out", () => {
-      const m = new Mock();
+    it("Adding hasMany with quantifyHasMany() leverages existing FK schemas when they already exist, adds more when runs out", async () => {
+      const m = await Mock.prepare();
       m.addSchema("company")
         .mock((h: SchemaHelper) => () => {
           return { name: h.faker.company.companyName() };
@@ -340,8 +340,8 @@ describe("Mock class()", () => {
       expect(Object.keys(m.db.employees).length).to.equal(10);
     });
 
-    it("Mock can generate more than once", () => {
-      const m = new Mock();
+    it("Mock can generate more than once", async () => {
+      const m = await Mock.prepare();
       m.addSchema("employee", employeeMocker);
       m.queueSchema("employee", 10);
       m.generate();

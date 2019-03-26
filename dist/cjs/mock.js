@@ -1,4 +1,11 @@
 "use strict";
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
 const database_1 = require("./database");
@@ -34,6 +41,33 @@ class Mock {
         }
         authAdmin_1.authAdminApi.configureAuth(authConfig);
     }
+    get db() {
+        return database_1.db;
+    }
+    get deploy() {
+        return new index_1.Deployment();
+    }
+    /**
+     * returns a Mock object while also ensuring that the
+     * Faker library has been asynchronously imported.
+     */
+    static async prepare(
+    /**
+     * allows publishing of raw data into the database as the databases
+     * initial state or alternatively to assign a callback function which
+     * will be executed when the Mock DB is "connecting" and allows the
+     * DB to be setup via mocking.
+     */
+    dataOrMock, authConfig = {
+        allowAnonymous: true,
+        allowEmailLogins: false,
+        allowEmailLinks: false,
+        allowPhoneLogins: false
+    }) {
+        const obj = new Mock(dataOrMock, authConfig);
+        await obj.importFakerLibrary();
+        return obj;
+    }
     /**
      * Update the mock DB with a raw JS object/hash
      */
@@ -43,11 +77,16 @@ class Mock {
     async auth() {
         return auth_1.auth();
     }
-    getMockHelper() {
-        return new MockHelper_1.MockHelper();
+    async importFakerLibrary() {
+        if (!exports.faker) {
+            exports.faker = await Promise.resolve().then(() => __importStar(require("faker")));
+        }
     }
-    get db() {
-        return database_1.db;
+    async getMockHelper() {
+        if (!exports.faker) {
+            exports.faker = await Promise.resolve().then(() => __importStar(require("faker")));
+        }
+        return new MockHelper_1.MockHelper();
     }
     addSchema(schema, mock) {
         const s = new index_1.Schema(schema);
@@ -59,9 +98,6 @@ class Mock {
     /** Set the network delay for queries with "once" */
     setDelay(d) {
         util_1.setNetworkDelay(d);
-    }
-    get deploy() {
-        return new index_1.Deployment();
     }
     queueSchema(schemaId, quantity = 1, overrides = {}) {
         const d = new index_1.Deployment();
