@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.20.7",
+  "version": "0.24.99",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -29,13 +29,13 @@
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "@firebase/app-types": "^0.3.7",
-    "@firebase/auth-types": "^0.5.5",
-    "@firebase/database-types": "^0.3.8",
-    "@firebase/util": "^0.2.11",
-    "common-types": "^1.9.7",
+    "@firebase/app-types": "^0.4.0",
+    "@firebase/auth-types": "^0.7.0",
+    "@firebase/database-types": "^0.4.0",
+    "@firebase/util": "^0.2.15",
+    "common-types": "^1.10.20",
     "faker": "^4.1.0",
-    "firebase-key": "^2.0.1",
+    "firebase-key": "^2.0.2",
     "lodash.first": "^3.0.0",
     "lodash.get": "^4.4.2",
     "lodash.last": "^3.0.0",

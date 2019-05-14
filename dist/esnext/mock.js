@@ -69,16 +69,28 @@ export default class Mock {
     async auth() {
         return fireAuth();
     }
+    /**
+     * **importFakerLibrary**
+     *
+     * The **faker** library is a key part of effective mocking but
+     * it is a large library so we only want to import it when
+     * it's required. Calling this _async_ method will ensure that
+     * before you're mocking with faker available.
+     */
     async importFakerLibrary() {
         if (!faker) {
-            faker = await import("faker");
+            faker = await import(/* webpackChunkName: "faker-lib" */ "faker");
         }
     }
-    async getMockHelper() {
-        if (!faker) {
-            faker = await import("faker");
-        }
-        return new MockHelper();
+    /**
+     * **getMockHelper**
+     *
+     * returns a MockHelper class which should always contain
+     * access to the faker library off the `faker` property exposed;
+     * you can also set some additional `context` where desirable.
+     */
+    getMockHelper(context) {
+        return new MockHelper(context);
     }
     addSchema(schema, mock) {
         const s = new Schema(schema);

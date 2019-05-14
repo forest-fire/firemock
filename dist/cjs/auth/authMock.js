@@ -26,7 +26,8 @@ exports.implemented = {
             };
             const credential = {
                 signInMethod: "anonymous",
-                providerId: "anonymous"
+                providerId: "anonymous",
+                toJSON: () => ""
             };
             const credentials = {
                 user,
@@ -92,5 +93,6 @@ exports.implemented = {
         appVerificationDisabledForTesting: false
     }
 };
+// tslint:disable-next-line:no-object-literal-type-assertion
 exports.authMockApi = Object.assign({}, notImplemented_1.notImplemented, exports.implemented);
 //# sourceMappingURL=authMock.js.map

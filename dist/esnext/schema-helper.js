@@ -1,7 +1,7 @@
 import { faker } from "./mock";
 export default class SchemaHelper {
-    constructor(raw) {
-        this._db = raw;
+    constructor(context) {
+        this.context = context;
     }
     get faker() {
         return faker;

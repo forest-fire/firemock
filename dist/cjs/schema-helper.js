@@ -2,8 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const mock_1 = require("./mock");
 class SchemaHelper {
-    constructor(raw) {
-        this._db = raw;
+    constructor(context) {
+        this.context = context;
     }
     get faker() {
         return mock_1.faker;

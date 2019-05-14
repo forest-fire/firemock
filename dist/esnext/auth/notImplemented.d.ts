@@ -1,25 +1,2 @@
-export declare const notImplemented: {
-    applyActionCode(code: string): Promise<void>;
-    checkActionCode(code: string): Promise<import("@firebase/auth-types").ActionCodeInfo>;
-    createUserAndRetrieveDataWithEmailAndPassword(): Promise<never>;
-    fetchProvidersForEmail(): Promise<never>;
-    fetchSignInMethodsForEmail(): Promise<never>;
-    getRedirectResult(): Promise<never>;
-    isSignInWithEmailLink(): never;
-    onAuthStateChanged(): never;
-    onIdTokenChanged(): never;
-    sendSignInLinkToEmail(): Promise<never>;
-    setPersistence(): Promise<never>;
-    signInAndRetrieveDataWithCredential(): Promise<never>;
-    signInAndRetrieveDataWithCustomToken(): Promise<never>;
-    signInAndRetrieveDataWithEmailAndPassword(): Promise<never>;
-    signInAnonymouslyAndRetrieveData(): Promise<never>;
-    signInWithCredential(): Promise<never>;
-    signInWithCustomToken(): Promise<never>;
-    signInWithEmailLink(): Promise<never>;
-    signInWithPhoneNumber(): Promise<never>;
-    signInWithPopup(): Promise<never>;
-    signInWithRedirect(): Promise<never>;
-    useDeviceLanguage(): Promise<never>;
-    verifyPasswordResetCode(code: string): Promise<never>;
-};
+import { FirebaseAuth } from "./types";
+export declare const notImplemented: Partial<FirebaseAuth>;

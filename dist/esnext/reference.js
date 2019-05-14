@@ -38,7 +38,8 @@ export default class Reference extends Query {
             onComplete(null);
         }
         // TODO: try and get this typed appropriately
-        return networkDelay(this);
+        const ref = networkDelay(this);
+        return ref;
     }
     remove(onComplete) {
         removeDB(this.path);

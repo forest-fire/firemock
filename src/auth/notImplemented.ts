@@ -4,7 +4,7 @@ import { createError } from "common-types";
 
 type ActionCodeInfo = import("@firebase/auth-types").ActionCodeInfo;
 
-export const notImplemented = {
+export const notImplemented: Partial<FirebaseAuth> = {
   async applyActionCode(code: string) {
     return;
   },
@@ -15,19 +15,6 @@ export const notImplemented = {
     };
   },
 
-  async createUserAndRetrieveDataWithEmailAndPassword() {
-    throw createError(
-      "auth/not-implemented",
-      "This feature is not implemented yet in FireMock auth module"
-    );
-  },
-
-  async fetchProvidersForEmail() {
-    throw createError(
-      "auth/not-implemented",
-      "This feature is not implemented yet in FireMock auth module"
-    );
-  },
   async fetchSignInMethodsForEmail() {
     throw createError(
       "auth/not-implemented",
@@ -76,24 +63,7 @@ export const notImplemented = {
       "This feature is not implemented yet in FireMock auth module"
     );
   },
-  async signInAndRetrieveDataWithCustomToken() {
-    throw createError(
-      "auth/not-implemented",
-      "This feature is not implemented yet in FireMock auth module"
-    );
-  },
-  async signInAndRetrieveDataWithEmailAndPassword() {
-    throw createError(
-      "auth/not-implemented",
-      "This feature is not implemented yet in FireMock auth module"
-    );
-  },
-  async signInAnonymouslyAndRetrieveData() {
-    throw createError(
-      "auth/not-implemented",
-      "This feature is not implemented yet in FireMock auth module"
-    );
-  },
+
   async signInWithCredential() {
     throw createError(
       "auth/not-implemented",

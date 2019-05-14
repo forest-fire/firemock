@@ -24,7 +24,8 @@ export const implemented = {
             };
             const credential = {
                 signInMethod: "anonymous",
-                providerId: "anonymous"
+                providerId: "anonymous",
+                toJSON: () => ""
             };
             const credentials = {
                 user,
@@ -90,4 +91,5 @@ export const implemented = {
         appVerificationDisabledForTesting: false
     }
 };
+// tslint:disable-next-line:no-object-literal-type-assertion
 export const authMockApi = Object.assign({}, notImplemented, implemented);

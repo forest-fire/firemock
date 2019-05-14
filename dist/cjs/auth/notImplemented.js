@@ -11,12 +11,6 @@ exports.notImplemented = {
             operation: ""
         };
     },
-    async createUserAndRetrieveDataWithEmailAndPassword() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
-    async fetchProvidersForEmail() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
     async fetchSignInMethodsForEmail() {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
@@ -39,15 +33,6 @@ exports.notImplemented = {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
     async signInAndRetrieveDataWithCredential() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
-    async signInAndRetrieveDataWithCustomToken() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
-    async signInAndRetrieveDataWithEmailAndPassword() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
-    async signInAnonymouslyAndRetrieveData() {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
     async signInWithCredential() {
