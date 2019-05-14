@@ -34,8 +34,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       };
       const credential: AuthCredential = {
         signInMethod: "anonymous",
-        providerId: "anonymous",
-        toJSON: () => ""
+        providerId: "anonymous"
       };
 
       const credentials = {
