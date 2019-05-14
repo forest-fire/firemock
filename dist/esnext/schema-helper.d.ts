@@ -1,6 +1,6 @@
 /// <reference types="faker" />
 export default class SchemaHelper {
-    private _db;
-    constructor(raw: any);
+    context: any;
+    constructor(context: any);
     readonly faker: Faker.FakerStatic;
 }

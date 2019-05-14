@@ -34,7 +34,8 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       };
       const credential: AuthCredential = {
         signInMethod: "anonymous",
-        providerId: "anonymous"
+        providerId: "anonymous",
+        toJSON: () => ""
       };
 
       const credentials = {
@@ -113,7 +114,8 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   }
 };
 
-export const authMockApi: FirebaseAuth = {
+// tslint:disable-next-line:no-object-literal-type-assertion
+export const authMockApi = {
   ...notImplemented,
   ...implemented
-};
+} as FirebaseAuth;
