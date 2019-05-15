@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.24.101",
+  "version": "0.24.102",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -60,17 +60,17 @@
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
     "coveralls": "^3.0.3",
-    "js-yaml": "^3.12.1",
+    "js-yaml": "^3.13.1",
     "mocha": "^6.0.2",
     "nyc": "^13.3.0",
     "prettier": "^1.16.4",
     "rimraf": "^2.6.3",
-    "rollup-plugin-typescript2": "^0.20.1",
+    "rollup-plugin-typescript2": "^0.21.0",
     "test-console": "^1.1.0",
     "ts-node": "^8.0.3",
-    "tslint": "^5.14.0",
+    "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.0-dev.20190321"
+    "typescript": "^3.4.5"
   },
   "engines": {
     "node": ">=6.0.0"

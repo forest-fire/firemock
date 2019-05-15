@@ -65,6 +65,7 @@ export default class Mock {
     private _relationships;
     private _queues;
     private _mockInitializer;
+    private _fakerLoaded;
     constructor(
     /**
      * allows publishing of raw data into the database as the databases
