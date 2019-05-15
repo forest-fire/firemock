@@ -26,7 +26,8 @@ exports.implemented = {
             };
             const credential = {
                 signInMethod: "anonymous",
-                providerId: "anonymous"
+                providerId: "anonymous",
+                toJSON: () => "" // recently added
             };
             const credentials = {
                 user,

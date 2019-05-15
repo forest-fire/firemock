@@ -13,6 +13,7 @@ const util_1 = require("./util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
 const authAdmin_1 = require("./auth/authAdmin");
+const FiremockError_1 = require("./errors/FiremockError");
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(
@@ -31,6 +32,10 @@ class Mock {
         this._schemas = new index_1.Queue("schemas").clear();
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
+        // start the loading of faker but store the Promise
+        // so we can check in an async function whether we've
+        // completed
+        this._fakerLoaded = this.importFakerLibrary();
         index_1.Queue.clearAll();
         database_1.clearDatabase();
         if (dataOrMock && typeof dataOrMock === "object") {
@@ -65,7 +70,8 @@ class Mock {
         allowPhoneLogins: false
     }) {
         const obj = new Mock(dataOrMock, authConfig);
-        await obj.importFakerLibrary();
+        // await obj.importFakerLibrary();
+        await obj._fakerLoaded;
         return obj;
     }
     /**
@@ -98,6 +104,9 @@ class Mock {
      * you can also set some additional `context` where desirable.
      */
     getMockHelper(context) {
+        if (!exports.faker && !exports.faker.address) {
+            throw new FiremockError_1.FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
+        }
         return new MockHelper_1.MockHelper(context);
     }
     addSchema(schema, mock) {
@@ -117,6 +126,9 @@ class Mock {
         return d;
     }
     generate() {
+        if (!exports.faker && !exports.faker.address) {
+            throw new FiremockError_1.FireMockError(`The Faker library must be loaded before you can generate mocked data can be returned`, "firemock/faker-not-ready");
+        }
         return new index_1.Deployment().generate();
     }
     ref(dbPath) {

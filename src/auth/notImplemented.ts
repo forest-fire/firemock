@@ -14,28 +14,28 @@ export const notImplemented: Partial<FirebaseAuth> = {
       operation: ""
     };
   },
-  async createUserAndRetrieveDataWithEmailAndPassword(
-    email: string,
-    password: string
-  ): Promise<UserCredential> {
-    return completeUserCredential({});
-  },
+  // async createUserAndRetrieveDataWithEmailAndPassword(
+  //   email: string,
+  //   password: string
+  // ): Promise<UserCredential> {
+  //   return completeUserCredential({});
+  // },
 
-  async fetchProvidersForEmail(email: string) {
-    return [];
-  },
+  // async fetchProvidersForEmail(email: string) {
+  //   return [];
+  // },
 
-  async signInAnonymouslyAndRetrieveData() {
-    return completeUserCredential({});
-  },
+  // async signInAnonymouslyAndRetrieveData() {
+  //   return completeUserCredential({});
+  // },
 
-  async signInAndRetrieveDataWithCustomToken(token: string) {
-    return completeUserCredential({});
-  },
+  // async signInAndRetrieveDataWithCustomToken(token: string) {
+  //   return completeUserCredential({});
+  // },
 
-  async signInAndRetrieveDataWithEmailAndPassword(email: string, password: string) {
-    return completeUserCredential({});
-  },
+  // async signInAndRetrieveDataWithEmailAndPassword(email: string, password: string) {
+  //   return completeUserCredential({});
+  // },
 
   async fetchSignInMethodsForEmail() {
     throw createError(

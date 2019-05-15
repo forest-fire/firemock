@@ -1,4 +1,3 @@
-import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 export const notImplemented = {
     async applyActionCode(code) {
@@ -10,21 +9,24 @@ export const notImplemented = {
             operation: ""
         };
     },
-    async createUserAndRetrieveDataWithEmailAndPassword(email, password) {
-        return completeUserCredential({});
-    },
-    async fetchProvidersForEmail(email) {
-        return [];
-    },
-    async signInAnonymouslyAndRetrieveData() {
-        return completeUserCredential({});
-    },
-    async signInAndRetrieveDataWithCustomToken(token) {
-        return completeUserCredential({});
-    },
-    async signInAndRetrieveDataWithEmailAndPassword(email, password) {
-        return completeUserCredential({});
-    },
+    // async createUserAndRetrieveDataWithEmailAndPassword(
+    //   email: string,
+    //   password: string
+    // ): Promise<UserCredential> {
+    //   return completeUserCredential({});
+    // },
+    // async fetchProvidersForEmail(email: string) {
+    //   return [];
+    // },
+    // async signInAnonymouslyAndRetrieveData() {
+    //   return completeUserCredential({});
+    // },
+    // async signInAndRetrieveDataWithCustomToken(token: string) {
+    //   return completeUserCredential({});
+    // },
+    // async signInAndRetrieveDataWithEmailAndPassword(email: string, password: string) {
+    //   return completeUserCredential({});
+    // },
     async fetchSignInMethodsForEmail() {
         throw createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },

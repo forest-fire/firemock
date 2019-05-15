@@ -16,7 +16,7 @@ const employeeMocker: SchemaCallback = (h: SchemaHelper) => () => ({
 });
 
 describe("Mock class()", () => {
-  it("Mock → Schema API structured correctly", async () => {
+  it("Mock a Schema API structured correctly", async () => {
     const m = await Mock.prepare();
     const schemaApi = m.addSchema("foo");
     expect(schemaApi.mock).is.a("function");

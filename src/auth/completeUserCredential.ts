@@ -42,8 +42,11 @@ const fakeUserCredential: UserCredential = {
     async linkAndRetrieveDataWithCredential(credential: AuthCredential) {
       return completeUserCredential({});
     },
+    // async linkWithCredential(credential: AuthCredential) {
+    //   return completeUserCredential({}).user;
+    // },
     async linkWithCredential(credential: AuthCredential) {
-      return completeUserCredential({}).user;
+      return completeUserCredential({});
     },
     async linkWithPhoneNumber(
       phoneNUmber: string,
@@ -60,8 +63,11 @@ const fakeUserCredential: UserCredential = {
     async reauthenticateAndRetrieveDataWithCredential(credential: AuthCredential) {
       return completeUserCredential({});
     },
+    // async reauthenticateWithCredential(credential: AuthCredential) {
+    //   return;
+    // },
     async reauthenticateWithCredential(credential: AuthCredential) {
-      return;
+      return completeUserCredential({});
     },
     async reauthenticateWithPhoneNumber(
       phoneNumber: string,
@@ -119,7 +125,8 @@ const fakeUserCredential: UserCredential = {
   operationType: "",
   credential: {
     signInMethod: "fake",
-    providerId: "fake"
+    providerId: "fake",
+    toJSON: () => "" // added recently
   }
 };
 
