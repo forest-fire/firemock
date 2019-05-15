@@ -1,4 +1,4 @@
-import { FirebaseAuth } from "./types";
+import { FirebaseAuth, UserCredential } from "./types";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 
@@ -13,6 +13,28 @@ export const notImplemented: Partial<FirebaseAuth> = {
       data: {},
       operation: ""
     };
+  },
+  async createUserAndRetrieveDataWithEmailAndPassword(
+    email: string,
+    password: string
+  ): Promise<UserCredential> {
+    return completeUserCredential({});
+  },
+
+  async fetchProvidersForEmail(email: string) {
+    return [];
+  },
+
+  async signInAnonymouslyAndRetrieveData() {
+    return completeUserCredential({});
+  },
+
+  async signInAndRetrieveDataWithCustomToken(token: string) {
+    return completeUserCredential({});
+  },
+
+  async signInAndRetrieveDataWithEmailAndPassword(email: string, password: string) {
+    return completeUserCredential({});
   },
 
   async fetchSignInMethodsForEmail() {
