@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const completeUserCredential_1 = require("./completeUserCredential");
 const common_types_1 = require("common-types");
 exports.notImplemented = {
     async applyActionCode(code) {
@@ -10,6 +11,21 @@ exports.notImplemented = {
             data: {},
             operation: ""
         };
+    },
+    async createUserAndRetrieveDataWithEmailAndPassword(email, password) {
+        return completeUserCredential_1.completeUserCredential({});
+    },
+    async fetchProvidersForEmail(email) {
+        return [];
+    },
+    async signInAnonymouslyAndRetrieveData() {
+        return completeUserCredential_1.completeUserCredential({});
+    },
+    async signInAndRetrieveDataWithCustomToken(token) {
+        return completeUserCredential_1.completeUserCredential({});
+    },
+    async signInAndRetrieveDataWithEmailAndPassword(email, password) {
+        return completeUserCredential_1.completeUserCredential({});
     },
     async fetchSignInMethodsForEmail() {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
