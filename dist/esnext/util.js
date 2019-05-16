@@ -78,9 +78,9 @@ export function orderedSnapToJS(snap) {
  */
 export function keyAndParent(dotPath) {
     const sections = dotPath.split(".");
-    const key = sections.pop();
+    const changeKey = sections.pop();
     const parent = sections.join(".");
-    return { parent, key };
+    return { parent, key: changeKey };
 }
 /** converts a '/' delimited path to a '.' delimited one */
 export function dotNotation(path) {
