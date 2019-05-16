@@ -167,4 +167,8 @@ function calcDelay() {
     }
     throw new Error("Delay property is of unknown format: " + delay);
 }
+function stripLeadingDot(str) {
+    return str.slice(0, 1) === "." ? str.slice(1) : str;
+}
+exports.stripLeadingDot = stripLeadingDot;
 //# sourceMappingURL=util.js.map

@@ -90,16 +90,20 @@ export declare function listenerPaths(lookFor?: EventTypePlusChild | EventTypePl
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
 export declare function getListeners(lookFor?: EventTypePlusChild | EventTypePlusChild[]): void;
+export declare type IListenerPlus = IListener & {
+    id: string;
+    changeIsAtRoot: boolean;
+};
 /**
  * **findChildListeners**
  *
  * Finds "child events" listening to a given _parent path_; optionally
  * allowing for specification of the specific `EventType` or `EventType(s)`.
  *
- * @param path the _parent path_ that children are detected off of
- * @param eventType <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
+ * @param changePath the _parent path_ that children are detected off of
+ * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
-export declare function findChildListeners(path: string, ...eventType: EventType[]): IListener[];
+export declare function findChildListeners(changePath: string, ...eventTypes: EventType[]): IListenerPlus[];
 /**
  * Finds all value listeners on a given path or below.
  * Unlike child listeners, Value listeners listen to changes at

@@ -32,10 +32,6 @@ class Mock {
         this._schemas = new index_1.Queue("schemas").clear();
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
-        // start the loading of faker but store the Promise
-        // so we can check in an async function whether we've
-        // completed
-        this._fakerLoaded = this.importFakerLibrary();
         index_1.Queue.clearAll();
         database_1.clearDatabase();
         if (dataOrMock && typeof dataOrMock === "object") {
@@ -70,8 +66,7 @@ class Mock {
         allowPhoneLogins: false
     }) {
         const obj = new Mock(dataOrMock, authConfig);
-        // await obj.importFakerLibrary();
-        await obj._fakerLoaded;
+        await obj.importFakerLibrary();
         return obj;
     }
     /**
@@ -82,6 +77,9 @@ class Mock {
     }
     async auth() {
         return auth_1.auth();
+    }
+    get faker() {
+        return exports.faker;
     }
     /**
      * **importFakerLibrary**

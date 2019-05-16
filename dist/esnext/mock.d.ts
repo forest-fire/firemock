@@ -79,6 +79,7 @@ export default class Mock {
      */
     updateDB(state: IDictionary): void;
     auth(): Promise<import(".").IMockAuth>;
+    readonly faker: Faker.FakerStatic;
     /**
      * **importFakerLibrary**
      *

@@ -234,7 +234,6 @@ exports.getListeners = getListeners;
  * @param oldValue the prior value
  */
 function notify(path, newValue, oldValue) {
-    // console.log("notify:", path, newValue);
     if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
         findValueListeners(path).map(l => {
             let result = {};
@@ -248,19 +247,53 @@ function notify(path, newValue, oldValue) {
             }
             return l.callback(new index_1.SnapShot(util_1.join(l.path), result));
         });
-        if (newValue === undefined) {
-            const { parent, key } = util_1.keyAndParent(path);
-            findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-                return l.callback(new index_1.SnapShot(key, newValue));
-            });
-        }
-        else if (oldValue === undefined) {
-            const { parent, key } = util_1.keyAndParent(path);
-            findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-                return l.callback(new index_1.SnapShot(key, newValue));
-            });
-        }
+        // get relevant listeners and whether path is
+        // a direct decendant (aka, the action is a removal or addition)
+        const decendants = findChildListeners(path);
+        const { parent, key: changeKey } = util_1.keyAndParent(path);
+        decendants.forEach(decendant => {
+            if (newValue === undefined &&
+                decendant.changeIsAtRoot &&
+                decendant.eventType === "child_removed") {
+                // removal of child
+                decendant.callback(new index_1.SnapShot(changeKey, oldValue));
+            }
+            if (oldValue === undefined &&
+                decendant.changeIsAtRoot &&
+                decendant.eventType === "child_added") {
+                // addition of child
+                decendant.callback(new index_1.SnapShot(changeKey, newValue), null);
+            }
+            const decendantPath = decendant.path + "." + decendant.id;
+            if (decendant.eventType === "child_changed") {
+                // change took place somewhere in decendant tree
+                // therefore "newValue" may be deeper in the structure
+                if (decendant.changeIsAtRoot) {
+                    decendant.callback(new index_1.SnapShot(changeKey, newValue), priorKey(decendant.path, decendant.id));
+                }
+                else {
+                    // TODO: if the 'id' looks like a number instead of a string weird things ensue.
+                    decendant.callback(new index_1.SnapShot(decendant.id, lodash_get_1.default(exports.db, decendantPath)), priorKey(decendant.path, decendant.id));
+                }
+            }
+        });
     }
+}
+function priorKey(path, id) {
+    let previous;
+    const ids = lodash_get_1.default(exports.db, path);
+    if (typeof ids === "object") {
+        return null;
+    }
+    return Object.keys(ids).reduce((acc, curr) => {
+        if (previous === id) {
+            return id;
+        }
+        else {
+            previous = id;
+            return acc;
+        }
+    }, null);
 }
 /**
  * **findChildListeners**
@@ -268,14 +301,24 @@ function notify(path, newValue, oldValue) {
  * Finds "child events" listening to a given _parent path_; optionally
  * allowing for specification of the specific `EventType` or `EventType(s)`.
  *
- * @param path the _parent path_ that children are detected off of
- * @param eventType <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
+ * @param changePath the _parent path_ that children are detected off of
+ * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
-function findChildListeners(path, ...eventType) {
-    const correctPath = _listeners.filter(l => l.path === util_1.join(path) && l.eventType !== "value");
-    return eventType.length > 0
-        ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
-        : correctPath;
+function findChildListeners(changePath, ...eventTypes) {
+    const decendants = _listeners
+        .filter(l => changePath.includes(l.path))
+        .reduce((acc, listener) => {
+        const id = changePath
+            .replace(listener.path, "")
+            .split(".")
+            .filter(i => i)[0]
+            .replace(/\./g, "");
+        const remainingPath = util_1.stripLeadingDot(changePath.replace(util_1.stripLeadingDot(listener.path), ""));
+        const changeIsAtRoot = id === remainingPath;
+        acc.push(Object.assign({}, listener, { id, changeIsAtRoot }));
+        return acc;
+    }, []);
+    return decendants;
 }
 exports.findChildListeners = findChildListeners;
 /**

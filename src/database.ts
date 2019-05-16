@@ -4,7 +4,7 @@ import { IListener } from "./query";
 import set from "lodash.set";
 import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
-import { join, pathDiff, getParent, getKey, keyAndParent } from "./util";
+import { join, pathDiff, getParent, getKey, keyAndParent, stripLeadingDot } from "./util";
 import { SnapShot } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { auth as mockedAuth } from "./auth";
@@ -265,8 +265,6 @@ export function getListeners(lookFor?: EventTypePlusChild | EventTypePlusChild[]
  * @param oldValue the prior value
  */
 function notify<T = any>(path: string, newValue: T, oldValue?: T) {
-  // console.log("notify:", path, newValue);
-
   if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
     findValueListeners(path).map(l => {
       let result: IDictionary = {};
@@ -280,19 +278,70 @@ function notify<T = any>(path: string, newValue: T, oldValue?: T) {
       return l.callback(new SnapShot(join(l.path), result));
     });
 
-    if (newValue === undefined) {
-      const { parent, key } = keyAndParent(path);
-      findChildListeners(parent, "child_removed", "child_changed").forEach(l => {
-        return l.callback(new SnapShot(key, newValue));
-      });
-    } else if (oldValue === undefined) {
-      const { parent, key } = keyAndParent(path);
-      findChildListeners(parent, "child_added", "child_changed").forEach(l => {
-        return l.callback(new SnapShot(key, newValue));
-      });
-    }
+    // get relevant listeners and whether path is
+    // a direct decendant (aka, the action is a removal or addition)
+    const decendants = findChildListeners(path);
+    const { parent, key: changeKey } = keyAndParent(path);
+
+    decendants.forEach(decendant => {
+      if (
+        newValue === undefined &&
+        decendant.changeIsAtRoot &&
+        decendant.eventType === "child_removed"
+      ) {
+        // removal of child
+        decendant.callback(new SnapShot(changeKey, oldValue));
+      }
+
+      if (
+        oldValue === undefined &&
+        decendant.changeIsAtRoot &&
+        decendant.eventType === "child_added"
+      ) {
+        // addition of child
+        decendant.callback(new SnapShot(changeKey, newValue), null);
+      }
+
+      const decendantPath = decendant.path + "." + decendant.id;
+
+      if (decendant.eventType === "child_changed") {
+        // change took place somewhere in decendant tree
+        // therefore "newValue" may be deeper in the structure
+        if (decendant.changeIsAtRoot) {
+          decendant.callback(
+            new SnapShot(changeKey, newValue),
+            priorKey(decendant.path, decendant.id)
+          );
+        } else {
+          // TODO: if the 'id' looks like a number instead of a string weird things ensue.
+
+          decendant.callback(
+            new SnapShot(decendant.id, get(db, decendantPath)),
+            priorKey(decendant.path, decendant.id)
+          );
+        }
+      }
+    });
   }
 }
+
+function priorKey(path: string, id: string) {
+  let previous: string;
+  const ids = get(db, path);
+  if (typeof ids === "object") {
+    return null;
+  }
+
+  return Object.keys(ids).reduce((acc: string | null, curr: string) => {
+    if (previous === id) {
+      return id;
+    } else {
+      previous = id;
+      return acc;
+    }
+  }, null);
+}
+export type IListenerPlus = IListener & { id: string; changeIsAtRoot: boolean };
 
 /**
  * **findChildListeners**
@@ -300,17 +349,28 @@ function notify<T = any>(path: string, newValue: T, oldValue?: T) {
  * Finds "child events" listening to a given _parent path_; optionally
  * allowing for specification of the specific `EventType` or `EventType(s)`.
  *
- * @param path the _parent path_ that children are detected off of
- * @param eventType <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
+ * @param changePath the _parent path_ that children are detected off of
+ * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
-export function findChildListeners(path: string, ...eventType: EventType[]) {
-  const correctPath = _listeners.filter(
-    l => l.path === join(path) && l.eventType !== "value"
-  );
+export function findChildListeners(changePath: string, ...eventTypes: EventType[]) {
+  const decendants = _listeners
+    .filter(l => changePath.includes(l.path))
+    .reduce((acc: IListenerPlus[], listener) => {
+      const id = changePath
+        .replace(listener.path, "")
+        .split(".")
+        .filter(i => i)[0]
+        .replace(/\./g, "");
+      const remainingPath = stripLeadingDot(
+        changePath.replace(stripLeadingDot(listener.path), "")
+      );
 
-  return eventType.length > 0
-    ? correctPath.filter(l => eventType.indexOf(l.eventType) !== -1)
-    : correctPath;
+      const changeIsAtRoot = id === remainingPath;
+      acc.push({ ...listener, ...{ id, changeIsAtRoot } });
+      return acc;
+    }, []);
+
+  return decendants;
 }
 
 /**

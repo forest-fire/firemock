@@ -142,3 +142,6 @@ function calcDelay() {
     }
     throw new Error("Delay property is of unknown format: " + delay);
 }
+export function stripLeadingDot(str) {
+    return str.slice(0, 1) === "." ? str.slice(1) : str;
+}

@@ -98,9 +98,9 @@ export function orderedSnapToJS<T = any>(snap: DataSnapshot) {
  */
 export function keyAndParent(dotPath: string) {
   const sections = dotPath.split(".");
-  const key = sections.pop();
+  const changeKey = sections.pop();
   const parent = sections.join(".");
-  return { parent, key };
+  return { parent, key: changeKey };
 }
 
 /** converts a '/' delimited path to a '.' delimited one */
@@ -173,4 +173,8 @@ function calcDelay(): number {
   }
 
   throw new Error("Delay property is of unknown format: " + delay);
+}
+
+export function stripLeadingDot(str: string) {
+  return str.slice(0, 1) === "." ? str.slice(1) : str;
 }
