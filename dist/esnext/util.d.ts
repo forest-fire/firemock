@@ -46,3 +46,4 @@ export declare enum Delays {
 export declare type DelayType = number | number[] | IDictionary<number> | Delays;
 export declare function setNetworkDelay(value: IDictionary | number | number[] | Delays): void;
 export declare function networkDelay<T = any>(returnValue?: T): Promise<T>;
+export declare function stripLeadingDot(str: string): string;

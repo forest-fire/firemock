@@ -85,8 +85,7 @@ export default class Mock {
     }
   ) {
     const obj = new Mock(dataOrMock, authConfig);
-    // await obj.importFakerLibrary();
-    await obj._fakerLoaded;
+    await obj.importFakerLibrary();
     return obj;
   }
   private _schemas = new Queue<ISchema>("schemas").clear();
@@ -110,10 +109,6 @@ export default class Mock {
       allowPhoneLogins: false
     }
   ) {
-    // start the loading of faker but store the Promise
-    // so we can check in an async function whether we've
-    // completed
-    this._fakerLoaded = this.importFakerLibrary();
     Queue.clearAll();
     clearDatabase();
     if (dataOrMock && typeof dataOrMock === "object") {
@@ -135,6 +130,10 @@ export default class Mock {
 
   public async auth() {
     return fireAuth();
+  }
+
+  public get faker() {
+    return faker;
   }
 
   /**

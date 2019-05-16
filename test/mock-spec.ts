@@ -16,6 +16,17 @@ const employeeMocker: SchemaCallback = (h: SchemaHelper) => () => ({
 });
 
 describe("Mock class()", () => {
+  it("using Mock without prepare() does not provide faker support at onset", async () => {
+    const m = new Mock();
+    expect(m.faker).is.a("undefined");
+  });
+
+  it("using Mock.prepare() initializer returns immediate use of faker library", async () => {
+    const m = await Mock.prepare();
+    expect(m.faker).is.a("object");
+    expect(m.faker.address.city).is.a("function");
+  });
+
   it("Mock a Schema API structured correctly", async () => {
     const m = await Mock.prepare();
     const schemaApi = m.addSchema("foo");
