@@ -3,8 +3,7 @@ import { IDictionary } from "common-types";
 import { Schema, Reference, Deployment } from "./index";
 import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
-import { IMockAuthConfig, IMockSetup } from "./auth/types";
-import { IMockConfigOptions } from "./auth/mockOptions";
+import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./auth/types";
 import { SchemaCallback } from "./types";
 export declare let faker: Faker.FakerStatic;
 export declare class Mock {

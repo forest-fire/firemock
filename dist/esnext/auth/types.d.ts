@@ -1,5 +1,5 @@
 import { IMockAdminApi } from "./authAdmin";
-import { Mock } from "..";
+import { Mock, IDictionary } from "..";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;
 export declare type AuthSettings = import("@firebase/auth-types").AuthSettings;
@@ -21,6 +21,10 @@ export interface IPartialUserCredential {
     credential?: Partial<AuthCredential> | null;
     operationType?: string | null;
     user?: Partial<User> | null;
+}
+export interface IMockConfigOptions {
+    auth?: IMockAuthConfig;
+    db?: IDictionary;
 }
 /**
  * Provides a full FirebaseAuth implementation (although many

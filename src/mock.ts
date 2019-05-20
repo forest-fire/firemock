@@ -4,10 +4,9 @@ import { db, clearDatabase, updateDatabase } from "./database";
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { IMockAuthConfig, IMockSetup } from "./auth/types";
+import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./auth/types";
 import { authAdminApi } from "./auth/authAdmin";
-import { FireMockError } from "./errors/FiremockError";
-import { IMockConfigOptions } from "./auth/mockOptions";
+import { FireMockError } from "./errors/FireMockError";
 import { IRelationship, ISchema, IQueue, SchemaCallback } from "./types";
 
 export let faker: Faker.FakerStatic;
