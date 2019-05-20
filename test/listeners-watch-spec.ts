@@ -32,12 +32,11 @@ describe("Listener events ->", () => {
     expect(events[3].snap.name).to.equal("Bob Marley");
   });
 
-  it.only('listening on "on_child" events', async () => {
+  it('listening on "on_child" events', async () => {
     const queryRef = new Query("userProfile", 10);
     let events = [];
     const cb = (eventType: string) => (snap: DataSnapshot, value: any) => {
       events.push({ snap: snap.val(), value, eventType });
-      // console.log(`event [${eventType}]`, snap.key, snap.val(), value);
     };
     queryRef.on("child_added", cb("child_added"));
     queryRef.on("child_changed", cb("child_changed"));

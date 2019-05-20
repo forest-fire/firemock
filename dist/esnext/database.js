@@ -1,7 +1,7 @@
 import set from "lodash.set";
 import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
-import { join, pathDiff, getParent, getKey, keyAndParent, stripLeadingDot } from "./util";
+import { join, pathDiff, getParent, getKey, keyAndParent, stripLeadingDot, removeDots } from "./util";
 import { SnapShot } from "./index";
 import { auth as mockedAuth } from "./auth";
 export let db = [];
@@ -286,14 +286,19 @@ function priorKey(path, id) {
  * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
 export function findChildListeners(changePath, ...eventTypes) {
+    changePath = stripLeadingDot(changePath.replace(/\//g, "."));
+    eventTypes =
+        eventTypes.length !== 0
+            ? eventTypes
+            : ["child_added", "child_changed", "child_moved", "child_removed"];
     const decendants = _listeners
-        .filter(l => changePath.includes(l.path))
+        .filter(l => eventTypes.includes(l.eventType))
+        .filter(l => changePath.startsWith(l.path))
         .reduce((acc, listener) => {
-        const id = changePath
+        const id = removeDots(changePath
             .replace(listener.path, "")
             .split(".")
-            .filter(i => i)[0]
-            .replace(/\./g, "");
+            .filter(i => i)[0]);
         const remainingPath = stripLeadingDot(changePath.replace(stripLeadingDot(listener.path), ""));
         const changeIsAtRoot = id === remainingPath;
         acc.push(Object.assign({}, listener, { id, changeIsAtRoot }));

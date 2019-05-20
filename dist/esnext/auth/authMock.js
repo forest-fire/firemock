@@ -3,6 +3,8 @@ import { authAdminApi } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 import { notImplemented } from "./notImplemented";
+import { FireMockError } from "../errors/FiremockError";
+import { checkIfEmailUserExists, validEmailUserPassword, emailVerified, userUid, emailValidationAllowed, loggedIn, loggedOut, checkIfEmailIsValidFormat } from "./authMockHelpers";
 export const implemented = {
     app: {
         name: "mocked-app",
@@ -11,6 +13,9 @@ export const implemented = {
             return;
         },
         automaticDataCollectionEnabled: false
+    },
+    onAuthStateChanged(observer) {
+        authAdminApi.addAuthObserver(observer);
     },
     signInAnonymously: async () => {
         await networkDelay();
@@ -39,36 +44,69 @@ export const implemented = {
     },
     async signInWithEmailAndPassword(email, password) {
         await networkDelay();
+        if (!emailValidationAllowed()) {
+            throw new FireMockError("email authentication not allowed", "auth/operation-not-allowed");
+        }
+        if (!checkIfEmailIsValidFormat(email)) {
+            throw new FireMockError(`invalid email: ${email}`, "auth/invalid-email");
+        }
         const found = authAdminApi
             .getAuthConfig()
             .validEmailLogins.find(i => i.email === email);
         if (!found) {
-            throw createError(`auth/invalid-email`, `The email provided "${email}" is not a valid email in mocked auth module. If you think it should be, make sure you set it with configureAuth() or setValidEmails()`);
+            throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
+        }
+        if (!validEmailUserPassword(email, found.password)) {
+            throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {
             user: {
                 email: found.email,
-                isAnonymous: false
+                isAnonymous: false,
+                emailVerified: emailVerified(email),
+                uid: userUid(email)
             },
             credential: {
                 signInMethod: "signInWithEmailAndPassword",
                 providerId: ""
+            },
+            additionalUserInfo: {
+                username: email
             }
         };
+        loggedIn(partial.user);
         return completeUserCredential(partial);
     },
     async createUserWithEmailAndPassword(email, password) {
         await networkDelay();
+        if (!emailValidationAllowed()) {
+            throw new FireMockError("email authentication not allowed", "auth/operation-not-allowed");
+        }
+        if (checkIfEmailUserExists(email)) {
+            throw new FireMockError(`"${email}" user already exists`, "auth/email-already-in-use");
+        }
+        if (checkIfEmailIsValidFormat(email)) {
+            throw new FireMockError(`"${email}" user already exists`, "auth/invalid-email");
+        }
+        if (!validEmailUserPassword(email, password)) {
+            throw new FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+        }
         const partial = {
             user: {
                 email,
-                isAnonymous: false
+                isAnonymous: false,
+                emailVerified: false,
+                uid: userUid(email)
             },
             credential: {
                 signInMethod: "signInWithEmailAndPassword",
                 providerId: ""
+            },
+            additionalUserInfo: {
+                username: email
             }
         };
+        loggedIn(partial.user);
         return completeUserCredential(partial);
     },
     async confirmPasswordReset(code, newPassword) {
@@ -78,6 +116,7 @@ export const implemented = {
         return;
     },
     async signOut() {
+        loggedOut();
         return;
     },
     get currentUser() {

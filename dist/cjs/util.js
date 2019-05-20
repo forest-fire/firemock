@@ -171,4 +171,8 @@ function stripLeadingDot(str) {
     return str.slice(0, 1) === "." ? str.slice(1) : str;
 }
 exports.stripLeadingDot = stripLeadingDot;
+function removeDots(str) {
+    return str ? str.replace(/\./g, "") : undefined;
+}
+exports.removeDots = removeDots;
 //# sourceMappingURL=util.js.map

@@ -3,8 +3,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-var mock_1 = require("./mock");
-exports.Mock = mock_1.default;
+__export(require("./mock"));
 var schema_helper_1 = require("./schema-helper");
 exports.SchemaHelper = schema_helper_1.default;
 var reference_1 = require("./reference");

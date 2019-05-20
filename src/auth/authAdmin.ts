@@ -1,9 +1,11 @@
-import { IMockAuthConfig, IEmailLogin } from "./types";
+import { IMockAuthConfig, IEmailLogin, User } from "./types";
 import { authApi } from "../auth";
 let authConfig: IMockAuthConfig = {
   allowAnonymous: true
 };
 let ANONYMOUS_USER_ID = "123456";
+export type Observer = (user: User | null) => any;
+const authObservers: Observer[] = [];
 
 export type IMockAdminApi = typeof authAdminApi;
 
@@ -27,5 +29,13 @@ export const authAdminApi = {
 
   getAnonymousUid() {
     return ANONYMOUS_USER_ID;
+  },
+
+  addAuthObserver(observer: (user: User | null) => any) {
+    authObservers.push(observer);
+  },
+
+  getAuthObservers() {
+    return authObservers;
   }
 };

@@ -14,23 +14,10 @@ export type FirebaseApp = import("@firebase/app-types").FirebaseApp;
 export interface IEmailLogin {
   email: string;
   password: string;
-}
-
-export interface IMockAuthConfig {
-  /**
-   * a list of email logins which are already setup as valid
-   * in the mock authentication module; this will be used for
-   * email logins as well as email links
-   */
-  validEmailLogins?: IEmailLogin[];
-  /** allow anonymous logins */
-  allowAnonymous?: boolean;
-  /** allow email/password logins */
-  allowEmailLogins?: boolean;
-  /** allow logins via links sent to email */
-  allowEmailLinks?: boolean;
-  /** allow logins via a code sent via SMS */
-  allowPhoneLogins?: boolean;
+  /** optionally state if the user should be considered email verified */
+  verified?: boolean;
+  /** optionally set a fixed UID for this user */
+  uid?: string;
 }
 
 export type IMockSetup = (mock: Mock) => () => Promise<void>;
@@ -48,3 +35,19 @@ export interface IPartialUserCredential {
  * to add an "administrative" API for mocking
  */
 export interface IMockAuth extends FirebaseAuth, IMockAdminApi {}
+export interface IMockAuthConfig {
+  /**
+   * a list of email logins which are already setup as valid
+   * in the mock authentication module; this will be used for
+   * email logins as well as email links
+   */
+  validEmailLogins?: IEmailLogin[];
+  /** allow anonymous logins */
+  allowAnonymous?: boolean;
+  /** allow email/password logins */
+  allowEmailLogins?: boolean;
+  /** allow logins via links sent to email */
+  allowEmailLinks?: boolean;
+  /** allow logins via a code sent via SMS */
+  allowPhoneLogins?: boolean;
+}

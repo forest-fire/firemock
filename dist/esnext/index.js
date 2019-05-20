@@ -1,4 +1,4 @@
-export { default as Mock } from "./mock";
+export * from "./mock";
 export { default as SchemaHelper } from "./schema-helper";
 export { default as Reference } from "./reference";
 export { default as Query } from "./query";

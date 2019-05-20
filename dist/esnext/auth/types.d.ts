@@ -10,6 +10,24 @@ export declare type FirebaseApp = import("@firebase/app-types").FirebaseApp;
 export interface IEmailLogin {
     email: string;
     password: string;
+    /** optionally state if the user should be considered email verified */
+    verified?: boolean;
+    /** optionally set a fixed UID for this user */
+    uid?: string;
+}
+export declare type IMockSetup = (mock: Mock) => () => Promise<void>;
+export interface IPartialUserCredential {
+    additionalUserInfo?: Partial<AdditionalUserInfo>;
+    credential?: Partial<AuthCredential> | null;
+    operationType?: string | null;
+    user?: Partial<User> | null;
+}
+/**
+ * Provides a full FirebaseAuth implementation (although many
+ * parts are un-implementated currently) as well as extending
+ * to add an "administrative" API for mocking
+ */
+export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
 }
 export interface IMockAuthConfig {
     /**
@@ -26,18 +44,4 @@ export interface IMockAuthConfig {
     allowEmailLinks?: boolean;
     /** allow logins via a code sent via SMS */
     allowPhoneLogins?: boolean;
-}
-export declare type IMockSetup = (mock: Mock) => () => Promise<void>;
-export interface IPartialUserCredential {
-    additionalUserInfo?: Partial<AdditionalUserInfo>;
-    credential?: Partial<AuthCredential> | null;
-    operationType?: string | null;
-    user?: Partial<User> | null;
-}
-/**
- * Provides a full FirebaseAuth implementation (although many
- * parts are un-implementated currently) as well as extending
- * to add an "administrative" API for mocking
- */
-export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
 }
