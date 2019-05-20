@@ -2,7 +2,7 @@
 import "mocha";
 import { IDictionary } from "common-types";
 import * as chai from "chai";
-import Mock, { SchemaCallback } from "../src/mock";
+import  {Mock, SchemaCallback } from "../src";
 import * as helpers from "./testing/helpers";
 const expect = chai.expect;
 

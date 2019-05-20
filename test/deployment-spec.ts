@@ -2,7 +2,7 @@
 import "mocha";
 import * as chai from "chai";
 import { length } from "./testing/helpers";
-import Mock, { SchemaCallback } from "../src/mock";
+import { Mock, SchemaCallback } from "../src";
 
 const expect = chai.expect;
 

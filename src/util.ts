@@ -178,3 +178,7 @@ function calcDelay(): number {
 export function stripLeadingDot(str: string) {
   return str.slice(0, 1) === "." ? str.slice(1) : str;
 }
+
+export function removeDots(str?: string) {
+  return str ? str.replace(/\./g, "") : undefined;
+}

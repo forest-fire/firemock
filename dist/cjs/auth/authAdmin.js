@@ -5,6 +5,7 @@ let authConfig = {
     allowAnonymous: true
 };
 let ANONYMOUS_USER_ID = "123456";
+const authObservers = [];
 exports.authAdminApi = {
     configureAuth(config) {
         authConfig = Object.assign({}, authConfig, config);
@@ -21,6 +22,12 @@ exports.authAdminApi = {
     },
     getAnonymousUid() {
         return ANONYMOUS_USER_ID;
+    },
+    addAuthObserver(observer) {
+        authObservers.push(observer);
+    },
+    getAuthObservers() {
+        return authObservers;
     }
 };
 //# sourceMappingURL=authAdmin.js.map

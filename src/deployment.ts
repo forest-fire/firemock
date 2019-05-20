@@ -3,7 +3,7 @@ import * as fbKey from "firebase-key";
 import set from "lodash.set";
 import get from "lodash.get";
 import first from "lodash.first";
-import { IRelationship, ISchema, IQueue } from "./mock";
+import { IRelationship, ISchema, IQueue } from "./index";
 import { getRandomInt, dotNotation } from "./util";
 import Queue from "./queue";
 import pluralize from "./pluralize";

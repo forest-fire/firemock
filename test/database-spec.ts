@@ -2,7 +2,7 @@
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import set from "lodash.set";
-import { Mock, SchemaCallback } from "../src/index";
+import { Mock, SchemaCallback } from "../src";
 import {
   db,
   clearDatabase,
@@ -209,6 +209,21 @@ describe("Database", () => {
       addListener("/auth/people", "value", callback);
       addListener("/auth/company", "child_removed", callback);
       const listeners = findChildListeners("/auth/people");
+
+      expect(listeners).length(3);
+    });
+
+    it("find all child listeners at a path below the listening path", () => {
+      const callback: HandleValueEvent = snap => undefined;
+      removeAllListeners();
+      addListener("/auth/people", "child_removed", callback);
+      addListener("/auth/people", "child_added", callback);
+      addListener("/auth/people", "child_moved", callback);
+      addListener("/people", "child_removed", callback);
+      addListener("/auth/people", "value", callback);
+      addListener("/auth/company", "child_removed", callback);
+      const listeners = findChildListeners("/auth/people/1234");
+
       expect(listeners).length(3);
     });
 

@@ -42,32 +42,34 @@ class Mock {
         }
         authAdmin_1.authAdminApi.configureAuth(authConfig);
     }
-    get db() {
-        return database_1.db;
-    }
-    get deploy() {
-        return new index_1.Deployment();
-    }
     /**
      * returns a Mock object while also ensuring that the
      * Faker library has been asynchronously imported.
      */
-    static async prepare(
+    static async prepare(options = {}
     /**
      * allows publishing of raw data into the database as the databases
      * initial state or alternatively to assign a callback function which
      * will be executed when the Mock DB is "connecting" and allows the
      * DB to be setup via mocking.
      */
-    dataOrMock, authConfig = {
-        allowAnonymous: true,
-        allowEmailLogins: false,
-        allowEmailLinks: false,
-        allowPhoneLogins: false
-    }) {
-        const obj = new Mock(dataOrMock, authConfig);
+    ) {
+        const defaultAuthConfig = {
+            allowAnonymous: true,
+            allowEmailLogins: false,
+            allowEmailLinks: false,
+            allowPhoneLogins: false
+        };
+        const defaultDbConfig = {};
+        const obj = new Mock(options.db || defaultDbConfig, options.auth || defaultAuthConfig);
         await obj.importFakerLibrary();
         return obj;
+    }
+    get db() {
+        return database_1.db;
+    }
+    get deploy() {
+        return new index_1.Deployment();
     }
     /**
      * Update the mock DB with a raw JS object/hash
@@ -133,5 +135,5 @@ class Mock {
         return new index_1.Reference(dbPath);
     }
 }
-exports.default = Mock;
+exports.Mock = Mock;
 //# sourceMappingURL=mock.js.map

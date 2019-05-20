@@ -1,4 +1,4 @@
-export { default as Mock, SchemaCallback } from "./mock";
+export * from "./mock";
 export { default as SchemaHelper } from "./schema-helper";
 export { default as Reference } from "./reference";
 export { default as Query } from "./query";
@@ -10,6 +10,7 @@ export { reset as resetDatabase } from "./database";
 export { IDictionary } from "common-types";
 export { MockHelper } from "./MockHelper";
 export * from "./auth/index";
+export * from "./types";
 
 export {
   GenericEventHandler,

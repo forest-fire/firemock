@@ -1,7 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Mock, SchemaCallback } from "../src/index";
+import { Mock } from "../src/mock";
 
 const expect = chai.expect;
 

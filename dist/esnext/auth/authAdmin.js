@@ -3,6 +3,7 @@ let authConfig = {
     allowAnonymous: true
 };
 let ANONYMOUS_USER_ID = "123456";
+const authObservers = [];
 export const authAdminApi = {
     configureAuth(config) {
         authConfig = Object.assign({}, authConfig, config);
@@ -19,5 +20,11 @@ export const authAdminApi = {
     },
     getAnonymousUid() {
         return ANONYMOUS_USER_ID;
+    },
+    addAuthObserver(observer) {
+        authObservers.push(observer);
+    },
+    getAuthObservers() {
+        return authObservers;
     }
 };

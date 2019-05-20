@@ -36,9 +36,6 @@ export const notImplemented = {
     isSignInWithEmailLink() {
         throw createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
-    onAuthStateChanged() {
-        throw createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
     onIdTokenChanged() {
         throw createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },

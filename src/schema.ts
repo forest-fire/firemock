@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { IRelationship } from "./mock";
+import { IRelationship } from "./index";
 import Queue from "./queue";
 import SchemaHelper from "./schema-helper";
 import pluralize, { addException } from "./pluralize";

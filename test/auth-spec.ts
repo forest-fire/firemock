@@ -2,7 +2,7 @@
 import "mocha";
 import * as chai from "chai";
 import { length } from "./testing/helpers";
-import Mock, { SchemaCallback } from "../src/mock";
+import { Mock, SchemaCallback } from "../src";
 
 const expect = chai.expect;
 
@@ -32,5 +32,20 @@ describe("Firebase Auth →", () => {
     const auth = await m.auth();
     const user = await auth.signInAnonymously();
     expect(user.user.uid).to.equal(auth.getAnonymousUid());
+  });
+
+  it("signInWithEmail with valid email returns a valid user", async () => {
+    const m = await Mock.prepare({
+      auth: {
+        allowEmailLogins: true,
+        validEmailLogins: [{ email: "test@test.com", password: "foobar", verified: true }]
+      }
+    });
+    const auth = await m.auth();
+    const user = await auth.signInWithEmailAndPassword("test@test.com", "foobar");
+    expect(user.user.email)
+      .to.be.a("string")
+      .and.to.equal("test@test.com");
+    expect(user.user.emailVerified).to.equal(true);
   });
 });

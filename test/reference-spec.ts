@@ -2,7 +2,7 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import Mock, { SchemaCallback } from "../src/mock";
+import  {Mock, SchemaCallback } from "../src";
 import SchemaHelper from "../src/schema-helper";
 import { difference } from "lodash";
 import { reset } from "../src/database";
@@ -540,10 +540,12 @@ describe("Reference functions", () => {
 
     it("update() will update referenced path", async () => {
       const m = await Mock.prepare({
-        people: {
-          abcd: {
-            name: "Happy Jack",
-            age: 35
+        db: {
+          people: {
+            abcd: {
+              name: "Happy Jack",
+              age: 35
+            }
           }
         }
       });
@@ -560,10 +562,12 @@ describe("Reference functions", () => {
     it("multi-path updates are reconized and set correctly", async () => {
       const now = new Date().toISOString();
       const m = await Mock.prepare({
-        people: {
-          abcd: {
-            name: "Happy Jack",
-            age: 35
+        db: {
+          people: {
+            abcd: {
+              name: "Happy Jack",
+              age: 35
+            }
           }
         }
       });
@@ -581,13 +585,15 @@ describe("Reference functions", () => {
     it("multi-path 'updates' behaves destructively like 'set' operations", async () => {
       const now = new Date().toISOString();
       const m = await Mock.prepare({
-        people: {
-          abcd: {
-            name: "Happy Jack",
-            age: 35,
-            foo: {
-              bar: 1,
-              baz: 2
+        db: {
+          people: {
+            abcd: {
+              name: "Happy Jack",
+              age: 35,
+              foo: {
+                bar: 1,
+                baz: 2
+              }
             }
           }
         }
@@ -606,10 +612,12 @@ describe("Reference functions", () => {
 
     it("remove() will remove data at referenced path", async () => {
       const m = await Mock.prepare({
-        people: {
-          abcd: {
-            name: "Happy Jack",
-            age: 35
+        db: {
+          people: {
+            abcd: {
+              name: "Happy Jack",
+              age: 35
+            }
           }
         }
       });
