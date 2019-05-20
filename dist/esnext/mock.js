@@ -4,7 +4,7 @@ import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
 import { authAdminApi } from "./auth/authAdmin";
-import { FireMockError } from "./errors/FiremockError";
+import { FireMockError } from "./errors/FireMockError";
 export let faker;
 /* tslint:disable:max-classes-per-file */
 export class Mock {

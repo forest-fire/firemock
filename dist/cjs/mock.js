@@ -13,7 +13,7 @@ const util_1 = require("./util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
 const authAdmin_1 = require("./auth/authAdmin");
-const FiremockError_1 = require("./errors/FiremockError");
+const FireMockError_1 = require("./errors/FireMockError");
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(
@@ -105,7 +105,7 @@ class Mock {
      */
     getMockHelper(context) {
         if (!exports.faker && !exports.faker.address) {
-            throw new FiremockError_1.FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
+            throw new FireMockError_1.FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
         }
         return new MockHelper_1.MockHelper(context);
     }
@@ -127,7 +127,7 @@ class Mock {
     }
     generate() {
         if (!exports.faker && !exports.faker.address) {
-            throw new FiremockError_1.FireMockError(`The Faker library must be loaded before you can generate mocked data can be returned`, "firemock/faker-not-ready");
+            throw new FireMockError_1.FireMockError(`The Faker library must be loaded before you can generate mocked data can be returned`, "firemock/faker-not-ready");
         }
         return new index_1.Deployment().generate();
     }
