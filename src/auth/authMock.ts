@@ -12,7 +12,7 @@ import { completeUserCredential } from "./completeUserCredential";
 import { createError, Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { ActionCodeSettings, TwitterAuthProvider_Instance } from "@firebase/auth-types";
-import { FireMockError } from "../errors/FiremockError";
+import { FireMockError } from "../errors/FireMockError";
 import {
   checkIfEmailUserExists,
   validEmailUserPassword,

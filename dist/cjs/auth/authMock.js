@@ -5,7 +5,7 @@ const authAdmin_1 = require("./authAdmin");
 const completeUserCredential_1 = require("./completeUserCredential");
 const common_types_1 = require("common-types");
 const notImplemented_1 = require("./notImplemented");
-const FiremockError_1 = require("../errors/FiremockError");
+const FireMockError_1 = require("../errors/FireMockError");
 const authMockHelpers_1 = require("./authMockHelpers");
 exports.implemented = {
     app: {
@@ -47,10 +47,10 @@ exports.implemented = {
     async signInWithEmailAndPassword(email, password) {
         await util_1.networkDelay();
         if (!authMockHelpers_1.emailValidationAllowed()) {
-            throw new FiremockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
+            throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
         if (!authMockHelpers_1.checkIfEmailIsValidFormat(email)) {
-            throw new FiremockError_1.FireMockError(`invalid email: ${email}`, "auth/invalid-email");
+            throw new FireMockError_1.FireMockError(`invalid email: ${email}`, "auth/invalid-email");
         }
         const found = authAdmin_1.authAdminApi
             .getAuthConfig()
@@ -59,7 +59,7 @@ exports.implemented = {
             throw common_types_1.createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
         if (!authMockHelpers_1.validEmailUserPassword(email, found.password)) {
-            throw new FiremockError_1.FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
+            throw new FireMockError_1.FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {
             user: {
@@ -82,16 +82,16 @@ exports.implemented = {
     async createUserWithEmailAndPassword(email, password) {
         await util_1.networkDelay();
         if (!authMockHelpers_1.emailValidationAllowed()) {
-            throw new FiremockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
+            throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
         if (authMockHelpers_1.checkIfEmailUserExists(email)) {
-            throw new FiremockError_1.FireMockError(`"${email}" user already exists`, "auth/email-already-in-use");
+            throw new FireMockError_1.FireMockError(`"${email}" user already exists`, "auth/email-already-in-use");
         }
         if (authMockHelpers_1.checkIfEmailIsValidFormat(email)) {
-            throw new FiremockError_1.FireMockError(`"${email}" user already exists`, "auth/invalid-email");
+            throw new FireMockError_1.FireMockError(`"${email}" user already exists`, "auth/invalid-email");
         }
         if (!authMockHelpers_1.validEmailUserPassword(email, password)) {
-            throw new FiremockError_1.FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+            throw new FireMockError_1.FireMockError(`invalid password for "${email}" user`, "firemock/denied");
         }
         const partial = {
             user: {

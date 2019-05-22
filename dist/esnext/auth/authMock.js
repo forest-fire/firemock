@@ -3,7 +3,7 @@ import { authAdminApi } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 import { notImplemented } from "./notImplemented";
-import { FireMockError } from "../errors/FiremockError";
+import { FireMockError } from "../errors/FireMockError";
 import { checkIfEmailUserExists, validEmailUserPassword, emailVerified, userUid, emailValidationAllowed, loggedIn, loggedOut, checkIfEmailIsValidFormat } from "./authMockHelpers";
 export const implemented = {
     app: {
