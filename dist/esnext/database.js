@@ -321,3 +321,4 @@ export function reset() {
     removeAllListeners();
     clearDatabase();
 }
+//# sourceMappingURL=database.js.map

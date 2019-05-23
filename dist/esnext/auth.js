@@ -12,3 +12,4 @@ export const auth = async () => {
 };
 // tslint:disable-next-line:no-object-literal-type-assertion
 export const authApi = Object.assign({}, authMockApi, authAdminApi);
+//# sourceMappingURL=auth.js.map

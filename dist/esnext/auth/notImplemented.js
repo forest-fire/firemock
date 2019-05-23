@@ -73,3 +73,4 @@ export const notImplemented = {
         throw createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     }
 };
+//# sourceMappingURL=notImplemented.js.map

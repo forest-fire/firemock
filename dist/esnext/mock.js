@@ -127,3 +127,4 @@ export class Mock {
         return new Reference(dbPath);
     }
 }
+//# sourceMappingURL=mock.js.map

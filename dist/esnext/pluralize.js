@@ -34,3 +34,4 @@ export const addException = (singular, plural) => {
 export const singularize = (plural) => {
     //
 };
+//# sourceMappingURL=pluralize.js.map

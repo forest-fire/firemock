@@ -6,3 +6,4 @@ export class FireMockError extends Error {
         this.code = name.split("/").pop();
     }
 }
+//# sourceMappingURL=FireMockError.js.map

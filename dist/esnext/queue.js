@@ -153,3 +153,4 @@ export default class Queue {
     }
 }
 Queue._queues = {};
+//# sourceMappingURL=queue.js.map

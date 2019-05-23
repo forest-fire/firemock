@@ -242,3 +242,4 @@ export default class Query {
         return sort;
     }
 }
+//# sourceMappingURL=query.js.map

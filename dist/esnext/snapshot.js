@@ -72,3 +72,4 @@ export default class SnapShot {
         return this;
     }
 }
+//# sourceMappingURL=snapshot.js.map

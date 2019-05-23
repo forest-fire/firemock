@@ -87,3 +87,4 @@ export default class Schema {
         return new Schema(schema);
     }
 }
+//# sourceMappingURL=schema.js.map

@@ -1,0 +1,10 @@
+import { User } from "@firebase/auth-types";
+export declare function checkIfEmailUserExists(email: string): boolean;
+export declare function checkIfEmailIsValidFormat(email: string): boolean;
+export declare function validEmailUserPassword(email: string, password: string): boolean;
+export declare function emailVerified(email: string): boolean;
+export declare function userUid(email: string): string;
+export declare function createUid(): string;
+export declare function emailValidationAllowed(): boolean;
+export declare function loggedIn(user: User): void;
+export declare function loggedOut(): void;

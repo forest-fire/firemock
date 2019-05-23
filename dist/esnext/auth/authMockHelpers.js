@@ -33,3 +33,4 @@ export function loggedIn(user) {
 export function loggedOut() {
     authAdminApi.getAuthObservers().map(o => o(null));
 }
+//# sourceMappingURL=authMockHelpers.js.map

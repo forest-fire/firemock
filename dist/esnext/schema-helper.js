@@ -7,3 +7,4 @@ export default class SchemaHelper {
         return faker;
     }
 }
+//# sourceMappingURL=schema-helper.js.map

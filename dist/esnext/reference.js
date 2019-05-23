@@ -91,3 +91,4 @@ export default class Reference extends Query {
             : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
     }
 }
+//# sourceMappingURL=reference.js.map

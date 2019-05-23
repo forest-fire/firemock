@@ -148,3 +148,4 @@ export function stripLeadingDot(str) {
 export function removeDots(str) {
     return str ? str.replace(/\./g, "") : undefined;
 }
+//# sourceMappingURL=util.js.map
