@@ -4,13 +4,15 @@
     "module": "esnext",
     "moduleResolution": "node",
     "target": "es2017",
+    "sourceMap": true,
     "noImplicitAny": true,
     "outDir": "./dist/esnext",
     "preserveConstEnums": true,
     "removeComments": false,
     "typeRoots": ["./node_modules/@types"],
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
   },
   "include": ["src/**/*.ts"]
 }

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "module": "commonjs",
     "target": "es2017",
     "lib": ["es2017", "esnext.asynciterable", "es2015.reflect"],
