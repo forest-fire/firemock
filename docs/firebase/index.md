@@ -1,6 +1,4 @@
-###### &nbsp; {#top}
-![header](images/firemock-header.jpg) 
-# Firebase API 
+# Firebase API
 
 Where the Deployment API was primarily concerned with _seeding_ you mock database with a proper set of test data, the **Firebase API** focuses on _interacting_ with your data exactly as you're used to when using a Firebase backend.
 
@@ -8,11 +6,11 @@ Where the Deployment API was primarily concerned with _seeding_ you mock databas
 
 Here's a pictorial diagram of the interfaces that **Firebase** _and_ **firemock** expose:
 
-![api](images/firebase-api.jpg)
+![api](../images/firebase-api.jpg)
 
-## Querying Firebase {#querying}
+## Querying Firebase
 
-If you know how to query Firebase, then you know how to query the **firemock** API. In a "realtime database" like Firebase we use either the traditional "request/reply" interaction used in most other databases or we can instead have the database notify us of changes we are interested in real time using an event model. In this section we'll cover the more standard interaction model but we'll get to event-driven interaction in the [real-time](#realtime) section later.
+If you know how to query Firebase, then you know how to query the **firemock** API. In a "realtime database" like Firebase we use either the traditional "request/reply" interaction used in most other databases or we can instead have the database notify us of changes we are interested in real time using an event model. In this section we'll cover the more standard interaction model but we'll get to event-driven interaction in the [real-time](#real-time-events) section later.
 
 Here's a simple example :
 
@@ -61,7 +59,7 @@ it('appointments in the next week should exist', () => {
 
 So now you start to see that filters like startAt, endAt, and equalTo are usable in exactly the same way you use them when going back to the Firebase DB.
 
-## Writing to the Database {#writing}
+## Writing to the Database
 
 When we talked about the _Deployment API_, we were writing to the mock database but in an effort to "prepare" the starting state of the database. But in many of desired mock tests we will want to use Firebase API endpoints to write to the mock database. This includes: `set()`, `update()`, `push()`, and `remove()`. A simple example of this might fall along these lines:
 
@@ -92,7 +90,7 @@ it('pushing a new customer works', async () => {
 
 This test isn't the best but hopefully it illustrates the use of the write-based `push` API used to push a new customer record into the mock database.
 
-## Real-time Events {#realtime}
+## Real-time Events
 
 In the _querying_ section above we saw a traditional interaction between code and database ... the code queried for something in the database with the `once()` method and got back a result as a one time data snapshot. That's the way most databases work but as we know Firebase is different.
 

@@ -1,20 +1,17 @@
-###### &nbsp; {#top}
-![header](images/firemock-header.jpg)
-
 # Deployment API
 
-The Deployment API has been created to help seed the database with good mock data for your tests. There are three stages to deployment:
+The Deployment API has been created to help seed the database with good mock data for your tests. There are three steps to deployment:
 
-1. Defining Schemas
-2. Queuing Schemas for Deployment
-3. Generating Mock Data
+1. **Defining** Schemas
+2. **Queuing** Schemas for Deployment
+3. **Generating** Mock Data
 
-The last step is a one-liner so we will cover these topics in the following docs:
+Generation is a _one-liner_ but we will cover the first two topics in the following docs:
 
-- [Defining Schemas](#schemas)
+- [Defining Schemas](#defining-schemas)
 - [Generating Mock Data](#generation)
 
-## Defining Schemas {#schemas}
+## Defining Schemas
 
 If you want to seed your mocked database with reasonable mock data but not hand code it all in, you'll want to take advantage of "schemas" in **firemock**. In a nutshell, a schema is a way of describing a Javascript hash/dictionary which leverages the popular [faker](https://github.com/marak/Faker.js/) and [chance](http://chancejs.com/) libraries.
 
@@ -80,7 +77,7 @@ const personMock: SchemaCallback<IPerson> = (h) => () => ({
 
 Now if you add a property that doesn't belong, miss one that is required, put in as the wrong type, etc. ... you'll be immediately told that your generator callback is _not_ in line with the interface.
 
-## Generating Mock Data {#generation}
+## Generating Mock Data
 
 Now that we understand how to define _schemas_ we should turn our attention into leveraging these schemas to create data in our mock database. This is where _queuing_ and _generation_ comes in.
 
