@@ -3,9 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// tslint:disable:no-implicit-dependencies
+const common_types_1 = require("common-types");
 const lodash_set_1 = __importDefault(require("lodash.set"));
 const lodash_get_1 = __importDefault(require("lodash.get"));
 const firebase_key_1 = require("firebase-key");
+const fast_equals_1 = require("fast-equals");
+const fast_copy_1 = __importDefault(require("fast-copy"));
 const util_1 = require("./util");
 const index_1 = require("./index");
 const auth_1 = require("./auth");
@@ -23,21 +27,40 @@ async function auth() {
     return auth_1.auth();
 }
 exports.auth = auth;
+function getDb(path) {
+    return lodash_get_1.default(exports.db, dotify(path));
+}
+exports.getDb = getDb;
 /**
  * **setDB**
  *
  * sets the database at a given path
  */
-function setDB(path, value) {
+function setDB(path, value, silent = false) {
     const dotPath = util_1.join(path);
-    const oldValue = lodash_get_1.default(exports.db, dotPath);
+    const oldRef = lodash_get_1.default(exports.db, dotPath);
+    const oldValue = typeof oldRef === "object" ? Object.assign({}, oldRef, {}) : oldRef;
+    const isReference = ["object", "array"].includes(typeof value);
+    const dbSnapshot = fast_copy_1.default(Object.assign({}, exports.db));
+    // ignore if no change
+    if ((isReference && fast_equals_1.deepEqual(oldValue, value)) ||
+        (!isReference && oldValue === value)) {
+        return;
+    }
     if (value === null) {
-        removeDB(dotPath);
+        const parentValue = lodash_get_1.default(exports.db, util_1.getParent(dotPath));
+        if (typeof parentValue === "object") {
+            delete parentValue[util_1.getKey(dotPath)];
+            lodash_set_1.default(exports.db, util_1.getParent(dotPath), parentValue);
+        }
+        else {
+            lodash_set_1.default(exports.db, dotPath, undefined);
+        }
     }
     else {
         lodash_set_1.default(exports.db, dotPath, value);
     }
-    notify(dotPath, value, oldValue);
+    notify({ [dotify(path)]: value }, dbSnapshot);
 }
 exports.setDB = setDB;
 /**
@@ -48,9 +71,19 @@ exports.setDB = setDB;
 function updateDB(path, value) {
     const dotPath = util_1.join(path);
     const oldValue = lodash_get_1.default(exports.db, dotPath);
+    let changed = true;
+    if (typeof value === "object" &&
+        Object.keys(value).every(k => (oldValue ? oldValue[k] : null) === value[k])) {
+        changed = false;
+    }
+    if (typeof value !== "object" && value === oldValue) {
+        changed = false;
+    }
+    if (!changed) {
+        return;
+    }
     const newValue = typeof oldValue === "object" ? Object.assign({}, oldValue, value) : value;
-    lodash_set_1.default(exports.db, dotPath, newValue);
-    notify(dotPath, newValue, oldValue);
+    setDB(dotPath, newValue);
 }
 exports.updateDB = updateDB;
 /**
@@ -58,23 +91,88 @@ exports.updateDB = updateDB;
  *
  * Emulates a Firebase multi-path update. The keys of the dictionary
  * are _paths_ in the DB, the value is the value to set at that path.
+ *
+ * **Note:** dispatch notifations must not be done at _path_ level but
+ * instead grouped up by _watcher_ level.
  */
 function multiPathUpdateDB(data) {
-    Object.keys(data).map(key => setDB(key, data[key]));
+    const snapshot = fast_copy_1.default(exports.db);
+    // set DB to new values
+    Object.keys(data).map(key => {
+        const value = data[key];
+        const path = key;
+        if (lodash_get_1.default(exports.db, path) !== value) {
+            // silent sets
+            setDB(path, value, true);
+        }
+    });
+    notify(data, snapshot);
 }
 exports.multiPathUpdateDB = multiPathUpdateDB;
+const dotify = (path) => {
+    const dotPath = path.replace(/[\\\/]/g, ".");
+    return dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath;
+};
+const slashify = (path) => {
+    const slashPath = path.replace(/\./g, "/");
+    return slashPath.slice(0, 1) === "/" ? slashPath.slice(1) : slashPath;
+};
+/**
+ * Will aggregate the data passed in to dictionary objects of paths
+ * which fire at the root of the listeners/watchers that are currently
+ * on the database.
+ *
+ * **Note:** if there was NO actual change between old and new values
+ * there will be no notification sent
+ */
+function groupEventsByWatcher(data, dbSnapshot) {
+    const getFromSnapshot = (path) => lodash_get_1.default(dbSnapshot, dotify(path));
+    const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path);
+    const eventPaths = Object.keys(data)
+        .filter(ignoreUnchanged)
+        .map(i => dotify(i));
+    const response = [];
+    const relativePath = (full, partial) => {
+        return full.replace(partial, "");
+    };
+    const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
+    const justValue = (obj) => (justKey(obj) ? obj[justKey(obj)] : null);
+    getListeners().forEach(l => {
+        const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
+        const paths = [];
+        const changeObject = eventPathsUnderListener.reduce((changes, path) => {
+            paths.push(path);
+            if (l.path === path) {
+                changes = data[path];
+            }
+            else {
+                lodash_set_1.default(changes, dotify(relativePath(path, l.path)), data[path]);
+            }
+            return changes;
+        }, {});
+        const key = l.eventType === "value"
+            ? changeObject
+                ? justKey(changeObject)
+                : l.path.split(".").pop()
+            : dotify(common_types_1.pathJoin(slashify(l.path), justKey(changeObject)));
+        response.push({
+            listenerId: l.id,
+            listenerPath: l.path,
+            listenerEvent: l.eventType,
+            callback: l.callback,
+            eventPaths: paths,
+            key,
+            value: justValue(changeObject),
+            priorValue: l.eventType === "value" ? getDb(l.path) : justValue(getDb(l.path))
+        });
+    });
+    return response;
+}
 function removeDB(path) {
-    const dotPath = util_1.join(path);
-    const oldValue = lodash_get_1.default(exports.db, dotPath);
-    const parentValue = lodash_get_1.default(exports.db, util_1.getParent(dotPath));
-    if (typeof parentValue === "object") {
-        delete parentValue[util_1.getKey(dotPath)];
-        lodash_set_1.default(exports.db, util_1.getParent(dotPath), parentValue);
+    if (!getDb(path)) {
+        return;
     }
-    else {
-        lodash_set_1.default(exports.db, dotPath, undefined);
-    }
-    notify(dotPath, undefined, oldValue);
+    setDB(path, null);
 }
 exports.removeDB = removeDB;
 /**
@@ -106,6 +204,9 @@ exports.pushDB = pushDB;
  */
 function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
     _listeners.push({
+        id: Math.random()
+            .toString(36)
+            .substr(2, 10),
         path: util_1.join(path),
         eventType,
         callback,
@@ -215,69 +316,62 @@ exports.listenerPaths = listenerPaths;
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
 function getListeners(lookFor) {
-    if (lookFor && !Array.isArray(lookFor)) {
-        lookFor =
-            lookFor === "child"
-                ? ["child_added", "child_changed", "child_removed", "child_moved"]
-                : [lookFor];
-    }
+    const childEvents = ["child_added", "child_changed", "child_removed", "child_moved"];
+    const allEvents = childEvents.concat(["value"]);
+    const events = !lookFor ? allEvents : lookFor === "child" ? childEvents : lookFor;
+    return _listeners.filter(l => events.includes(l.eventType));
 }
 exports.getListeners = getListeners;
+function keyDidNotPreviouslyExist(e, dbSnapshot) {
+    return lodash_get_1.default(dbSnapshot, e.key) === undefined ? true : false;
+}
 /**
  * **notify**
  *
- * A private function used to notify all appropriate listeners when changes
- * in state happen on a given path in the database.
- *
- * @param path the path where the change was made
- * @param newValue the new value
- * @param oldValue the prior value
+ * Based on a dictionary of paths/values it reduces this to events to
+ * send to zero or more listeners.
  */
-function notify(path, newValue, oldValue) {
-    if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
-        findValueListeners(path).map(l => {
-            let result = {};
-            const listeningRoot = lodash_get_1.default(exports.db, l.path);
-            if (typeof listeningRoot === "object" && !newValue) {
-                result = lodash_get_1.default(exports.db, l.path);
-                delete result[util_1.getKey(path)];
-            }
-            else {
-                lodash_set_1.default(result, util_1.pathDiff(path, l.path), newValue);
-            }
-            return l.callback(new index_1.SnapShot(util_1.join(l.path), result));
-        });
-        // get relevant listeners and whether path is
-        // a direct decendant (aka, the action is a removal or addition)
-        const decendants = findChildListeners(path);
-        const { parent, key: changeKey } = util_1.keyAndParent(path);
-        decendants.forEach(decendant => {
-            if (newValue === undefined &&
-                decendant.changeIsAtRoot &&
-                decendant.eventType === "child_removed") {
-                // removal of child
-                decendant.callback(new index_1.SnapShot(changeKey, oldValue));
-            }
-            if (oldValue === undefined &&
-                decendant.changeIsAtRoot &&
-                decendant.eventType === "child_added") {
-                // addition of child
-                decendant.callback(new index_1.SnapShot(changeKey, newValue), null);
-            }
-            const decendantPath = decendant.path + "." + decendant.id;
-            if (decendant.eventType === "child_changed") {
-                // change took place somewhere in decendant tree
-                // therefore "newValue" may be deeper in the structure
-                if (decendant.changeIsAtRoot) {
-                    decendant.callback(new index_1.SnapShot(changeKey, newValue), priorKey(decendant.path, decendant.id));
+function notify(data, dbSnapshot) {
+    const events = groupEventsByWatcher(data, dbSnapshot);
+    events.forEach(e => {
+        switch (e.listenerEvent) {
+            case "child_removed":
+                if (e.value === null) {
+                    e.callback(new index_1.SnapShot(e.key, e.priorValue));
+                }
+                return;
+            case "child_added":
+                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+                    e.callback(new index_1.SnapShot(e.key, e.value));
+                }
+                return;
+            case "child_changed":
+                if (e.value !== null) {
+                    e.callback(new index_1.SnapShot(e.key, e.value));
+                }
+                return;
+            case "child_moved":
+                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+                    // TODO: if we implement sorting then add the previousKey value
+                    e.callback(new index_1.SnapShot(e.key, e.value));
+                }
+                return;
+            case "value":
+                const snapKey = new index_1.SnapShot(e.listenerPath, e.value).key;
+                if (snapKey === e.key) {
+                    // root set
+                    e.callback(new index_1.SnapShot(e.listenerPath, e.value === null ? undefined : { [e.key]: e.value }));
                 }
                 else {
-                    // TODO: if the 'id' looks like a number instead of a string weird things ensue.
-                    decendant.callback(new index_1.SnapShot(decendant.id, lodash_get_1.default(exports.db, decendantPath)), priorKey(decendant.path, decendant.id));
+                    // property set
+                    const value = e.value === null
+                        ? getDb(e.listenerPath)
+                        : Object.assign({}, getDb(e.listenerPath), { [e.key]: e.value });
+                    e.callback(new index_1.SnapShot(e.listenerPath, value));
                 }
-            }
-        });
-    }
+                return;
+        }
+    });
 }
 function priorKey(path, id) {
     let previous;

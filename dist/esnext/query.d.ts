@@ -21,6 +21,9 @@ export interface IOrdering {
     value: any;
 }
 export interface IListener {
+    /** random string */
+    id: string;
+    /** path in db */
     path: string;
     eventType: EventType;
     callback: (a: DataSnapshot | null, b?: string) => any;

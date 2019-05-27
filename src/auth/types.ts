@@ -56,4 +56,3 @@ export interface IMockAuthConfig {
   /** allow logins via a code sent via SMS */
   allowPhoneLogins?: boolean;
 }
-

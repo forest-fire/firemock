@@ -1,14 +1,10 @@
-###### &nbsp; {#top}
-
-![header](images/firemock-header.jpg)
-
 # Other Features
 
-### Firebase IDs {#firebase-ids}
+## Firebase IDs
 
 Rather than putting in some random push-id string we use the very useful `firebase-key` library to create _time appropriate_ id's which very closely resemble the ID you'd get with the Firebase DB.
 
-### Initializing Database State {#initialize-db}
+## Initializing Database State
 
 By default your mock database will start out empty and you're expected to create, queue, and generate schemas to get a good test data state. However, sometimes it's useful to start the database with a known state and that is possible when using the constructor of the Mock class:
 
@@ -34,7 +30,7 @@ m.updateDB({
 });
 ```
 
-### Network Delay {#network}
+## Network Delay
 
 By default the Firebase events return with a delay of 5ms but this number can be set by adjusting the `delay()` method:
 
@@ -50,7 +46,7 @@ From this point forward all requests will have a 200ms delay. You can also confi
 m.setDelay([10, 100]);
 ```
 
-### Direct views into database {#view-db}
+## Direct views into database
 
 Querying as described above is the right way to test code since that's the way that you'll code against the actual Firebase DB but occationally it's useful to just look into the database and you can do this by utilizing the `db` property off of Mock class:
 
@@ -66,7 +62,7 @@ console.log(m.db.cats);
 
 The logging statement at the bottom will print out a JS hash of cats (who doesn't want that).
 
-### Resetting Mock Database {#reset}
+## Resetting Mock Database
 
 The mock database is a singleton which will continue to grow in records -- and listeners -- for the duration of your testing run. In many cases you may want to reset the database (this clears data and all listeners). Let's say you instead wanted each test to run with a fresh database, you could achieve that with:
 
@@ -82,7 +78,7 @@ describe("my tests", () => {
 });
 ```
 
-### Advanced Type Goodness
+## Advanced Type Goodness
 
 Because this library is fully written in Typescript you can explore the API with the super useful intellisense popups from the comfort of your favorite editor. Stop pretending this isn't exciting. Ok, but beyond that there's an attempt to provide generic types throughout so that you can provide additional type safety if you wish to. For example, you can specify your typing for a schema like so:
 
