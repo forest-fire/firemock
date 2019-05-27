@@ -11,7 +11,7 @@ import { stdout, stderr } from "test-console";
 // tslint:disable-next-line
 interface Console {
   _restored: boolean;
-  Console: typeof NodeJS.Console;
+  // Console: typeof NodeJS.Console;
   assert(value: any, message?: string, ...optionalParams: any[]): void;
   dir(
     obj: any,

@@ -4,6 +4,7 @@ import set from "lodash.set";
 import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
+import copy from "fast-copy";
 import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
 import { SnapShot } from "./index";
 import { auth as mockedAuth } from "./auth";
@@ -19,7 +20,7 @@ export async function auth() {
     return mockedAuth();
 }
 export function getDb(path) {
-    return get(db, path);
+    return get(db, dotify(path));
 }
 /**
  * **setDB**
@@ -31,15 +32,12 @@ export function setDB(path, value, silent = false) {
     const oldRef = get(db, dotPath);
     const oldValue = typeof oldRef === "object" ? Object.assign({}, oldRef, {}) : oldRef;
     const isReference = ["object", "array"].includes(typeof value);
+    const dbSnapshot = copy(Object.assign({}, db));
     // ignore if no change
     if ((isReference && deepEqual(oldValue, value)) ||
         (!isReference && oldValue === value)) {
         return;
     }
-    // run notify first because otherwise notify
-    // will not be able to do change detection
-    // at the watcher level
-    notify({ [path]: value });
     if (value === null) {
         const parentValue = get(db, getParent(dotPath));
         if (typeof parentValue === "object") {
@@ -53,6 +51,7 @@ export function setDB(path, value, silent = false) {
     else {
         set(db, dotPath, value);
     }
+    notify({ [dotify(path)]: value }, dbSnapshot);
 }
 /**
  * **updateDB**
@@ -86,9 +85,7 @@ export function updateDB(path, value) {
  * instead grouped up by _watcher_ level.
  */
 export function multiPathUpdateDB(data) {
-    // notify at group level
-    // we're doing this first so no delta/change data is lost
-    notify(data);
+    const snapshot = copy(db);
     // set DB to new values
     Object.keys(data).map(key => {
         const value = data[key];
@@ -98,10 +95,15 @@ export function multiPathUpdateDB(data) {
             setDB(path, value, true);
         }
     });
+    notify(data, snapshot);
 }
 const dotify = (path) => {
     const dotPath = path.replace(/[\\\/]/g, ".");
     return dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath;
+};
+const slashify = (path) => {
+    const slashPath = path.replace(/\./g, "/");
+    return slashPath.slice(0, 1) === "/" ? slashPath.slice(1) : slashPath;
 };
 /**
  * Will aggregate the data passed in to dictionary objects of paths
@@ -111,9 +113,12 @@ const dotify = (path) => {
  * **Note:** if there was NO actual change between old and new values
  * there will be no notification sent
  */
-function groupEventsByWatcher(data) {
-    const ignoreUnchanged = (path) => data[path] !== getDb(path);
-    const eventPaths = Object.keys(data).filter(ignoreUnchanged);
+function groupEventsByWatcher(data, dbSnapshot) {
+    const getFromSnapshot = (path) => get(dbSnapshot, dotify(path));
+    const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path);
+    const eventPaths = Object.keys(data)
+        .filter(ignoreUnchanged)
+        .map(i => dotify(i));
     const response = [];
     const relativePath = (full, partial) => {
         return full.replace(partial, "");
@@ -133,21 +138,28 @@ function groupEventsByWatcher(data) {
             }
             return changes;
         }, {});
-        console.log(l.path);
+        const key = l.eventType === "value"
+            ? changeObject
+                ? justKey(changeObject)
+                : l.path.split(".").pop()
+            : dotify(pathJoin(slashify(l.path), justKey(changeObject)));
         response.push({
             listenerId: l.id,
             listenerPath: l.path,
             listenerEvent: l.eventType,
             callback: l.callback,
             eventPaths: paths,
-            key: dotify(pathJoin(l.path, justKey(changeObject))),
+            key,
             value: justValue(changeObject),
-            priorValue: justValue(getDb(l.path))
+            priorValue: l.eventType === "value" ? getDb(l.path) : justValue(getDb(l.path))
         });
     });
     return response;
 }
 export function removeDB(path) {
+    if (!getDb(path)) {
+        return;
+    }
     setDB(path, null);
 }
 /**
@@ -290,8 +302,8 @@ export function getListeners(lookFor) {
     const events = !lookFor ? allEvents : lookFor === "child" ? childEvents : lookFor;
     return _listeners.filter(l => events.includes(l.eventType));
 }
-function keyDidNotPreviouslyExist(e) {
-    return getDb(e.key) === undefined ? true : false;
+function keyDidNotPreviouslyExist(e, dbSnapshot) {
+    return get(dbSnapshot, e.key) === undefined ? true : false;
 }
 /**
  * **notify**
@@ -299,8 +311,8 @@ function keyDidNotPreviouslyExist(e) {
  * Based on a dictionary of paths/values it reduces this to events to
  * send to zero or more listeners.
  */
-function notify(data) {
-    const events = groupEventsByWatcher(data);
+function notify(data, dbSnapshot) {
+    const events = groupEventsByWatcher(data, dbSnapshot);
     events.forEach(e => {
         switch (e.listenerEvent) {
             case "child_removed":
@@ -309,7 +321,7 @@ function notify(data) {
                 }
                 return;
             case "child_added":
-                if (e.value !== null && keyDidNotPreviouslyExist(e)) {
+                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
                     e.callback(new SnapShot(e.key, e.value));
                 }
                 return;
@@ -319,13 +331,24 @@ function notify(data) {
                 }
                 return;
             case "child_moved":
-                if (e.value !== null && keyDidNotPreviouslyExist(e)) {
+                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
                     // TODO: if we implement sorting then add the previousKey value
                     e.callback(new SnapShot(e.key, e.value));
                 }
                 return;
             case "value":
-                e.callback(new SnapShot(e.key, e.value));
+                const snapKey = new SnapShot(e.listenerPath, e.value).key;
+                if (snapKey === e.key) {
+                    // root set
+                    e.callback(new SnapShot(e.listenerPath, e.value === null ? undefined : { [e.key]: e.value }));
+                }
+                else {
+                    // property set
+                    const value = e.value === null
+                        ? getDb(e.listenerPath)
+                        : Object.assign({}, getDb(e.listenerPath), { [e.key]: e.value });
+                    e.callback(new SnapShot(e.listenerPath, value));
+                }
                 return;
         }
     });

@@ -2,7 +2,7 @@
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import set from "lodash.set";
-import { Mock, SchemaCallback } from "../src";
+import { Mock, SchemaCallback, IFirebaseEventHandler } from "../src";
 import {
   db,
   clearDatabase,
@@ -21,6 +21,7 @@ import {
 } from "../src/database";
 import { GenericEventHandler, HandleValueEvent } from "../src/query";
 import "mocha";
+import { wait } from "common-types";
 
 const expect = chai.expect;
 
@@ -319,32 +320,33 @@ describe("Database", () => {
     it('"value" responds to REMOVED child', async () => {
       reset();
       const m = await Mock.prepare();
-      return new Promise(resolve => {
-        m.addSchema("person", personMock);
-        m.queueSchema("person", 10);
-        m.generate();
-        m.ref("/people")
-          .once("value")
-          .then(people => {
-            const firstKey = helpers.firstKey(people.val());
-            const callback: HandleValueEvent = snap => {
-              const list = snap.val();
-              expect(snap.numChildren()).to.equal(9);
-              expect(Object.keys(list)).to.not.include(firstKey);
-              resolve();
-            };
-            addListener("/people", "value", callback);
-            expect(listenerCount()).to.equal(1);
-            removeDB(`/people/${firstKey}`);
-          });
-      });
-    });
+      m.addSchema("person", personMock);
+      m.queueSchema("person", 10);
+      m.generate();
 
+      const people = (await m.ref("/people").once("value")).val();
+      expect(Object.keys(people)).to.have.lengthOf(10);
+      const firstKey = helpers.firstKey(people);
+      const callback: IFirebaseEventHandler = snap => {
+        const list = snap.val();
+        expect(snap.numChildren()).to.equal(9);
+        expect(Object.keys(list)).to.not.include(firstKey);
+      };
+      addListener("/people", "value", callback);
+      expect(listenerCount()).to.equal(1);
+      removeDB(`/people/${firstKey}`);
+      const andThen = (await m.ref("/people").once("value")).val();
+      expect(Object.keys(andThen)).to.have.lengthOf(9);
+      expect(Object.keys(andThen)).to.not.include(firstKey);
+    });
+  });
+
+  describe("Other", () => {
     it('"value" responds to scalar value set', done => {
       reset();
-      const callback: HandleValueEvent = snap => {
+      const callback: IFirebaseEventHandler = snap => {
         const scalar = snap.val();
-        expect(scalar).to.not.equal(53);
+        expect(scalar).to.equal(53);
         done();
       };
       addListener("/scalar", "value", callback);
@@ -435,7 +437,7 @@ describe("Database", () => {
     it('"child_removed" ignores removal of non-existing child', done => {
       reset();
       const callback: HandleValueEvent = snap => {
-        done("Should NOT have called callback!");
+        done(`Should NOT have called callback! [ ${snap.key}, ${snap.val()} ]`);
       };
       addListener("/people", "child_removed", callback);
       removeDB("people.abcdefg");
@@ -470,12 +472,13 @@ describe("Database", () => {
         name: "Chris Chisty",
         age: 100
       });
+
       const callback: HandleValueEvent = snap => {
         expect(db.people).to.be.an("object");
         expect(db.people).to.not.have.key("abcd");
         done();
       };
-      addListener("/people", "child_changed", callback);
+      addListener("/people", "child_removed", callback);
       removeDB(`/people.abcd`);
     });
   });
