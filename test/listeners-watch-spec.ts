@@ -2,9 +2,9 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Query } from "../src";
+import { Query, SnapShot } from "../src";
 import { DataSnapshot } from "@firebase/database-types";
-import { updateDB, removeDB, pushDB, setDB } from "../src/database";
+import { updateDB, removeDB, pushDB, setDB, getDb } from "../src/database";
 
 const expect = chai.expect;
 
@@ -14,7 +14,6 @@ describe("Listener events ->", () => {
     const events = [];
     const cb = (snap: DataSnapshot, value: any) => {
       events.push({ snap: snap.val(), value });
-      console.log("event", snap.val(), value);
     };
     queryRef.on("value", cb);
     updateDB("userProfile/1234/name", "Bob Marley");
@@ -32,41 +31,58 @@ describe("Listener events ->", () => {
     expect(events[3].snap.name).to.equal("Bob Marley");
   });
 
-  it('listening on "on_child" events', async () => {
+  it.only('listening on "on_child" events', async () => {
     const queryRef = new Query("userProfile", 10);
     let events = [];
-    const cb = (eventType: string) => (snap: DataSnapshot, value: any) => {
-      events.push({ snap: snap.val(), value, eventType });
+    const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
+      events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
     };
-    queryRef.on("child_added", cb("child_added"));
+    const userProfileListener = queryRef.on("child_added", cb("child_added"));
+    queryRef.on("child_moved", cb("child_moved"));
     queryRef.on("child_changed", cb("child_changed"));
     queryRef.on("child_removed", cb("child_removed"));
 
     updateDB("userProfile/abcd/name", "Bob Marley");
+    expect(events.map(e => e.eventType)).includes("child_added");
     expect(events.map(e => e.eventType)).includes("child_changed");
-    expect(events.map(e => e.eventType)).not.includes("child_added");
+    expect(events.map(e => e.eventType)).not.includes("child_updated");
+    expect(events.map(e => e.eventType)).includes("child_moved");
     events = [];
+
     updateDB("userProfile/p-tosh", { name: "Peter Tosh" });
-    expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_removed");
+    expect(events.map(e => e.eventType)).includes("child_moved");
     events = [];
+
     pushDB("userProfile", { "jane-doe": { name: "Jane Doe" } });
-    expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_removed");
+    expect(events.map(e => e.eventType)).includes("child_moved");
     events = [];
+
     setDB("userProfile/jjohnson", { name: "Jack Johnson", age: 45 });
-    expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_removed");
+    expect(events.map(e => e.eventType)).includes("child_moved");
     events = [];
     updateDB("userProfile/jjohnson/age", 99);
-    expect(events.map(e => e.eventType)).includes("child_changed");
+
     expect(events.map(e => e.eventType)).not.includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_removed");
+    expect(events.map(e => e.eventType)).not.includes("child_moved");
     events = [];
+
     removeDB("userProfile/p-tosh");
-    expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).includes("child_removed");
+    expect(events.map(e => e.eventType)).not.includes("child_changed");
     expect(events.map(e => e.eventType)).not.includes("child_added");
     events = [];
+
     pushDB("userProfile", { name: "Chris Christy" });
     expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).includes("child_added");

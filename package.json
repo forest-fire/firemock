@@ -38,6 +38,7 @@
     "common-types": "^1.10.26",
     "email-validator": "^2.0.4",
     "faker": "^4.1.0",
+    "fast-equals": "^2.0.0",
     "firebase-key": "^2.0.2",
     "lodash.first": "^3.0.0",
     "lodash.get": "^4.4.2",
@@ -58,7 +59,6 @@
     "@types/node": "^8.0.0",
     "@types/rimraf": "^0.0.28",
     "@types/stack-trace": "^0.0.29",
-    "vuepress": "^1.0.0-alpha.48",
     "@vuepress/plugin-back-to-top": "^1.0.0-alpha.48",
     "@vuepress/plugin-last-updated": "^1.0.0-alpha.48",
     "@vuepress/plugin-medium-zoom": "^1.0.0-alpha.48",
@@ -74,7 +74,8 @@
     "ts-node": "^8.1.1",
     "tslint": "^5.16.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "vuepress": "^1.0.0-alpha.48"
   },
   "engines": {
     "node": ">=8.0.0"

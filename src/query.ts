@@ -33,6 +33,9 @@ export interface IOrdering {
 }
 
 export interface IListener {
+  /** random string */
+  id: string;
+  /** path in db */
   path: string;
 
   eventType: EventType;

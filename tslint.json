@@ -1,11 +1,8 @@
 {
-  "extends": [
-    "tslint:latest",
-    "tslint-config-prettier"
-  ],
+  "extends": ["tslint:latest", "tslint-config-prettier"],
   "rules": {
     "quotemark": ["single"],
-    "no-console": [ false ],
+    "no-console": [false],
     "object-literal-sort-keys": false,
     "no-trailing-whitespace": false,
     "ordered-imports": [false],
@@ -14,6 +11,7 @@
     "trailing-comma": [false],
     "variable-name": [false],
     "arrow-parens": [false],
-    "no-namespace": [true, "allow-declarations"]
+    "no-namespace": [true, "allow-declarations"],
+    "callable-types": [false]
   }
 }

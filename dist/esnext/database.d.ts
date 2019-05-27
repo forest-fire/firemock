@@ -1,17 +1,19 @@
 import { IDictionary } from "common-types";
 import { IListener } from "./query";
 import { DataSnapshot, EventType } from "@firebase/database-types";
+import { IFirebaseEventHandler } from "./types";
 export declare type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export declare let db: IDictionary;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;
 export declare function auth(): Promise<import(".").IMockAuth>;
+export declare function getDb(path: string): any;
 /**
  * **setDB**
  *
  * sets the database at a given path
  */
-export declare function setDB(path: string, value: any): void;
+export declare function setDB(path: string, value: any, silent?: boolean): void;
 /**
  * **updateDB**
  *
@@ -23,6 +25,9 @@ export declare function updateDB<T = any>(path: string, value: T): void;
  *
  * Emulates a Firebase multi-path update. The keys of the dictionary
  * are _paths_ in the DB, the value is the value to set at that path.
+ *
+ * **Note:** dispatch notifations must not be done at _path_ level but
+ * instead grouped up by _watcher_ level.
  */
 export declare function multiPathUpdateDB(data: IDictionary): void;
 export declare function removeDB(path: string): void;
@@ -47,7 +52,7 @@ export declare function pushDB(path: string, value: any): string;
  * interested in the _paths_ which are being watched
  * you can call `listenerPaths()`.
  */
-export declare function addListener(path: string, eventType: EventType, callback: (snap: DataSnapshot, key?: string) => void, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): void;
+export declare function addListener(path: string, eventType: EventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): void;
 /**
  * **removeListener**
  *
@@ -89,7 +94,7 @@ export declare function listenerPaths(lookFor?: EventTypePlusChild | EventTypePl
  * You can also just state "child" as the event and it will resolve to all child
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
-export declare function getListeners(lookFor?: EventTypePlusChild | EventTypePlusChild[]): void;
+export declare function getListeners(lookFor?: EventTypePlusChild | EventTypePlusChild[]): IListener[];
 export declare type IListenerPlus = IListener & {
     id: string;
     changeIsAtRoot: boolean;
