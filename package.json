@@ -36,7 +36,7 @@
     "@firebase/auth-types": "^0.7.0",
     "@firebase/database-types": "^0.4.0",
     "@firebase/util": "^0.2.15",
-    "common-types": "^1.11.4",
+    "common-types": "^1.11.10",
     "email-validator": "^2.0.4",
     "faker": "^4.1.0",
     "fast-copy": "^2.0.3",

@@ -2,9 +2,23 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Query, SnapShot, IMockWatcherGroupEvent, IDictionary } from "../src";
+import {
+  Query,
+  SnapShot,
+  IMockWatcherGroupEvent,
+  IDictionary,
+  SchemaHelper,
+  Mock
+} from "../src";
 import { DataSnapshot } from "@firebase/database-types";
-import { updateDB, removeDB, pushDB, setDB, getDb } from "../src/database";
+import {
+  updateDB,
+  removeDB,
+  pushDB,
+  setDB,
+  getDb,
+  multiPathUpdateDB
+} from "../src/database";
 
 const expect = chai.expect;
 
@@ -116,5 +130,36 @@ describe("Listener events ->", () => {
     events.map(e => expect(e.key).to.equal("jjohnson"));
     expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).not.includes("child_added");
+  });
+
+  it.only("dispatch works for a MPS", async () => {
+    const m = await Mock.prepare();
+    m.addSchema("company")
+      .mock((h: SchemaHelper) => () => {
+        return { name: h.faker.company.companyName() };
+      })
+      .hasMany("employee");
+    m.addSchema("employee").mock((h: SchemaHelper) => () => {
+      return {
+        first: h.faker.name.firstName(),
+        last: h.faker.name.lastName()
+      };
+    });
+    m.deploy
+      .queueSchema("employee", 5)
+      .queueSchema("company")
+      .quantifyHasMany("employee", 10)
+      .generate();
+
+    const firstEmployee = helpers.firstKey(m.db.employees);
+    const firstCompany = helpers.firstKey(m.db.companies);
+    const mps = [
+      { [`employees/${firstEmployee}/age`]: 45 },
+      { [`companies/${firstEmployee}/address`]: "123 Nowhere Ave" }
+    ];
+
+    multiPathUpdateDB(mps);
+
+    console.log(m.db)
   });
 });

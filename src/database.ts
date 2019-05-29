@@ -50,6 +50,8 @@ export function getDb(path: string) {
  * sets the database at a given path
  */
 export function setDB(path: string, value: any, silent: boolean = false) {
+  console.log(path, value);
+
   const dotPath = join(path);
   const oldRef = get(db, dotPath);
   const oldValue = typeof oldRef === "object" ? { ...oldRef, ...{} } : oldRef;
@@ -119,12 +121,13 @@ export function updateDB<T = any>(path: string, value: T) {
  * **Note:** dispatch notifations must not be done at _path_ level but
  * instead grouped up by _watcher_ level.
  */
-export function multiPathUpdateDB(data: IDictionary) {
+export function multiPathUpdateDB(data: IDictionary[]) {
   const snapshot = copy(db);
   // set DB to new values
-  Object.keys(data).map(key => {
-    const value = data[key];
-    const path = key;
+  data.map(tuple => {
+    const path = Object.keys(tuple).pop();
+    const value = tuple[path];
+
     if (get(db, path) !== value) {
       // silent sets
       setDB(path, value, true);
