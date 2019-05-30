@@ -14,7 +14,7 @@ export declare function silenceEvents(): void;
  * returns the database to its default state of sending
  * events out.
  */
-export declare function dispatchEvents(): void;
+export declare function restoreEvents(): void;
 export declare function shouldSendEvents(): boolean;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;

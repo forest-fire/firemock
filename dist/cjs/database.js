@@ -29,10 +29,10 @@ exports.silenceEvents = silenceEvents;
  * returns the database to its default state of sending
  * events out.
  */
-function dispatchEvents() {
+function restoreEvents() {
     _silenceEvents = false;
 }
-exports.dispatchEvents = dispatchEvents;
+exports.restoreEvents = restoreEvents;
 function shouldSendEvents() {
     return !_silenceEvents;
 }
