@@ -8,7 +8,8 @@ import {
   IMockWatcherGroupEvent,
   IDictionary,
   SchemaHelper,
-  Mock
+  Mock,
+  IFirebaseEventHandler
 } from "../src";
 import { DataSnapshot } from "@firebase/database-types";
 import {
@@ -17,7 +18,9 @@ import {
   pushDB,
   setDB,
   getDb,
-  multiPathUpdateDB
+  multiPathUpdateDB,
+  clearDatabase,
+  reset
 } from "../src/database";
 
 const expect = chai.expect;
@@ -57,12 +60,13 @@ describe("Listener events ->", () => {
   });
 
   it('listening on "on_child" events', async () => {
+    reset();
     const queryRef = new Query("userProfile", 10);
     let events: IDictionary[] = [];
     const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
       events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
     };
-    const userProfileListener = queryRef.on("child_added", cb("child_added"));
+    queryRef.on("child_added", cb("child_added"));
     queryRef.on("child_moved", cb("child_moved"));
     queryRef.on("child_changed", cb("child_changed"));
     queryRef.on("child_removed", cb("child_removed"));
@@ -72,14 +76,6 @@ describe("Listener events ->", () => {
     expect(events.map(e => e.eventType)).includes("child_added");
     expect(events.map(e => e.eventType)).includes("child_changed");
     expect(events.map(e => e.eventType)).not.includes("child_updated");
-    expect(events.map(e => e.eventType)).includes("child_moved");
-    events = [];
-
-    updateDB("userProfile/p-tosh", { name: "Peter Tosh" });
-    events.map(e => expect(e.key).to.equal("p-tosh"));
-    expect(events.map(e => e.eventType)).includes("child_added");
-    expect(events.map(e => e.eventType)).includes("child_changed");
-    expect(events.map(e => e.eventType)).not.includes("child_removed");
     expect(events.map(e => e.eventType)).includes("child_moved");
     events = [];
 
@@ -110,13 +106,6 @@ describe("Listener events ->", () => {
     expect(events.map(e => e.eventType)).not.includes("child_moved");
     events = [];
 
-    removeDB("userProfile/p-tosh");
-    events.map(e => expect(e.key).to.equal("p-tosh"));
-    expect(events.map(e => e.eventType)).includes("child_removed");
-    expect(events.map(e => e.eventType)).not.includes("child_changed");
-    expect(events.map(e => e.eventType)).not.includes("child_added");
-    events = [];
-
     pushDB("userProfile", { name: "Chris Christy" });
     events.map(e => {
       expect(e.key).to.be.a("string");
@@ -132,7 +121,73 @@ describe("Listener events ->", () => {
     expect(events.map(e => e.eventType)).not.includes("child_added");
   });
 
-  it.only("dispatch works for a MPS", async () => {
+  it("removing a record that exists sends child_removed event", async () => {
+    reset();
+    const queryRef = new Query("userProfile", 10);
+    let events: IDictionary[] = [];
+    const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
+      events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
+    };
+    queryRef.on("child_added", cb("child_added"));
+    queryRef.on("child_moved", cb("child_moved"));
+    queryRef.on("child_changed", cb("child_changed"));
+    queryRef.on("child_removed", cb("child_removed"));
+
+    updateDB("userProfile/p-tosh", { name: "Peter Tosh" });
+    events.map(e => expect(e.key).to.equal("p-tosh"));
+    expect(events.map(e => e.eventType)).includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_removed");
+    expect(events.map(e => e.eventType)).includes("child_moved");
+    events = [];
+    removeDB("userProfile/p-tosh");
+    events.map(e => expect(e.key).to.equal("p-tosh"));
+    expect(events.map(e => e.eventType)).includes("child_removed");
+    expect(events.map(e => e.eventType)).not.includes("child_changed");
+    expect(events.map(e => e.eventType)).not.includes("child_added");
+    events = [];
+  });
+
+  it("removing a record that was not there; results in no events", async () => {
+    reset();
+    const queryRef = new Query("userProfile", 10);
+    const events: IDictionary[] = [];
+    const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
+      events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
+    };
+    queryRef.on("child_added", cb("child_added"));
+    queryRef.on("child_moved", cb("child_moved"));
+    queryRef.on("child_changed", cb("child_changed"));
+    queryRef.on("child_removed", cb("child_removed"));
+    removeDB("userProfile/p-tosh");
+    expect(events).to.have.lengthOf(0);
+  });
+
+  it("updating DB in a watcher path does not return child_added, does return child_changed", async () => {
+    clearDatabase();
+    const queryRef = new Query("userProfile", 10);
+    let events: IDictionary[] = [];
+    const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
+      events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
+    };
+    queryRef.on("child_added", cb("child_added"));
+    queryRef.on("child_changed", cb("child_changed"));
+    setDB("userProfile/jjohnson", { name: "Jack Johnson", age: 45 });
+
+    events.map(e => expect(e.key).to.equal("jjohnson"));
+    expect(events.map(e => e.eventType)).includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    events = [];
+
+    updateDB("userProfile/jjohnson/age", 99);
+    events.map(e => expect(e.key).to.equal("jjohnson"));
+    expect(events.map(e => e.eventType)).not.includes("child_added");
+    expect(events.map(e => e.eventType)).includes("child_changed");
+    events = [];
+  });
+
+  it("dispatch works for a MPS", async () => {
+    clearDatabase();
     const m = await Mock.prepare();
     m.addSchema("company")
       .mock((h: SchemaHelper) => () => {
@@ -153,13 +208,27 @@ describe("Listener events ->", () => {
 
     const firstEmployee = helpers.firstKey(m.db.employees);
     const firstCompany = helpers.firstKey(m.db.companies);
-    const mps = [
-      { [`employees/${firstEmployee}/age`]: 45 },
-      { [`companies/${firstEmployee}/address`]: "123 Nowhere Ave" }
-    ];
+    expect(m.db.employees[firstEmployee]).to.be.an("object");
+    expect(m.db.companies[firstCompany]).to.be.an("object");
 
+    const qEmployee = new Query("employees", 10);
+    const qCompany = new Query("companies", 10);
+
+    const events: Array<{ eventType: string; key: string; value: IDictionary }> = [];
+    const cb = (eventType: string) => (event: DataSnapshot) =>
+      events.push({ eventType, key: event.key, value: event.val() });
+
+    qEmployee.on("child_changed", cb("employee"));
+    qCompany.on("child_changed", cb("company"));
+
+    const mps = {
+      [`employees/${firstEmployee}/age`]: 45,
+      [`companies/${firstCompany}/address`]: "123 Nowhere Ave"
+    };
     multiPathUpdateDB(mps);
 
-    console.log(m.db)
+    expect(events).to.have.lengthOf(2);
+    expect(events.map(i => i.eventType)).to.include("employee");
+    expect(events.map(i => i.eventType)).to.include("company");
   });
 });

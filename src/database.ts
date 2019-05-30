@@ -50,8 +50,6 @@ export function getDb(path: string) {
  * sets the database at a given path
  */
 export function setDB(path: string, value: any, silent: boolean = false) {
-  console.log(path, value);
-
   const dotPath = join(path);
   const oldRef = get(db, dotPath);
   const oldValue = typeof oldRef === "object" ? { ...oldRef, ...{} } : oldRef;
@@ -78,7 +76,9 @@ export function setDB(path: string, value: any, silent: boolean = false) {
     set(db, dotPath, value);
   }
 
-  notify({ [dotify(path)]: value }, dbSnapshot);
+  if (!silent) {
+    notify({ [dotPath]: value }, dbSnapshot);
+  }
 }
 
 /**
@@ -121,13 +121,12 @@ export function updateDB<T = any>(path: string, value: T) {
  * **Note:** dispatch notifations must not be done at _path_ level but
  * instead grouped up by _watcher_ level.
  */
-export function multiPathUpdateDB(data: IDictionary[]) {
+export function multiPathUpdateDB(data: IDictionary) {
   const snapshot = copy(db);
-  // set DB to new values
-  data.map(tuple => {
-    const path = Object.keys(tuple).pop();
-    const value = tuple[path];
 
+  Object.keys(data).map(key => {
+    const value = data[key];
+    const path = key;
     if (get(db, path) !== value) {
       // silent sets
       setDB(path, value, true);
@@ -139,8 +138,21 @@ export function multiPathUpdateDB(data: IDictionary[]) {
 
 const dotify = (path: string) => {
   const dotPath = path.replace(/[\\\/]/g, ".");
-  return dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath;
+  return removeDotsAtExtremes(dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath);
 };
+
+function dotifyKeys(obj: IDictionary) {
+  const result: IDictionary = {};
+  Object.keys(obj).forEach(key => {
+    result[dotify(key)] = obj[key];
+  });
+  return result;
+}
+
+function removeDotsAtExtremes(path: string) {
+  const front = path.slice(0, 1) === "." ? path.slice(1) : path;
+  return front.slice(-1) === "." ? front.slice(0, front.length - 1) : front;
+}
 
 const slashify = (path: string) => {
   const slashPath = path.replace(/\./g, "/");
@@ -159,6 +171,7 @@ function groupEventsByWatcher(
   data: IDictionary,
   dbSnapshot: IDictionary
 ): IMockWatcherGroupEvent[] {
+  data = dotifyKeys(data);
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
   const ignoreUnchanged = (path: string) => data[path] !== getFromSnapshot(path);
   const eventPaths = Object.keys(data)
@@ -174,6 +187,9 @@ function groupEventsByWatcher(
   const justValue = (obj: IDictionary) => (justKey(obj) ? obj[justKey(obj)] : null);
   getListeners().forEach(l => {
     const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
+    if (eventPathsUnderListener.length === 0) {
+      return;
+    }
     const paths: string[] = [];
 
     const changeObject = eventPathsUnderListener.reduce(
@@ -195,16 +211,22 @@ function groupEventsByWatcher(
           : l.path.split(".").pop()
         : dotify(pathJoin(slashify(l.path), justKey(changeObject)));
 
-    response.push({
+    const newResponse = {
       listenerId: l.id,
       listenerPath: l.path,
       listenerEvent: l.eventType,
       callback: l.callback,
       eventPaths: paths,
       key,
-      value: justValue(changeObject),
-      priorValue: l.eventType === "value" ? getDb(l.path) : justValue(getDb(l.path))
-    });
+      changes: justValue(changeObject),
+      value: l.eventType === "value" ? getDb(l.path) : getDb(key),
+      priorValue:
+        l.eventType === "value"
+          ? get(dbSnapshot, l.path)
+          : justValue(get(dbSnapshot, l.path))
+    };
+
+    response.push(newResponse);
   });
 
   return response;
@@ -228,7 +250,9 @@ export function removeDB(path: string) {
 export function pushDB(path: string, value: any): string {
   const pushId = fbKey();
   const fullPath = join(path, pushId);
-  setDB(fullPath, value);
+  const valuePlusId = typeof value === "object" ? { ...value, id: pushId } : value;
+
+  setDB(fullPath, valuePlusId);
   return pushId;
 }
 
@@ -401,24 +425,25 @@ function notify<T = any>(data: IDictionary, dbSnapshot: IDictionary) {
   const events = groupEventsByWatcher(data, dbSnapshot);
 
   events.forEach(e => {
+    const isDeleteEvent = e.value === null || e.value === undefined;
     switch (e.listenerEvent) {
       case "child_removed":
-        if (e.value === null) {
+        if (isDeleteEvent) {
           e.callback(new SnapShot(e.key, e.priorValue));
         }
         return;
       case "child_added":
-        if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+        if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
           e.callback(new SnapShot(e.key, e.value));
         }
         return;
       case "child_changed":
-        if (e.value !== null) {
+        if (!isDeleteEvent) {
           e.callback(new SnapShot(e.key, e.value));
         }
         return;
       case "child_moved":
-        if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+        if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
           // TODO: if we implement sorting then add the previousKey value
           e.callback(new SnapShot(e.key, e.value));
         }
@@ -431,15 +456,12 @@ function notify<T = any>(data: IDictionary, dbSnapshot: IDictionary) {
           e.callback(
             new SnapShot(
               e.listenerPath,
-              e.value === null ? undefined : { [e.key]: e.value }
+              e.value === null || e.value === undefined ? undefined : { [e.key]: e.value }
             )
           );
         } else {
           // property set
-          const value =
-            e.value === null
-              ? getDb(e.listenerPath)
-              : { ...getDb(e.listenerPath), [e.key]: e.value };
+          const value = e.value === null ? getDb(e.listenerPath) : e.value;
           e.callback(new SnapShot(e.listenerPath, value));
         }
 
