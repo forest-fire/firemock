@@ -1,5 +1,5 @@
 import { Queue, Schema, Reference, Deployment } from "./index";
-import { db, clearDatabase, updateDatabase } from "./database";
+import { db, clearDatabase, updateDatabase, silenceEvents, restoreEvents } from "./database";
 import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
@@ -68,6 +68,21 @@ export class Mock {
      */
     updateDB(state) {
         updateDatabase(state);
+    }
+    /**
+     * silences the database from sending events;
+     * this is not typically done but can be done
+     * as part of the Mocking process to reduce noise
+     */
+    silenceEvents() {
+        silenceEvents();
+    }
+    /**
+     * returns the database to its default state of sending
+     * events out.
+     */
+    restoreEvents() {
+        restoreEvents();
     }
     async auth() {
         return fireAuth();

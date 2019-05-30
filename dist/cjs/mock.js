@@ -77,6 +77,21 @@ class Mock {
     updateDB(state) {
         database_1.updateDatabase(state);
     }
+    /**
+     * silences the database from sending events;
+     * this is not typically done but can be done
+     * as part of the Mocking process to reduce noise
+     */
+    silenceEvents() {
+        database_1.silenceEvents();
+    }
+    /**
+     * returns the database to its default state of sending
+     * events out.
+     */
+    restoreEvents() {
+        database_1.restoreEvents();
+    }
     async auth() {
         return auth_1.auth();
     }
