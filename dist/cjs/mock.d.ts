@@ -38,6 +38,17 @@ export declare class Mock {
      * Update the mock DB with a raw JS object/hash
      */
     updateDB(state: IDictionary): void;
+    /**
+     * silences the database from sending events;
+     * this is not typically done but can be done
+     * as part of the Mocking process to reduce noise
+     */
+    silenceEvents(): void;
+    /**
+     * returns the database to its default state of sending
+     * events out.
+     */
+    restoreEvents(): void;
     auth(): Promise<import(".").IMockAuth>;
     readonly faker: Faker.FakerStatic;
     /**
