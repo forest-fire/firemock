@@ -15,6 +15,28 @@ const index_1 = require("./index");
 const auth_1 = require("./auth");
 exports.db = [];
 let _listeners = [];
+let _silenceEvents = false;
+/**
+ * silences the database from sending events;
+ * this is not typically done but can be done
+ * as part of the Mocking process to reduce noise
+ */
+function silenceEvents() {
+    _silenceEvents = true;
+}
+exports.silenceEvents = silenceEvents;
+/**
+ * returns the database to its default state of sending
+ * events out.
+ */
+function dispatchEvents() {
+    _silenceEvents = false;
+}
+exports.dispatchEvents = dispatchEvents;
+function shouldSendEvents() {
+    return !_silenceEvents;
+}
+exports.shouldSendEvents = shouldSendEvents;
 function clearDatabase() {
     exports.db = {};
 }
@@ -353,6 +375,9 @@ function keyDidNotPreviouslyExist(e, dbSnapshot) {
  * send to zero or more listeners.
  */
 function notify(data, dbSnapshot) {
+    if (!shouldSendEvents()) {
+        return;
+    }
     const events = groupEventsByWatcher(data, dbSnapshot);
     events.forEach(e => {
         const isDeleteEvent = e.value === null || e.value === undefined;

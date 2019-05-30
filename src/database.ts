@@ -6,15 +6,7 @@ import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
 import copy from "fast-copy";
-import {
-  join,
-  pathDiff,
-  getParent,
-  getKey,
-  keyAndParent,
-  stripLeadingDot,
-  removeDots
-} from "./util";
+import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
 import { SnapShot, IMockWatcherGroupEvent } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { auth as mockedAuth } from "./auth";
@@ -24,6 +16,29 @@ export type FirebaseDatabase = import("@firebase/database-types").FirebaseDataba
 export let db: IDictionary = [];
 
 let _listeners: IListener[] = [];
+
+let _silenceEvents: boolean = false;
+
+/**
+ * silences the database from sending events;
+ * this is not typically done but can be done
+ * as part of the Mocking process to reduce noise
+ */
+export function silenceEvents() {
+  _silenceEvents = true;
+}
+
+/**
+ * returns the database to its default state of sending
+ * events out.
+ */
+export function dispatchEvents() {
+  _silenceEvents = false;
+}
+
+export function shouldSendEvents() {
+  return !_silenceEvents;
+}
 
 export function clearDatabase() {
   db = {};
@@ -422,6 +437,9 @@ function keyDidNotPreviouslyExist(e: IMockWatcherGroupEvent, dbSnapshot: IDictio
  * send to zero or more listeners.
  */
 function notify<T = any>(data: IDictionary, dbSnapshot: IDictionary) {
+  if (!shouldSendEvents()) {
+    return;
+  }
   const events = groupEventsByWatcher(data, dbSnapshot);
 
   events.forEach(e => {

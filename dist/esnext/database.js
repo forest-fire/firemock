@@ -10,6 +10,25 @@ import { SnapShot } from "./index";
 import { auth as mockedAuth } from "./auth";
 export let db = [];
 let _listeners = [];
+let _silenceEvents = false;
+/**
+ * silences the database from sending events;
+ * this is not typically done but can be done
+ * as part of the Mocking process to reduce noise
+ */
+export function silenceEvents() {
+    _silenceEvents = true;
+}
+/**
+ * returns the database to its default state of sending
+ * events out.
+ */
+export function dispatchEvents() {
+    _silenceEvents = false;
+}
+export function shouldSendEvents() {
+    return !_silenceEvents;
+}
 export function clearDatabase() {
     db = {};
 }
@@ -333,6 +352,9 @@ function keyDidNotPreviouslyExist(e, dbSnapshot) {
  * send to zero or more listeners.
  */
 function notify(data, dbSnapshot) {
+    if (!shouldSendEvents()) {
+        return;
+    }
     const events = groupEventsByWatcher(data, dbSnapshot);
     events.forEach(e => {
         const isDeleteEvent = e.value === null || e.value === undefined;

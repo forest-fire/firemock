@@ -4,6 +4,18 @@ import { DataSnapshot, EventType } from "@firebase/database-types";
 import { IFirebaseEventHandler } from "./types";
 export declare type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export declare let db: IDictionary;
+/**
+ * silences the database from sending events;
+ * this is not typically done but can be done
+ * as part of the Mocking process to reduce noise
+ */
+export declare function silenceEvents(): void;
+/**
+ * returns the database to its default state of sending
+ * events out.
+ */
+export declare function dispatchEvents(): void;
+export declare function shouldSendEvents(): boolean;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;
 export declare function auth(): Promise<import(".").IMockAuth>;
