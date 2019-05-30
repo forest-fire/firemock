@@ -32,7 +32,7 @@ export function silenceEvents() {
  * returns the database to its default state of sending
  * events out.
  */
-export function dispatchEvents() {
+export function restoreEvents() {
   _silenceEvents = false;
 }
 
