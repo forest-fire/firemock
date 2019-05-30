@@ -60,7 +60,9 @@ function setDB(path, value, silent = false) {
     else {
         lodash_set_1.default(exports.db, dotPath, value);
     }
-    notify({ [dotify(path)]: value }, dbSnapshot);
+    if (!silent) {
+        notify({ [dotPath]: value }, dbSnapshot);
+    }
 }
 exports.setDB = setDB;
 /**
@@ -97,7 +99,6 @@ exports.updateDB = updateDB;
  */
 function multiPathUpdateDB(data) {
     const snapshot = fast_copy_1.default(exports.db);
-    // set DB to new values
     Object.keys(data).map(key => {
         const value = data[key];
         const path = key;
@@ -111,8 +112,19 @@ function multiPathUpdateDB(data) {
 exports.multiPathUpdateDB = multiPathUpdateDB;
 const dotify = (path) => {
     const dotPath = path.replace(/[\\\/]/g, ".");
-    return dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath;
+    return removeDotsAtExtremes(dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath);
 };
+function dotifyKeys(obj) {
+    const result = {};
+    Object.keys(obj).forEach(key => {
+        result[dotify(key)] = obj[key];
+    });
+    return result;
+}
+function removeDotsAtExtremes(path) {
+    const front = path.slice(0, 1) === "." ? path.slice(1) : path;
+    return front.slice(-1) === "." ? front.slice(0, front.length - 1) : front;
+}
 const slashify = (path) => {
     const slashPath = path.replace(/\./g, "/");
     return slashPath.slice(0, 1) === "/" ? slashPath.slice(1) : slashPath;
@@ -126,6 +138,7 @@ const slashify = (path) => {
  * there will be no notification sent
  */
 function groupEventsByWatcher(data, dbSnapshot) {
+    data = dotifyKeys(data);
     const getFromSnapshot = (path) => lodash_get_1.default(dbSnapshot, dotify(path));
     const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path);
     const eventPaths = Object.keys(data)
@@ -139,6 +152,9 @@ function groupEventsByWatcher(data, dbSnapshot) {
     const justValue = (obj) => (justKey(obj) ? obj[justKey(obj)] : null);
     getListeners().forEach(l => {
         const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
+        if (eventPathsUnderListener.length === 0) {
+            return;
+        }
         const paths = [];
         const changeObject = eventPathsUnderListener.reduce((changes, path) => {
             paths.push(path);
@@ -155,16 +171,20 @@ function groupEventsByWatcher(data, dbSnapshot) {
                 ? justKey(changeObject)
                 : l.path.split(".").pop()
             : dotify(common_types_1.pathJoin(slashify(l.path), justKey(changeObject)));
-        response.push({
+        const newResponse = {
             listenerId: l.id,
             listenerPath: l.path,
             listenerEvent: l.eventType,
             callback: l.callback,
             eventPaths: paths,
             key,
-            value: justValue(changeObject),
-            priorValue: l.eventType === "value" ? getDb(l.path) : justValue(getDb(l.path))
-        });
+            changes: justValue(changeObject),
+            value: l.eventType === "value" ? getDb(l.path) : getDb(key),
+            priorValue: l.eventType === "value"
+                ? lodash_get_1.default(dbSnapshot, l.path)
+                : justValue(lodash_get_1.default(dbSnapshot, l.path))
+        };
+        response.push(newResponse);
     });
     return response;
 }
@@ -186,7 +206,8 @@ exports.removeDB = removeDB;
 function pushDB(path, value) {
     const pushId = firebase_key_1.key();
     const fullPath = util_1.join(path, pushId);
-    setDB(fullPath, value);
+    const valuePlusId = typeof value === "object" ? Object.assign({}, value, { id: pushId }) : value;
+    setDB(fullPath, valuePlusId);
     return pushId;
 }
 exports.pushDB = pushDB;
@@ -334,24 +355,25 @@ function keyDidNotPreviouslyExist(e, dbSnapshot) {
 function notify(data, dbSnapshot) {
     const events = groupEventsByWatcher(data, dbSnapshot);
     events.forEach(e => {
+        const isDeleteEvent = e.value === null || e.value === undefined;
         switch (e.listenerEvent) {
             case "child_removed":
-                if (e.value === null) {
+                if (isDeleteEvent) {
                     e.callback(new index_1.SnapShot(e.key, e.priorValue));
                 }
                 return;
             case "child_added":
-                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+                if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
                     e.callback(new index_1.SnapShot(e.key, e.value));
                 }
                 return;
             case "child_changed":
-                if (e.value !== null) {
+                if (!isDeleteEvent) {
                     e.callback(new index_1.SnapShot(e.key, e.value));
                 }
                 return;
             case "child_moved":
-                if (e.value !== null && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+                if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
                     // TODO: if we implement sorting then add the previousKey value
                     e.callback(new index_1.SnapShot(e.key, e.value));
                 }
@@ -360,13 +382,11 @@ function notify(data, dbSnapshot) {
                 const snapKey = new index_1.SnapShot(e.listenerPath, e.value).key;
                 if (snapKey === e.key) {
                     // root set
-                    e.callback(new index_1.SnapShot(e.listenerPath, e.value === null ? undefined : { [e.key]: e.value }));
+                    e.callback(new index_1.SnapShot(e.listenerPath, e.value === null || e.value === undefined ? undefined : { [e.key]: e.value }));
                 }
                 else {
                     // property set
-                    const value = e.value === null
-                        ? getDb(e.listenerPath)
-                        : Object.assign({}, getDb(e.listenerPath), { [e.key]: e.value });
+                    const value = e.value === null ? getDb(e.listenerPath) : e.value;
                     e.callback(new index_1.SnapShot(e.listenerPath, value));
                 }
                 return;

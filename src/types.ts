@@ -63,6 +63,8 @@ export interface IMockWatcherGroupEvent {
   eventPaths: string[];
   /** the "key" of the event; this applied to value AND child events */
   key: string;
+  /** changes between value and priorValue */
+  changes: any;
   /** the new value which has been set */
   value: any;
   /** the prior value that this property held previous to the event */

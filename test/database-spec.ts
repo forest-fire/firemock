@@ -263,7 +263,6 @@ describe("Database", () => {
       reset();
       const callback: HandleValueEvent = snap => {
         const record = helpers.firstRecord(snap.val());
-
         expect(record.name).to.equal("Humpty Dumpty");
         expect(record.age).to.equal(5);
         done();
@@ -478,6 +477,7 @@ describe("Database", () => {
         expect(db.people).to.not.have.key("abcd");
         done();
       };
+      expect(db.people).to.have.key("abcd");
       addListener("/people", "child_removed", callback);
       removeDB(`/people.abcd`);
     });
