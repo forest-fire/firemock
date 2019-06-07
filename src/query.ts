@@ -136,7 +136,7 @@ export default class Query<T = any> implements IQuery {
 
   public on(
     eventType: EventType,
-    callback: (a: DataSnapshot | null, b?: string) => any,
+    callback: (a: DataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
   ): (a: DataSnapshot | null, b?: string) => any {
