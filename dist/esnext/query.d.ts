@@ -49,7 +49,7 @@ export default class Query<T = any> implements IQuery {
     /** Creates a Query with the specified starting point. */
     startAt(value: QueryValue, key?: string): Query<T>;
     endAt(value: QueryValue, key?: string): Query<T>;
-    on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot | null, b?: string) => any;
+    on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot, b?: null | string) => any;
     once(eventType: "value"): Promise<DataSnapshot>;
     off(): void;
     /** NOT IMPLEMENTED YET */

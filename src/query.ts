@@ -139,7 +139,7 @@ export default class Query<T = any> implements IQuery {
     callback: (a: DataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: DataSnapshot | null, b?: string) => any {
+  ): (a: DataSnapshot, b?: null | string) => any {
     addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
 
     return null;
