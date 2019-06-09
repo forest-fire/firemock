@@ -14,7 +14,6 @@ import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./auth/types";
 import { authAdminApi } from "./auth/authAdmin";
 import { FireMockError } from "./errors/FireMockError";
 import { IRelationship, ISchema, IQueue, SchemaCallback } from "./types";
-
 export let faker: Faker.FakerStatic;
 
 /* tslint:disable:max-classes-per-file */
