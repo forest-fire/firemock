@@ -10,7 +10,7 @@ import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
 import { SnapShot, IMockWatcherGroupEvent } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { auth as mockedAuth } from "./auth";
-import { IFirebaseEventHandler } from "./types";
+import { IFirebaseEventHandler } from "./@types/db-types";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];

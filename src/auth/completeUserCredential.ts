@@ -1,4 +1,8 @@
-import { IPartialUserCredential, UserCredential, AuthCredential } from "./types";
+import {
+  IPartialUserCredential,
+  UserCredential,
+  AuthCredential
+} from "../@types/auth-types";
 import {
   ApplicationVerifier,
   AuthProvider,

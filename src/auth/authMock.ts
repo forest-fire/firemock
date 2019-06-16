@@ -5,7 +5,7 @@ import {
   User,
   IEmailLogin,
   IPartialUserCredential
-} from "./types";
+} from "../@types/auth-types";
 import { networkDelay } from "../util";
 import { authAdminApi, Observer } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";

@@ -1,5 +1,7 @@
-import { IMockAuthConfig, IEmailLogin, User } from "./types";
+import { User } from "../@types/auth-types";
+import { IMockAuthConfig } from "../@types/config-types";
 import { authApi } from "../auth";
+
 let authConfig: IMockAuthConfig = {
   allowAnonymous: true
 };

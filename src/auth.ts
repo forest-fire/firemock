@@ -1,5 +1,5 @@
 import { networkDelay } from "./util";
-import { IMockAuth } from "./auth/types";
+import { IMockAuth } from "./@types/auth-types";
 import { authAdminApi } from "./auth/authAdmin";
 import { authMockApi } from "./auth/authMock";
 
