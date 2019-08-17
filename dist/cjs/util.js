@@ -156,9 +156,9 @@ function calcDelay() {
     if (delay === "random") {
         return getRandomInt(10, 300);
     }
-    if (delay === "weak") {
-        return getRandomInt(400, 900);
-    }
+    // if (delay === "weak") {
+    //   return getRandomInt(400, 900);
+    // }
     if (delay === "mobile") {
         return getRandomInt(300, 500);
     }

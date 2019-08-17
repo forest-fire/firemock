@@ -3,7 +3,6 @@ import {
   UserCredential,
   AuthCredential,
   User,
-  IEmailLogin,
   IPartialUserCredential
 } from "./types";
 import { networkDelay } from "../util";
@@ -11,7 +10,10 @@ import { authAdminApi, Observer } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError, Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
-import { ActionCodeSettings, TwitterAuthProvider_Instance } from "@firebase/auth-types";
+import {
+  ActionCodeSettings,
+  TwitterAuthProvider_Instance
+} from "@firebase/auth-types";
 import { FireMockError } from "../errors/FireMockError";
 import {
   checkIfEmailUserExists,
@@ -19,8 +21,6 @@ import {
   emailVerified,
   userUid,
   emailValidationAllowed,
-  loggedIn,
-  loggedOut,
   checkIfEmailIsValidFormat
 } from "./authMockHelpers";
 
@@ -78,13 +78,19 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     }
     const found = authAdminApi
       .getAuthConfig()
-      .validEmailLogins.find(i => i.email === email);
+      .validEmailUsers.find(i => i.email === email);
     if (!found) {
-      throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
+      throw createError(
+        `auth/user-not-found`,
+        `The email "${email}" was not found`
+      );
     }
 
     if (!validEmailUserPassword(email, found.password)) {
-      throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
+      throw new FireMockError(
+        `Invalid password for ${email}`,
+        "auth/wrong-password"
+      );
     }
     const partial: IPartialUserCredential = {
       user: {
@@ -101,10 +107,14 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         username: email
       }
     };
-    loggedIn(partial.user as User);
-    return completeUserCredential(partial);
+    const u = completeUserCredential(partial);
+    authAdminApi.login(u.user);
+    return u;
   },
 
+  /**
+   * Add a new user with the Email/Password provider
+   */
   async createUserWithEmailAndPassword(email: string, password: string) {
     await networkDelay();
     if (!emailValidationAllowed()) {
@@ -122,11 +132,17 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     }
 
     if (checkIfEmailIsValidFormat(email)) {
-      throw new FireMockError(`"${email}" user already exists`, "auth/invalid-email");
+      throw new FireMockError(
+        `"${email}" user already exists`,
+        "auth/invalid-email"
+      );
     }
 
     if (!validEmailUserPassword(email, password)) {
-      throw new FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+      throw new FireMockError(
+        `invalid password for "${email}" user`,
+        "firemock/denied"
+      );
     }
 
     const partial: IPartialUserCredential = {
@@ -144,7 +160,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         username: email
       }
     };
-    loggedIn(partial.user as User);
+    const u = completeUserCredential(partial);
+    authAdminApi.addUserToAuth(u.user, password);
+    authAdminApi.login(u.user);
     return completeUserCredential(partial);
   },
 
@@ -152,13 +170,15 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     return;
   },
 
-  async sendPasswordResetEmail(email: string, actionCodeSetting: ActionCodeSettings) {
+  async sendPasswordResetEmail(
+    email: string,
+    actionCodeSetting: ActionCodeSettings
+  ) {
     return;
   },
 
   async signOut() {
-    loggedOut();
-    return;
+    authAdminApi.logout();
   },
 
   get currentUser() {

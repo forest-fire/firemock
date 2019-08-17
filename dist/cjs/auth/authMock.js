@@ -54,7 +54,7 @@ exports.implemented = {
         }
         const found = authAdmin_1.authAdminApi
             .getAuthConfig()
-            .validEmailLogins.find(i => i.email === email);
+            .validEmailUsers.find(i => i.email === email);
         if (!found) {
             throw common_types_1.createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
@@ -76,9 +76,13 @@ exports.implemented = {
                 username: email
             }
         };
-        authMockHelpers_1.loggedIn(partial.user);
-        return completeUserCredential_1.completeUserCredential(partial);
+        const u = completeUserCredential_1.completeUserCredential(partial);
+        authAdmin_1.authAdminApi.login(u.user);
+        return u;
     },
+    /**
+     * Add a new user with the Email/Password provider
+     */
     async createUserWithEmailAndPassword(email, password) {
         await util_1.networkDelay();
         if (!authMockHelpers_1.emailValidationAllowed()) {
@@ -108,7 +112,9 @@ exports.implemented = {
                 username: email
             }
         };
-        authMockHelpers_1.loggedIn(partial.user);
+        const u = completeUserCredential_1.completeUserCredential(partial);
+        authAdmin_1.authAdminApi.addUserToAuth(u.user, password);
+        authAdmin_1.authAdminApi.login(u.user);
         return completeUserCredential_1.completeUserCredential(partial);
     },
     async confirmPasswordReset(code, newPassword) {
@@ -118,8 +124,7 @@ exports.implemented = {
         return;
     },
     async signOut() {
-        authMockHelpers_1.loggedOut();
-        return;
+        authAdmin_1.authAdminApi.logout();
     },
     get currentUser() {
         return completeUserCredential_1.completeUserCredential({}).user;

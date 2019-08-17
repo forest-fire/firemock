@@ -1,4 +1,8 @@
-import { IPartialUserCredential, UserCredential, AuthCredential } from "./types";
+import {
+  IPartialUserCredential,
+  UserCredential,
+  AuthCredential
+} from "./types";
 import {
   ApplicationVerifier,
   AuthProvider,
@@ -10,7 +14,9 @@ import { authAdminApi } from "./authAdmin";
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental
  */
-export function completeUserCredential(partial: IPartialUserCredential): UserCredential {
+export function completeUserCredential(
+  partial: IPartialUserCredential
+): UserCredential {
   const combined = {
     ...fakeUserCredential,
     ...partial
@@ -42,9 +48,7 @@ const fakeUserCredential: UserCredential = {
     async linkAndRetrieveDataWithCredential(credential: AuthCredential) {
       return completeUserCredential({});
     },
-    // async linkWithCredential(credential: AuthCredential) {
-    //   return completeUserCredential({}).user;
-    // },
+
     async linkWithCredential(credential: AuthCredential) {
       return completeUserCredential({});
     },
@@ -60,7 +64,9 @@ const fakeUserCredential: UserCredential = {
     async linkWithRedirect(provider: AuthProvider) {
       return;
     },
-    async reauthenticateAndRetrieveDataWithCredential(credential: AuthCredential) {
+    async reauthenticateAndRetrieveDataWithCredential(
+      credential: AuthCredential
+    ) {
       return completeUserCredential({});
     },
     // async reauthenticateWithCredential(credential: AuthCredential) {
