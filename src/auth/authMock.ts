@@ -3,7 +3,6 @@ import {
   UserCredential,
   AuthCredential,
   User,
-  IEmailLogin,
   IPartialUserCredential
 } from "../@types/auth-types";
 import { networkDelay } from "../util";
@@ -11,17 +10,15 @@ import { authAdminApi, Observer } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError, Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
-import { ActionCodeSettings, TwitterAuthProvider_Instance } from "@firebase/auth-types";
+import { ActionCodeSettings } from "@firebase/auth-types";
 import { FireMockError } from "../errors/FireMockError";
 import {
-  checkIfEmailUserExists,
-  validEmailUserPassword,
+  emailExistsAsUserInAuth,
+  emailHasCorrectPassword,
   emailVerified,
   userUid,
   emailValidationAllowed,
-  loggedIn,
-  loggedOut,
-  checkIfEmailIsValidFormat
+  emailIsValidFormat
 } from "./authMockHelpers";
 
 export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
@@ -73,18 +70,24 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         "auth/operation-not-allowed"
       );
     }
-    if (!checkIfEmailIsValidFormat(email)) {
+    if (!emailIsValidFormat(email)) {
       throw new FireMockError(`invalid email: ${email}`, "auth/invalid-email");
     }
     const found = authAdminApi
       .getAuthConfig()
-      .validEmailLogins.find(i => i.email === email);
+      .validEmailUsers.find(i => i.email === email);
     if (!found) {
-      throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
+      throw createError(
+        `auth/user-not-found`,
+        `The email "${email}" was not found`
+      );
     }
 
-    if (!validEmailUserPassword(email, found.password)) {
-      throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
+    if (!emailHasCorrectPassword(email, found.password)) {
+      throw new FireMockError(
+        `Invalid password for ${email}`,
+        "auth/wrong-password"
+      );
     }
     const partial: IPartialUserCredential = {
       user: {
@@ -101,10 +104,14 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         username: email
       }
     };
-    loggedIn(partial.user as User);
-    return completeUserCredential(partial);
+    const u = completeUserCredential(partial);
+    authAdminApi.login(u.user);
+    return u;
   },
 
+  /**
+   * Add a new user with the Email/Password provider
+   */
   async createUserWithEmailAndPassword(email: string, password: string) {
     await networkDelay();
     if (!emailValidationAllowed()) {
@@ -114,19 +121,18 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       );
     }
 
-    if (checkIfEmailUserExists(email)) {
+    if (emailExistsAsUserInAuth(email)) {
       throw new FireMockError(
         `"${email}" user already exists`,
         "auth/email-already-in-use"
       );
     }
 
-    if (checkIfEmailIsValidFormat(email)) {
-      throw new FireMockError(`"${email}" user already exists`, "auth/invalid-email");
-    }
-
-    if (!validEmailUserPassword(email, password)) {
-      throw new FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+    if (!emailIsValidFormat(email)) {
+      throw new FireMockError(
+        `"${email}" is not a valid email format`,
+        "auth/invalid-email"
+      );
     }
 
     const partial: IPartialUserCredential = {
@@ -144,21 +150,27 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         username: email
       }
     };
-    loggedIn(partial.user as User);
-    return completeUserCredential(partial);
+    const u = completeUserCredential(partial);
+    authAdminApi.addUserToAuth(u.user, password);
+    authAdminApi.login(u.user);
+    console.log(u.user);
+
+    return u;
   },
 
   async confirmPasswordReset(code: string, newPassword: string) {
     return;
   },
 
-  async sendPasswordResetEmail(email: string, actionCodeSetting: ActionCodeSettings) {
+  async sendPasswordResetEmail(
+    email: string,
+    actionCodeSetting: ActionCodeSettings
+  ) {
     return;
   },
 
   async signOut() {
-    loggedOut();
-    return;
+    authAdminApi.logout();
   },
 
   get currentUser() {

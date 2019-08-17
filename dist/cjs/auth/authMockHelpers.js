@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const authAdmin_1 = require("./authAdmin");
 const email_validator_1 = require("email-validator");
 function checkIfEmailUserExists(email) {
-    const emails = authAdmin_1.authAdminApi.getValidEmails();
+    const emails = authAdmin_1.authAdminApi.getValidEmailUsers();
     return emails.map(e => e.email).includes(email);
 }
 exports.checkIfEmailUserExists = checkIfEmailUserExists;
@@ -12,24 +12,25 @@ function checkIfEmailIsValidFormat(email) {
 }
 exports.checkIfEmailIsValidFormat = checkIfEmailIsValidFormat;
 function validEmailUserPassword(email, password) {
-    const config = authAdmin_1.authAdminApi.getValidEmails().find(i => i.email === email);
+    const config = authAdmin_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
     return config ? config.password === password : false;
 }
 exports.validEmailUserPassword = validEmailUserPassword;
 function emailVerified(email) {
-    const config = authAdmin_1.authAdminApi.getValidEmails().find(i => i.email === email);
+    const config = authAdmin_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
     return config ? config.verified || false : false;
 }
 exports.emailVerified = emailVerified;
 function userUid(email) {
-    const config = authAdmin_1.authAdminApi.getValidEmails().find(i => i.email === email);
+    const config = authAdmin_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
     return config.uid || createUid();
 }
 exports.userUid = userUid;
 function createUid() {
+    // example: 0CMjMW6vWQePd3zVmap78mHCxst1
     return Math.random()
         .toString(36)
-        .substr(2, 10);
+        .substr(2, 28);
 }
 exports.createUid = createUid;
 function emailValidationAllowed() {

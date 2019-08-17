@@ -4,7 +4,7 @@ import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { FireMockError } from "../errors/FireMockError";
-import { checkIfEmailUserExists, validEmailUserPassword, emailVerified, userUid, emailValidationAllowed, loggedIn, loggedOut, checkIfEmailIsValidFormat } from "./authMockHelpers";
+import { checkIfEmailUserExists, validEmailUserPassword, emailVerified, userUid, emailValidationAllowed, checkIfEmailIsValidFormat } from "./authMockHelpers";
 export const implemented = {
     app: {
         name: "mocked-app",
@@ -52,7 +52,7 @@ export const implemented = {
         }
         const found = authAdminApi
             .getAuthConfig()
-            .validEmailLogins.find(i => i.email === email);
+            .validEmailUsers.find(i => i.email === email);
         if (!found) {
             throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
@@ -74,9 +74,13 @@ export const implemented = {
                 username: email
             }
         };
-        loggedIn(partial.user);
-        return completeUserCredential(partial);
+        const u = completeUserCredential(partial);
+        authAdminApi.login(u.user);
+        return u;
     },
+    /**
+     * Add a new user with the Email/Password provider
+     */
     async createUserWithEmailAndPassword(email, password) {
         await networkDelay();
         if (!emailValidationAllowed()) {
@@ -106,7 +110,9 @@ export const implemented = {
                 username: email
             }
         };
-        loggedIn(partial.user);
+        const u = completeUserCredential(partial);
+        authAdminApi.addUserToAuth(u.user, password);
+        authAdminApi.login(u.user);
         return completeUserCredential(partial);
     },
     async confirmPasswordReset(code, newPassword) {
@@ -116,8 +122,7 @@ export const implemented = {
         return;
     },
     async signOut() {
-        loggedOut();
-        return;
+        authAdminApi.logout();
     },
     get currentUser() {
         return completeUserCredential({}).user;

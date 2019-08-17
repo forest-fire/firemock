@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { Queue, Schema, SchemaHelper, Reference, Deployment } from "./index";
+import { Queue, Schema, Reference, Deployment, IMockSetup } from "./index";
 import {
   db,
   clearDatabase,
@@ -10,10 +10,15 @@ import {
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./@types/auth-types";
-import { authAdminApi } from "./auth/authAdmin";
+import { authAdminApi, clearAuthUsers } from "./auth/authAdmin";
 import { FireMockError } from "./errors/FireMockError";
-import { IRelationship, ISchema, IQueue, SchemaCallback } from "./@types/db-types";
+import {
+  IRelationship,
+  ISchema,
+  IQueue,
+  SchemaCallback
+} from "./@types/db-types";
+import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
 export let faker: Faker.FakerStatic;
 
 /* tslint:disable:max-classes-per-file */
@@ -35,12 +40,15 @@ export class Mock {
       allowAnonymous: true,
       allowEmailLogins: false,
       allowEmailLinks: false,
-      allowPhoneLogins: false
+      allowPhoneLogins: false,
+      validEmailUsers: []
     };
     const defaultDbConfig = {};
     const obj = new Mock(
       options.db || defaultDbConfig,
-      options.auth || defaultAuthConfig
+      options.auth
+        ? { ...defaultAuthConfig, ...options.auth }
+        : defaultAuthConfig
     );
     await obj.importFakerLibrary();
     return obj;
@@ -77,6 +85,7 @@ export class Mock {
   ) {
     Queue.clearAll();
     clearDatabase();
+    clearAuthUsers();
     if (dataOrMock && typeof dataOrMock === "object") {
       this.updateDB(dataOrMock);
     }

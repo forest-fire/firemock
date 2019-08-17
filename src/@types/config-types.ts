@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { IEmailLogin } from "./auth-types";
+import { IEmailUser } from "./auth-types";
 
 export interface IMockConfigOptions {
   auth?: IMockAuthConfig;
@@ -12,7 +12,7 @@ export interface IMockAuthConfig {
    * in the mock authentication module; this will be used for
    * email logins as well as email links
    */
-  validEmailLogins?: IEmailLogin[];
+  validEmailUsers?: IEmailUser[];
   /** allow anonymous logins */
   allowAnonymous?: boolean;
   /** allow email/password logins */
