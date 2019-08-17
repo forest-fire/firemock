@@ -11,13 +11,19 @@ export type AdditionalUserInfo = import("@firebase/auth-types").AdditionalUserIn
 export type FirebaseAuth = import("@firebase/auth-types").FirebaseAuth;
 export type FirebaseApp = import("@firebase/app-types").FirebaseApp;
 
-export interface IEmailLogin {
+/**
+ * Create a user in the Auth system which can be logged in via the
+ * email/password authentication style
+ */
+export interface IEmailUser {
   email: string;
   password: string;
   /** optionally state if the user should be considered email verified */
   verified?: boolean;
   /** optionally set a fixed UID for this user */
   uid?: string;
+  /** optionally give the user a set of claims */
+  claims?: string[];
 }
 
 export type IMockSetup = (mock: Mock) => () => Promise<void>;
@@ -40,13 +46,19 @@ export interface IMockConfigOptions {
  * to add an "administrative" API for mocking
  */
 export interface IMockAuth extends FirebaseAuth, IMockAdminApi {}
+
+/**
+ * The configuration of the **Auth** mocking service
+ */
 export interface IMockAuthConfig {
   /**
-   * a list of email logins which are already setup as valid
-   * in the mock authentication module; this will be used for
-   * email logins as well as email links
+   * create a set of users who are deemed valid for email/password
+   * login; this will be used for email logins as well as email links.
+   *
+   * **Note:** if you set this without setting `allowEmailLogins` to true
+   * it will throw a `firemock/invalid-configuration` error.
    */
-  validEmailLogins?: IEmailLogin[];
+  validEmailUsers?: IEmailUser[];
   /** allow anonymous logins */
   allowAnonymous?: boolean;
   /** allow email/password logins */

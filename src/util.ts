@@ -133,7 +133,9 @@ export enum Delays {
 export type DelayType = number | number[] | IDictionary<number> | Delays;
 let _delay: IDictionary | number | number[] | Delays = 5;
 
-export function setNetworkDelay(value: IDictionary | number | number[] | Delays) {
+export function setNetworkDelay(
+  value: IDictionary | number | number[] | Delays
+) {
   _delay = value;
 }
 
@@ -162,9 +164,9 @@ function calcDelay(): number {
   if (delay === "random") {
     return getRandomInt(10, 300);
   }
-  if (delay === "weak") {
-    return getRandomInt(400, 900);
-  }
+  // if (delay === "weak") {
+  //   return getRandomInt(400, 900);
+  // }
   if (delay === "mobile") {
     return getRandomInt(300, 500);
   }

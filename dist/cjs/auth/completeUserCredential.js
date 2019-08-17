@@ -34,9 +34,6 @@ const fakeUserCredential = {
         async linkAndRetrieveDataWithCredential(credential) {
             return completeUserCredential({});
         },
-        // async linkWithCredential(credential: AuthCredential) {
-        //   return completeUserCredential({}).user;
-        // },
         async linkWithCredential(credential) {
             return completeUserCredential({});
         },
