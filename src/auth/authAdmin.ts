@@ -10,6 +10,10 @@ let authConfig: IMockAuthConfig = {
   allowAnonymous: true
 };
 
+export function clearAuthUsers() {
+  authConfig.validEmailUsers = [];
+}
+
 let ANONYMOUS_USER_ID: string;
 
 export type Observer = (user: User | null) => any;
@@ -27,6 +31,11 @@ let currentUser: User;
 export type IMockAdminApi = typeof authAdminApi;
 
 export const authAdminApi = {
+  /**
+   * Updates the Auth configuration
+   *
+   * @param config the new config parameters passed in
+   */
   configureAuth(config: IMockAuthConfig) {
     authConfig = { ...authConfig, ...config };
   },
@@ -80,7 +89,7 @@ export const authAdminApi = {
    * should get; if not stated the default is to
    * generate a random UID.
    */
-  setAnonymousUser(uid: string | null) {
+  setAnonymousUid(uid: string | null) {
     ANONYMOUS_USER_ID = uid;
     return authApi;
   },
@@ -88,7 +97,7 @@ export const authAdminApi = {
   /**
    * Gets a UID for an anonymous user; this UID will
    * be randomly generated unless it has been set
-   * statically with the `setAnonymousUser()` method
+   * statically with the `setAnonymousUid()` method
    */
   getAnonymousUid() {
     return ANONYMOUS_USER_ID ? ANONYMOUS_USER_ID : createUid();

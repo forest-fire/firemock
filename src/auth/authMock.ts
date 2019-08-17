@@ -16,12 +16,12 @@ import {
 } from "@firebase/auth-types";
 import { FireMockError } from "../errors/FireMockError";
 import {
-  checkIfEmailUserExists,
-  validEmailUserPassword,
+  emailExistsAsUserInAuth,
+  emailHasCorrectPassword,
   emailVerified,
   userUid,
   emailValidationAllowed,
-  checkIfEmailIsValidFormat
+  emailIsValidFormat
 } from "./authMockHelpers";
 
 export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
@@ -73,7 +73,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         "auth/operation-not-allowed"
       );
     }
-    if (!checkIfEmailIsValidFormat(email)) {
+    if (!emailIsValidFormat(email)) {
       throw new FireMockError(`invalid email: ${email}`, "auth/invalid-email");
     }
     const found = authAdminApi
@@ -86,7 +86,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       );
     }
 
-    if (!validEmailUserPassword(email, found.password)) {
+    if (!emailHasCorrectPassword(email, found.password)) {
       throw new FireMockError(
         `Invalid password for ${email}`,
         "auth/wrong-password"
@@ -124,24 +124,17 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       );
     }
 
-    if (checkIfEmailUserExists(email)) {
+    if (emailExistsAsUserInAuth(email)) {
       throw new FireMockError(
         `"${email}" user already exists`,
         "auth/email-already-in-use"
       );
     }
 
-    if (checkIfEmailIsValidFormat(email)) {
+    if (!emailIsValidFormat(email)) {
       throw new FireMockError(
-        `"${email}" user already exists`,
+        `"${email}" is not a valid email format`,
         "auth/invalid-email"
-      );
-    }
-
-    if (!validEmailUserPassword(email, password)) {
-      throw new FireMockError(
-        `invalid password for "${email}" user`,
-        "firemock/denied"
       );
     }
 
@@ -163,7 +156,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     const u = completeUserCredential(partial);
     authAdminApi.addUserToAuth(u.user, password);
     authAdminApi.login(u.user);
-    return completeUserCredential(partial);
+    console.log(u.user);
+
+    return u;
   },
 
   async confirmPasswordReset(code: string, newPassword: string) {

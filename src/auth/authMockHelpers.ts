@@ -2,16 +2,17 @@ import { authAdminApi } from "./authAdmin";
 import { User } from "@firebase/auth-types";
 import { validate } from "email-validator";
 
-export function checkIfEmailUserExists(email: string) {
-  const emails = authAdminApi.getValidEmailUsers();
-  return emails.map(e => e.email).includes(email);
+export function emailExistsAsUserInAuth(email: string) {
+  const emails = authAdminApi.getValidEmailUsers().map(i => i.email);
+
+  return emails.includes(email);
 }
 
-export function checkIfEmailIsValidFormat(email: string) {
+export function emailIsValidFormat(email: string) {
   return validate(email);
 }
 
-export function validEmailUserPassword(email: string, password: string) {
+export function emailHasCorrectPassword(email: string, password: string) {
   const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
   return config ? config.password === password : false;
 }
@@ -23,7 +24,7 @@ export function emailVerified(email: string) {
 
 export function userUid(email: string) {
   const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
-  return config.uid || createUid();
+  return config ? config.uid || createUid() : createUid();
 }
 
 export function createUid() {
