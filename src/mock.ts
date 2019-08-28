@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { Queue, Schema, SchemaHelper, Reference, Deployment } from "./index";
+import { Queue, Schema, Reference, Deployment, IMockSetup } from "./index";
 import {
   db,
   clearDatabase,
@@ -10,10 +10,15 @@ import {
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./auth/types";
 import { authAdminApi, clearAuthUsers } from "./auth/authAdmin";
 import { FireMockError } from "./errors/FireMockError";
-import { IRelationship, ISchema, IQueue, SchemaCallback } from "./types";
+import {
+  IRelationship,
+  ISchema,
+  IQueue,
+  SchemaCallback
+} from "./@types/db-types";
+import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
 export let faker: Faker.FakerStatic;
 
 /* tslint:disable:max-classes-per-file */

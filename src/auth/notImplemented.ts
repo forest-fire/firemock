@@ -1,4 +1,4 @@
-import { FirebaseAuth, UserCredential } from "./types";
+import { FirebaseAuth, UserCredential } from "../@types/auth-types";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 

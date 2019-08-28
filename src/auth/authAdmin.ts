@@ -1,7 +1,9 @@
-import { IMockAuthConfig, User, IEmailUser } from "./types";
 import { authApi } from "../auth";
 import { createUid } from "./authMockHelpers";
 import { FireMockError } from "../errors/FireMockError";
+import { IMockAuthConfig } from "../@types/config-types";
+import { User } from "@firebase/auth-types";
+import { IEmailUser } from "../@types/auth-types";
 
 /**
  * The **Auth** configuration dictionary

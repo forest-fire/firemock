@@ -15,7 +15,7 @@ export {
 export { IDictionary } from "common-types";
 export { MockHelper } from "./MockHelper";
 export * from "./auth/index";
-export * from "./types";
+export * from "./@types/db-types";
 
 export {
   GenericEventHandler,

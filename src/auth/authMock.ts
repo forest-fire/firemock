@@ -4,16 +4,13 @@ import {
   AuthCredential,
   User,
   IPartialUserCredential
-} from "./types";
+} from "../@types/auth-types";
 import { networkDelay } from "../util";
 import { authAdminApi, Observer } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError, Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
-import {
-  ActionCodeSettings,
-  TwitterAuthProvider_Instance
-} from "@firebase/auth-types";
+import { ActionCodeSettings } from "@firebase/auth-types";
 import { FireMockError } from "../errors/FireMockError";
 import {
   emailExistsAsUserInAuth,
