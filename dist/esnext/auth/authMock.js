@@ -4,7 +4,7 @@ import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { FireMockError } from "../errors/FireMockError";
-import { checkIfEmailUserExists, validEmailUserPassword, emailVerified, userUid, emailValidationAllowed, checkIfEmailIsValidFormat } from "./authMockHelpers";
+import { emailExistsAsUserInAuth, emailHasCorrectPassword, emailVerified, userUid, emailValidationAllowed, emailIsValidFormat } from "./authMockHelpers";
 export const implemented = {
     app: {
         name: "mocked-app",
@@ -47,7 +47,7 @@ export const implemented = {
         if (!emailValidationAllowed()) {
             throw new FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
-        if (!checkIfEmailIsValidFormat(email)) {
+        if (!emailIsValidFormat(email)) {
             throw new FireMockError(`invalid email: ${email}`, "auth/invalid-email");
         }
         const found = authAdminApi
@@ -56,7 +56,7 @@ export const implemented = {
         if (!found) {
             throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
-        if (!validEmailUserPassword(email, found.password)) {
+        if (!emailHasCorrectPassword(email, found.password)) {
             throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {
@@ -86,14 +86,11 @@ export const implemented = {
         if (!emailValidationAllowed()) {
             throw new FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
-        if (checkIfEmailUserExists(email)) {
+        if (emailExistsAsUserInAuth(email)) {
             throw new FireMockError(`"${email}" user already exists`, "auth/email-already-in-use");
         }
-        if (checkIfEmailIsValidFormat(email)) {
-            throw new FireMockError(`"${email}" user already exists`, "auth/invalid-email");
-        }
-        if (!validEmailUserPassword(email, password)) {
-            throw new FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+        if (!emailIsValidFormat(email)) {
+            throw new FireMockError(`"${email}" is not a valid email format`, "auth/invalid-email");
         }
         const partial = {
             user: {
@@ -113,7 +110,8 @@ export const implemented = {
         const u = completeUserCredential(partial);
         authAdminApi.addUserToAuth(u.user, password);
         authAdminApi.login(u.user);
-        return completeUserCredential(partial);
+        console.log(u.user);
+        return u;
     },
     async confirmPasswordReset(code, newPassword) {
         return;

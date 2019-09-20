@@ -1,4 +1,4 @@
-import { IPartialUserCredential, UserCredential } from "./types";
+import { IPartialUserCredential, UserCredential } from "../@types/auth-types";
 /**
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental

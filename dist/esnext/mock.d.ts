@@ -1,10 +1,10 @@
 /// <reference types="faker" />
 import { IDictionary } from "common-types";
-import { Schema, Reference, Deployment } from "./index";
+import { Schema, Reference, Deployment, IMockSetup } from "./index";
 import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
-import { IMockAuthConfig, IMockSetup, IMockConfigOptions } from "./auth/types";
-import { SchemaCallback } from "./types";
+import { SchemaCallback } from "./@types/db-types";
+import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
 export declare let faker: Faker.FakerStatic;
 export declare class Mock {
     /**
@@ -35,7 +35,7 @@ export declare class Mock {
      */
     dataOrMock?: IDictionary | IMockSetup, authConfig?: IMockAuthConfig);
     /**
-     * Update the mock DB with a raw JS object/hash
+     * Update (non-desctructively) the mock DB with a raw JS object/hash
      */
     updateDB(state: IDictionary): void;
     /**

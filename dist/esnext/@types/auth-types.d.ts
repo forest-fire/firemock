@@ -1,4 +1,11 @@
-import { IMockAdminApi } from "./authAdmin";
+/**
+ * Provides a full FirebaseAuth implementation (although many
+ * parts are un-implementated currently) as well as extending
+ * to add an "administrative" API for mocking
+ */
+export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
+}
+import { IMockAdminApi } from "../auth/authAdmin";
 import { Mock, IDictionary } from "..";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;

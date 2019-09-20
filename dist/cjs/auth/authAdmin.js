@@ -9,6 +9,10 @@ const FireMockError_1 = require("../errors/FireMockError");
 let authConfig = {
     allowAnonymous: true
 };
+function clearAuthUsers() {
+    authConfig.validEmailUsers = [];
+}
+exports.clearAuthUsers = clearAuthUsers;
 let ANONYMOUS_USER_ID;
 /**
  * callbacks sent in for callback when the
@@ -20,6 +24,11 @@ const authObservers = [];
  */
 let currentUser;
 exports.authAdminApi = {
+    /**
+     * Updates the Auth configuration
+     *
+     * @param config the new config parameters passed in
+     */
     configureAuth(config) {
         authConfig = Object.assign({}, authConfig, config);
     },
@@ -62,14 +71,14 @@ exports.authAdminApi = {
      * should get; if not stated the default is to
      * generate a random UID.
      */
-    setAnonymousUser(uid) {
+    setAnonymousUid(uid) {
         ANONYMOUS_USER_ID = uid;
         return auth_1.authApi;
     },
     /**
      * Gets a UID for an anonymous user; this UID will
      * be randomly generated unless it has been set
-     * statically with the `setAnonymousUser()` method
+     * statically with the `setAnonymousUid()` method
      */
     getAnonymousUid() {
         return ANONYMOUS_USER_ID ? ANONYMOUS_USER_ID : authMockHelpers_1.createUid();
