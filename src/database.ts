@@ -11,6 +11,7 @@ import { SnapShot, IMockWatcherGroupEvent } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { auth as mockedAuth } from "./auth";
 import { IFirebaseEventHandler } from "./@types/db-types";
+import deepmerge from "deepmerge";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
@@ -45,10 +46,7 @@ export function clearDatabase() {
 }
 
 export function updateDatabase(state: any) {
-  db = {
-    ...db,
-    ...state
-  };
+  db = deepmerge(db, state);
 }
 
 export async function auth() {
@@ -108,7 +106,9 @@ export function updateDB<T = any>(path: string, value: T) {
   if (
     typeof value === "object" &&
     Object.keys(value).every(
-      k => (oldValue ? (oldValue as IDictionary)[k] : null) === (value as IDictionary)[k]
+      k =>
+        (oldValue ? (oldValue as IDictionary)[k] : null) ===
+        (value as IDictionary)[k]
     )
   ) {
     changed = false;
@@ -122,7 +122,8 @@ export function updateDB<T = any>(path: string, value: T) {
     return;
   }
 
-  const newValue: T = typeof oldValue === "object" ? { ...oldValue, ...value } : value;
+  const newValue: T =
+    typeof oldValue === "object" ? { ...oldValue, ...value } : value;
 
   setDB(dotPath, newValue);
 }
@@ -153,7 +154,9 @@ export function multiPathUpdateDB(data: IDictionary) {
 
 const dotify = (path: string) => {
   const dotPath = path.replace(/[\\\/]/g, ".");
-  return removeDotsAtExtremes(dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath);
+  return removeDotsAtExtremes(
+    dotPath.slice(0, 1) === "." ? dotPath.slice(1) : dotPath
+  );
 };
 
 function dotifyKeys(obj: IDictionary) {
@@ -188,7 +191,8 @@ function groupEventsByWatcher(
 ): IMockWatcherGroupEvent[] {
   data = dotifyKeys(data);
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
-  const ignoreUnchanged = (path: string) => data[path] !== getFromSnapshot(path);
+  const ignoreUnchanged = (path: string) =>
+    data[path] !== getFromSnapshot(path);
   const eventPaths = Object.keys(data)
     .filter(ignoreUnchanged)
     .map(i => dotify(i));
@@ -199,7 +203,8 @@ function groupEventsByWatcher(
   };
 
   const justKey = (obj: IDictionary) => (obj ? Object.keys(obj)[0] : null);
-  const justValue = (obj: IDictionary) => (justKey(obj) ? obj[justKey(obj)] : null);
+  const justValue = (obj: IDictionary) =>
+    justKey(obj) ? obj[justKey(obj)] : null;
   getListeners().forEach(l => {
     const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
     if (eventPathsUnderListener.length === 0) {
@@ -265,7 +270,8 @@ export function removeDB(path: string) {
 export function pushDB(path: string, value: any): string {
   const pushId = fbKey();
   const fullPath = join(path, pushId);
-  const valuePlusId = typeof value === "object" ? { ...value, id: pushId } : value;
+  const valuePlusId =
+    typeof value === "object" ? { ...value, id: pushId } : value;
 
   setDB(fullPath, valuePlusId);
   return pushId;
@@ -346,7 +352,10 @@ export function removeListener(
       .filter(l => l.context === context);
 
     _listeners = _listeners.filter(
-      l => l.context !== context || l.callback !== callback || l.eventType !== eventType
+      l =>
+        l.context !== context ||
+        l.callback !== callback ||
+        l.eventType !== eventType
     );
 
     return cancelCallback(removed);
@@ -382,7 +391,9 @@ export function removeAllListeners(): number {
  * of only this type of event.
  */
 export function listenerCount(type?: EventType) {
-  return type ? _listeners.filter(l => l.eventType === type).length : _listeners.length;
+  return type
+    ? _listeners.filter(l => l.eventType === type).length
+    : _listeners.length;
 }
 
 export type EventTypePlusChild = EventType | "child";
@@ -397,7 +408,9 @@ export type EventTypePlusChild = EventType | "child";
  * You can also just state "child" as the event and it will resolve to all child
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
-export function listenerPaths(lookFor?: EventTypePlusChild | EventTypePlusChild[]) {
+export function listenerPaths(
+  lookFor?: EventTypePlusChild | EventTypePlusChild[]
+) {
   if (lookFor && !Array.isArray(lookFor)) {
     lookFor =
       lookFor === "child"
@@ -418,15 +431,29 @@ export function listenerPaths(lookFor?: EventTypePlusChild | EventTypePlusChild[
  * You can also just state "child" as the event and it will resolve to all child
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
-export function getListeners(lookFor?: EventTypePlusChild | EventTypePlusChild[]) {
-  const childEvents = ["child_added", "child_changed", "child_removed", "child_moved"];
+export function getListeners(
+  lookFor?: EventTypePlusChild | EventTypePlusChild[]
+) {
+  const childEvents = [
+    "child_added",
+    "child_changed",
+    "child_removed",
+    "child_moved"
+  ];
   const allEvents = childEvents.concat(["value"]);
-  const events = !lookFor ? allEvents : lookFor === "child" ? childEvents : lookFor;
+  const events = !lookFor
+    ? allEvents
+    : lookFor === "child"
+    ? childEvents
+    : lookFor;
 
   return _listeners.filter(l => events.includes(l.eventType));
 }
 
-function keyDidNotPreviouslyExist(e: IMockWatcherGroupEvent, dbSnapshot: IDictionary) {
+function keyDidNotPreviouslyExist(
+  e: IMockWatcherGroupEvent,
+  dbSnapshot: IDictionary
+) {
   return get(dbSnapshot, e.key) === undefined ? true : false;
 }
 
@@ -474,7 +501,9 @@ function notify<T = any>(data: IDictionary, dbSnapshot: IDictionary) {
           e.callback(
             new SnapShot(
               e.listenerPath,
-              e.value === null || e.value === undefined ? undefined : { [e.key]: e.value }
+              e.value === null || e.value === undefined
+                ? undefined
+                : { [e.key]: e.value }
             )
           );
         } else {
@@ -515,7 +544,10 @@ export type IListenerPlus = IListener & { id: string; changeIsAtRoot: boolean };
  * @param changePath the _parent path_ that children are detected off of
  * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
-export function findChildListeners(changePath: string, ...eventTypes: EventType[]) {
+export function findChildListeners(
+  changePath: string,
+  ...eventTypes: EventType[]
+) {
   changePath = stripLeadingDot(changePath.replace(/\//g, "."));
   eventTypes =
     eventTypes.length !== 0

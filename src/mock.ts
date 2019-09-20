@@ -97,10 +97,18 @@ export class Mock {
   }
 
   /**
-   * Update the mock DB with a raw JS object/hash
+   * Update -- _non-desctructively_ -- the mock DB with a JS object/hash
    */
-  public updateDB(state: IDictionary) {
-    updateDatabase(state);
+  public updateDB(
+    /** the _new_ state that will be updated with the old */
+    stateUpdate: IDictionary,
+    /** optionally clear the DB before applying the update */
+    clearFirst?: boolean
+  ) {
+    if (clearFirst) {
+      clearDatabase();
+    }
+    updateDatabase(stateUpdate);
   }
 
   /**

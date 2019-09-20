@@ -1,7 +1,7 @@
 import { IDictionary } from "common-types";
 import { IListener } from "./query";
 import { DataSnapshot, EventType } from "@firebase/database-types";
-import { IFirebaseEventHandler } from "./types";
+import { IFirebaseEventHandler } from "./@types/db-types";
 export declare type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export declare let db: IDictionary;
 /**

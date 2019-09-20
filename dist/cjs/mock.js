@@ -34,6 +34,7 @@ class Mock {
         this._queues = new index_1.Queue("queues").clear();
         index_1.Queue.clearAll();
         database_1.clearDatabase();
+        authAdmin_1.clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
         }
@@ -58,10 +59,12 @@ class Mock {
             allowAnonymous: true,
             allowEmailLogins: false,
             allowEmailLinks: false,
-            allowPhoneLogins: false
+            allowPhoneLogins: false,
+            validEmailUsers: []
         };
         const defaultDbConfig = {};
-        const obj = new Mock(options.db || defaultDbConfig, options.auth || defaultAuthConfig);
+        const obj = new Mock(options.db || defaultDbConfig, options.auth
+            ? Object.assign({}, defaultAuthConfig, options.auth) : defaultAuthConfig);
         await obj.importFakerLibrary();
         return obj;
     }
@@ -72,7 +75,7 @@ class Mock {
         return new index_1.Deployment();
     }
     /**
-     * Update the mock DB with a raw JS object/hash
+     * Update (non-desctructively) the mock DB with a raw JS object/hash
      */
     updateDB(state) {
         database_1.updateDatabase(state);

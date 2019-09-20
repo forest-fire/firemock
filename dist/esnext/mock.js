@@ -3,7 +3,7 @@ import { db, clearDatabase, updateDatabase, silenceEvents, restoreEvents } from 
 import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { authAdminApi } from "./auth/authAdmin";
+import { authAdminApi, clearAuthUsers } from "./auth/authAdmin";
 import { FireMockError } from "./errors/FireMockError";
 export let faker;
 /* tslint:disable:max-classes-per-file */
@@ -26,6 +26,7 @@ export class Mock {
         this._queues = new Queue("queues").clear();
         Queue.clearAll();
         clearDatabase();
+        clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
         }
@@ -50,10 +51,12 @@ export class Mock {
             allowAnonymous: true,
             allowEmailLogins: false,
             allowEmailLinks: false,
-            allowPhoneLogins: false
+            allowPhoneLogins: false,
+            validEmailUsers: []
         };
         const defaultDbConfig = {};
-        const obj = new Mock(options.db || defaultDbConfig, options.auth || defaultAuthConfig);
+        const obj = new Mock(options.db || defaultDbConfig, options.auth
+            ? Object.assign({}, defaultAuthConfig, options.auth) : defaultAuthConfig);
         await obj.importFakerLibrary();
         return obj;
     }
@@ -64,7 +67,7 @@ export class Mock {
         return new Deployment();
     }
     /**
-     * Update the mock DB with a raw JS object/hash
+     * Update (non-desctructively) the mock DB with a raw JS object/hash
      */
     updateDB(state) {
         updateDatabase(state);

@@ -2,7 +2,7 @@ import {
   IMockFirebaseCustomClaimPath,
   IMockFirebaseUidOnlyPath
 } from "../@types/config-types";
-import { IMockPathPermissions, User } from "../@types/auth-types";
+import { User } from "../@types/auth-types";
 
 let _readOnlyPaths: string[] = [];
 let _customClaims: IMockFirebaseCustomClaimPath[] = [];
@@ -12,7 +12,7 @@ let _uidBasedPaths: IMockFirebaseUidOnlyPath[] = [];
  * Given a _path_ and Firebase _user_, determines what
  * access rights are available and passes back as a hash.
  */
-export function authorizePath(path: string, user: User): IMockPathPermissions {
+export function authorizePath(path: string, user: User) {
   //
   return { read: true, write: true };
 }

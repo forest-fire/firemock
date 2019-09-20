@@ -8,6 +8,7 @@ import copy from "fast-copy";
 import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
 import { SnapShot } from "./index";
 import { auth as mockedAuth } from "./auth";
+import deepmerge from "deepmerge";
 export let db = [];
 let _listeners = [];
 let _silenceEvents = false;
@@ -33,7 +34,7 @@ export function clearDatabase() {
     db = {};
 }
 export function updateDatabase(state) {
-    db = Object.assign({}, db, state);
+    db = deepmerge(db, state);
 }
 export async function auth() {
     return mockedAuth();
@@ -84,7 +85,8 @@ export function updateDB(path, value) {
     const oldValue = get(db, dotPath);
     let changed = true;
     if (typeof value === "object" &&
-        Object.keys(value).every(k => (oldValue ? oldValue[k] : null) === value[k])) {
+        Object.keys(value).every(k => (oldValue ? oldValue[k] : null) ===
+            value[k])) {
         changed = false;
     }
     if (typeof value !== "object" && value === oldValue) {
@@ -156,7 +158,7 @@ function groupEventsByWatcher(data, dbSnapshot) {
         return full.replace(partial, "");
     };
     const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
-    const justValue = (obj) => (justKey(obj) ? obj[justKey(obj)] : null);
+    const justValue = (obj) => justKey(obj) ? obj[justKey(obj)] : null;
     getListeners().forEach(l => {
         const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
         if (eventPathsUnderListener.length === 0) {
@@ -273,7 +275,9 @@ export function removeListener(eventType, callback, context) {
             .filter(l => l.callback === callback)
             .filter(l => l.eventType === eventType)
             .filter(l => l.context === context);
-        _listeners = _listeners.filter(l => l.context !== context || l.callback !== callback || l.eventType !== eventType);
+        _listeners = _listeners.filter(l => l.context !== context ||
+            l.callback !== callback ||
+            l.eventType !== eventType);
         return cancelCallback(removed);
     }
 }
@@ -304,7 +308,9 @@ export function removeAllListeners() {
  * of only this type of event.
  */
 export function listenerCount(type) {
-    return type ? _listeners.filter(l => l.eventType === type).length : _listeners.length;
+    return type
+        ? _listeners.filter(l => l.eventType === type).length
+        : _listeners.length;
 }
 /**
  * **listenerPaths**
@@ -337,9 +343,18 @@ export function listenerPaths(lookFor) {
  * events: `[ 'child_added', 'child_changed', 'child_removed', 'child_moved' ]`
  */
 export function getListeners(lookFor) {
-    const childEvents = ["child_added", "child_changed", "child_removed", "child_moved"];
+    const childEvents = [
+        "child_added",
+        "child_changed",
+        "child_removed",
+        "child_moved"
+    ];
     const allEvents = childEvents.concat(["value"]);
-    const events = !lookFor ? allEvents : lookFor === "child" ? childEvents : lookFor;
+    const events = !lookFor
+        ? allEvents
+        : lookFor === "child"
+            ? childEvents
+            : lookFor;
     return _listeners.filter(l => events.includes(l.eventType));
 }
 function keyDidNotPreviouslyExist(e, dbSnapshot) {
@@ -384,7 +399,9 @@ function notify(data, dbSnapshot) {
                 const snapKey = new SnapShot(e.listenerPath, e.value).key;
                 if (snapKey === e.key) {
                     // root set
-                    e.callback(new SnapShot(e.listenerPath, e.value === null || e.value === undefined ? undefined : { [e.key]: e.value }));
+                    e.callback(new SnapShot(e.listenerPath, e.value === null || e.value === undefined
+                        ? undefined
+                        : { [e.key]: e.value }));
                 }
                 else {
                     // property set

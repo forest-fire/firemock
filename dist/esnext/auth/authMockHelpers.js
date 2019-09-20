@@ -1,13 +1,13 @@
 import { authAdminApi } from "./authAdmin";
 import { validate } from "email-validator";
-export function checkIfEmailUserExists(email) {
-    const emails = authAdminApi.getValidEmailUsers();
-    return emails.map(e => e.email).includes(email);
+export function emailExistsAsUserInAuth(email) {
+    const emails = authAdminApi.getValidEmailUsers().map(i => i.email);
+    return emails.includes(email);
 }
-export function checkIfEmailIsValidFormat(email) {
+export function emailIsValidFormat(email) {
     return validate(email);
 }
-export function validEmailUserPassword(email, password) {
+export function emailHasCorrectPassword(email, password) {
     const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
     return config ? config.password === password : false;
 }
@@ -17,7 +17,7 @@ export function emailVerified(email) {
 }
 export function userUid(email) {
     const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
-    return config.uid || createUid();
+    return config ? config.uid || createUid() : createUid();
 }
 export function createUid() {
     // example: 0CMjMW6vWQePd3zVmap78mHCxst1

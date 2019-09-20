@@ -49,7 +49,7 @@ exports.implemented = {
         if (!authMockHelpers_1.emailValidationAllowed()) {
             throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
-        if (!authMockHelpers_1.checkIfEmailIsValidFormat(email)) {
+        if (!authMockHelpers_1.emailIsValidFormat(email)) {
             throw new FireMockError_1.FireMockError(`invalid email: ${email}`, "auth/invalid-email");
         }
         const found = authAdmin_1.authAdminApi
@@ -58,7 +58,7 @@ exports.implemented = {
         if (!found) {
             throw common_types_1.createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
-        if (!authMockHelpers_1.validEmailUserPassword(email, found.password)) {
+        if (!authMockHelpers_1.emailHasCorrectPassword(email, found.password)) {
             throw new FireMockError_1.FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {
@@ -88,14 +88,11 @@ exports.implemented = {
         if (!authMockHelpers_1.emailValidationAllowed()) {
             throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
-        if (authMockHelpers_1.checkIfEmailUserExists(email)) {
+        if (authMockHelpers_1.emailExistsAsUserInAuth(email)) {
             throw new FireMockError_1.FireMockError(`"${email}" user already exists`, "auth/email-already-in-use");
         }
-        if (authMockHelpers_1.checkIfEmailIsValidFormat(email)) {
-            throw new FireMockError_1.FireMockError(`"${email}" user already exists`, "auth/invalid-email");
-        }
-        if (!authMockHelpers_1.validEmailUserPassword(email, password)) {
-            throw new FireMockError_1.FireMockError(`invalid password for "${email}" user`, "firemock/denied");
+        if (!authMockHelpers_1.emailIsValidFormat(email)) {
+            throw new FireMockError_1.FireMockError(`"${email}" is not a valid email format`, "auth/invalid-email");
         }
         const partial = {
             user: {
@@ -115,7 +112,8 @@ exports.implemented = {
         const u = completeUserCredential_1.completeUserCredential(partial);
         authAdmin_1.authAdminApi.addUserToAuth(u.user, password);
         authAdmin_1.authAdminApi.login(u.user);
-        return completeUserCredential_1.completeUserCredential(partial);
+        console.log(u.user);
+        return u;
     },
     async confirmPasswordReset(code, newPassword) {
         return;
