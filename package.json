@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.30.1",
+  "version": "0.30.2",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -32,12 +32,12 @@
     "deploy": "ts-node ./scripts/deploy.ts "
   },
   "dependencies": {
-    "@firebase/app-types": "^0.4.3",
+    "@firebase/app-types": "^0.4.4",
     "@firebase/auth-types": "^0.7.2",
-    "@firebase/database-types": "^0.4.3",
+    "@firebase/database-types": "^0.4.4",
     "@firebase/util": "^0.2.25",
     "@types/faker": "^4.1.5",
-    "common-types": "^1.11.23",
+    "common-types": "^1.12.7",
     "deepmerge": "^4.0.0",
     "email-validator": "^2.0.4",
     "faker": "^4.1.0",
@@ -63,10 +63,10 @@
     "@types/node": "^8.0.0",
     "@types/rimraf": "^0.0.28",
     "@types/stack-trace": "^0.0.29",
-    "@vuepress/plugin-back-to-top": "^1.0.3",
-    "@vuepress/plugin-last-updated": "^1.0.3",
-    "@vuepress/plugin-medium-zoom": "^1.0.3",
-    "@vuepress/plugin-pwa": "^1.0.3",
+    "@vuepress/plugin-back-to-top": "^1.1.0",
+    "@vuepress/plugin-last-updated": "^1.1.0",
+    "@vuepress/plugin-medium-zoom": "^1.1.0",
+    "@vuepress/plugin-pwa": "^1.1.0",
     "async-shelljs": "^0.1.2",
     "chai": "^4.2.0",
     "chalk": "^2.4.2",
@@ -78,8 +78,8 @@
     "ts-node": "^8.2.0",
     "tslint": "^5.18.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.3",
-    "vuepress": "^1.0.3"
+    "typescript": "^3.6.3",
+    "vuepress": "^1.1.0"
   },
   "engines": {
     "node": ">=8.0.0"
