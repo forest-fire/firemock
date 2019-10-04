@@ -50,7 +50,7 @@ export function getDb(path) {
 export function setDB(path, value, silent = false) {
     const dotPath = join(path);
     const oldRef = get(db, dotPath);
-    const oldValue = typeof oldRef === "object" ? Object.assign({}, oldRef, {}) : oldRef;
+    const oldValue = typeof oldRef === "object" ? Object.assign(Object.assign({}, oldRef), {}) : oldRef;
     const isReference = ["object", "array"].includes(typeof value);
     const dbSnapshot = copy(Object.assign({}, db));
     // ignore if no change
@@ -95,7 +95,7 @@ export function updateDB(path, value) {
     if (!changed) {
         return;
     }
-    const newValue = typeof oldValue === "object" ? Object.assign({}, oldValue, value) : value;
+    const newValue = typeof oldValue === "object" ? Object.assign(Object.assign({}, oldValue), value) : value;
     setDB(dotPath, newValue);
 }
 /**
@@ -214,7 +214,7 @@ export function removeDB(path) {
 export function pushDB(path, value) {
     const pushId = fbKey();
     const fullPath = join(path, pushId);
-    const valuePlusId = typeof value === "object" ? Object.assign({}, value, { id: pushId }) : value;
+    const valuePlusId = typeof value === "object" ? Object.assign(Object.assign({}, value), { id: pushId }) : value;
     setDB(fullPath, valuePlusId);
     return pushId;
 }
@@ -453,7 +453,7 @@ export function findChildListeners(changePath, ...eventTypes) {
             .filter(i => i)[0]);
         const remainingPath = stripLeadingDot(changePath.replace(stripLeadingDot(listener.path), ""));
         const changeIsAtRoot = id === remainingPath;
-        acc.push(Object.assign({}, listener, { id, changeIsAtRoot }));
+        acc.push(Object.assign(Object.assign({}, listener), { id, changeIsAtRoot }));
         return acc;
     }, []);
     return decendants;

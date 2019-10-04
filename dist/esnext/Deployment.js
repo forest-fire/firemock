@@ -57,7 +57,7 @@ export default class Deployment {
         else {
             const queue = this._queue.find(this.queueId);
             this._queue.update(this.queueId, {
-                hasMany: Object.assign({}, queue.hasMany, { [pluralize(targetSchema)]: quantity })
+                hasMany: Object.assign(Object.assign({}, queue.hasMany), { [pluralize(targetSchema)]: quantity })
             });
         }
         return this;
@@ -74,7 +74,7 @@ export default class Deployment {
         const sourceProperty = schema.path();
         const queue = this._queue.find(this.queueId);
         this._queue.update(this.queueId, {
-            belongsTo: Object.assign({}, queue.belongsTo, { [`${targetSchema}Id`]: true })
+            belongsTo: Object.assign(Object.assign({}, queue.belongsTo), { [`${targetSchema}Id`]: true })
         });
         return this;
     }
@@ -97,7 +97,7 @@ export default class Deployment {
         const path = schema.path();
         const key = overrides.id || fbKey.key();
         set(db, dotNotation(path) + `.${key}`, typeof mock === "object"
-            ? Object.assign({}, mock, overrides) : overrides && typeof overrides !== "object"
+            ? Object.assign(Object.assign({}, mock), overrides) : overrides && typeof overrides !== "object"
             ? overrides
             : mock);
         return key;

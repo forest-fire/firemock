@@ -14,7 +14,7 @@ export declare function lastProp<T = IDictionary>(listOf: IDictionary<any>): T;
 export declare function objectIndex(obj: IDictionary, index: number): any;
 export declare function firstKey<T = any>(listOf: IDictionary<T>): string;
 export declare function lastKey<T = any>(listOf: IDictionary<T>): string;
-export declare function removeKeys(obj: IDictionary, remove: string[]): {};
+export declare function removeKeys(obj: IDictionary, remove: string[]): IDictionary<any>;
 /**
  * Joins a set of paths together and converts into
  * correctly formatted "dot notation" directory path

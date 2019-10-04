@@ -13,5 +13,5 @@ exports.auth = async () => {
     return exports.authApi;
 };
 // tslint:disable-next-line:no-object-literal-type-assertion
-exports.authApi = Object.assign({}, authMock_1.authMockApi, authAdmin_1.authAdminApi);
+exports.authApi = Object.assign(Object.assign({}, authMock_1.authMockApi), authAdmin_1.authAdminApi);
 //# sourceMappingURL=auth.js.map

@@ -62,7 +62,7 @@ exports.getDb = getDb;
 function setDB(path, value, silent = false) {
     const dotPath = util_1.join(path);
     const oldRef = lodash_get_1.default(exports.db, dotPath);
-    const oldValue = typeof oldRef === "object" ? Object.assign({}, oldRef, {}) : oldRef;
+    const oldValue = typeof oldRef === "object" ? Object.assign(Object.assign({}, oldRef), {}) : oldRef;
     const isReference = ["object", "array"].includes(typeof value);
     const dbSnapshot = fast_copy_1.default(Object.assign({}, exports.db));
     // ignore if no change
@@ -108,7 +108,7 @@ function updateDB(path, value) {
     if (!changed) {
         return;
     }
-    const newValue = typeof oldValue === "object" ? Object.assign({}, oldValue, value) : value;
+    const newValue = typeof oldValue === "object" ? Object.assign(Object.assign({}, oldValue), value) : value;
     setDB(dotPath, newValue);
 }
 exports.updateDB = updateDB;
@@ -230,7 +230,7 @@ exports.removeDB = removeDB;
 function pushDB(path, value) {
     const pushId = firebase_key_1.key();
     const fullPath = util_1.join(path, pushId);
-    const valuePlusId = typeof value === "object" ? Object.assign({}, value, { id: pushId }) : value;
+    const valuePlusId = typeof value === "object" ? Object.assign(Object.assign({}, value), { id: pushId }) : value;
     setDB(fullPath, valuePlusId);
     return pushId;
 }
@@ -476,7 +476,7 @@ function findChildListeners(changePath, ...eventTypes) {
             .filter(i => i)[0]);
         const remainingPath = util_1.stripLeadingDot(changePath.replace(util_1.stripLeadingDot(listener.path), ""));
         const changeIsAtRoot = id === remainingPath;
-        acc.push(Object.assign({}, listener, { id, changeIsAtRoot }));
+        acc.push(Object.assign(Object.assign({}, listener), { id, changeIsAtRoot }));
         return acc;
     }, []);
     return decendants;

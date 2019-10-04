@@ -27,7 +27,7 @@ export const authAdminApi = {
      * @param config the new config parameters passed in
      */
     configureAuth(config) {
-        authConfig = Object.assign({}, authConfig, config);
+        authConfig = Object.assign(Object.assign({}, authConfig), config);
     },
     getValidEmailUsers() {
         return authConfig.validEmailUsers || [];
@@ -48,7 +48,7 @@ export const authAdminApi = {
         authConfig.validEmailUsers = authConfig.validEmailUsers.map(i => {
             if (i.email === email) {
                 found = true;
-                return Object.assign({}, i, updates);
+                return Object.assign(Object.assign({}, i), updates);
             }
             return i;
         });

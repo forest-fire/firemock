@@ -7,6 +7,7 @@ import merge from "deepmerge";
 export function completeUserCredential(partial) {
     const fakeUserCredential = {
         user: {
+            tenantId: "fake-tenantId",
             async delete() {
                 return;
             },

@@ -12,6 +12,7 @@ const deepmerge_1 = __importDefault(require("deepmerge"));
 function completeUserCredential(partial) {
     const fakeUserCredential = {
         user: {
+            tenantId: "fake-tenantId",
             async delete() {
                 return;
             },
