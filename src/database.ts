@@ -53,7 +53,7 @@ export async function auth() {
   return mockedAuth();
 }
 
-export function getDb(path: string) {
+export function getDb<T = any>(path: string) {
   return get(db, dotify(path));
 }
 

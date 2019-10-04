@@ -1,8 +1,10 @@
 import { IDictionary } from "common-types";
 import { IEmailUser } from "./auth-types";
+/** an _async_ mock function which returns a dictionary data structure */
+export declare type AsyncMockData = () => Promise<IDictionary>;
 export interface IMockConfigOptions {
     auth?: IMockAuthConfig;
-    db?: IDictionary;
+    db?: IDictionary | AsyncMockData;
 }
 export interface IMockAuthConfig {
     /**

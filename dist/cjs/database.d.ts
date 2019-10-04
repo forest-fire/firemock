@@ -19,7 +19,7 @@ export declare function shouldSendEvents(): boolean;
 export declare function clearDatabase(): void;
 export declare function updateDatabase(state: any): void;
 export declare function auth(): Promise<import(".").IMockAuth>;
-export declare function getDb(path: string): any;
+export declare function getDb<T = any>(path: string): any;
 /**
  * **setDB**
  *

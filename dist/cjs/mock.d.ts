@@ -35,9 +35,13 @@ export declare class Mock {
      */
     dataOrMock?: IDictionary | IMockSetup, authConfig?: IMockAuthConfig);
     /**
-     * Update (non-desctructively) the mock DB with a raw JS object/hash
+     * Update -- _non-desctructively_ -- the mock DB with a JS object/hash
      */
-    updateDB(state: IDictionary): void;
+    updateDB(
+    /** the _new_ state that will be updated with the old */
+    stateUpdate: IDictionary, 
+    /** optionally clear the DB before applying the update */
+    clearFirst?: boolean): void;
     /**
      * silences the database from sending events;
      * this is not typically done but can be done

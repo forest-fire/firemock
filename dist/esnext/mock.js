@@ -55,7 +55,11 @@ export class Mock {
             validEmailUsers: []
         };
         const defaultDbConfig = {};
-        const obj = new Mock(options.db || defaultDbConfig, options.auth
+        const obj = new Mock(options.db
+            ? typeof options.db === "function"
+                ? await options.db()
+                : options.db || defaultDbConfig
+            : defaultDbConfig, options.auth
             ? Object.assign({}, defaultAuthConfig, options.auth) : defaultAuthConfig);
         await obj.importFakerLibrary();
         return obj;
@@ -67,10 +71,17 @@ export class Mock {
         return new Deployment();
     }
     /**
-     * Update (non-desctructively) the mock DB with a raw JS object/hash
+     * Update -- _non-desctructively_ -- the mock DB with a JS object/hash
      */
-    updateDB(state) {
-        updateDatabase(state);
+    updateDB(
+    /** the _new_ state that will be updated with the old */
+    stateUpdate, 
+    /** optionally clear the DB before applying the update */
+    clearFirst) {
+        if (clearFirst) {
+            clearDatabase();
+        }
+        updateDatabase(stateUpdate);
     }
     /**
      * silences the database from sending events;

@@ -45,7 +45,11 @@ export class Mock {
     };
     const defaultDbConfig = {};
     const obj = new Mock(
-      options.db || defaultDbConfig,
+      options.db
+        ? typeof options.db === "function"
+          ? await options.db()
+          : options.db || defaultDbConfig
+        : defaultDbConfig,
       options.auth
         ? { ...defaultAuthConfig, ...options.auth }
         : defaultAuthConfig

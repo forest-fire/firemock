@@ -17,11 +17,12 @@ import {
   updateDB,
   findChildListeners,
   findValueListeners,
-  reset
+  reset,
+  getDb
 } from "../src/database";
 import { GenericEventHandler, HandleValueEvent } from "../src/query";
 import "mocha";
-import { wait } from "common-types";
+import { wait, IDictionary } from "common-types";
 
 const expect = chai.expect;
 
@@ -337,6 +338,37 @@ describe("Database", () => {
       const andThen = (await m.ref("/people").once("value")).val();
       expect(Object.keys(andThen)).to.have.lengthOf(9);
       expect(Object.keys(andThen)).to.not.include(firstKey);
+    });
+  });
+
+  describe("Initialing DB state", () => {
+    it("passing in dictionary for db config initializes the DB", async () => {
+      reset();
+      const m = await Mock.prepare({
+        db: { foo: { bar: true, baz: true } }
+      });
+
+      expect(db).to.be.an("object");
+      expect(db.foo).to.be.an("object");
+      expect(db.foo.bar).to.equal(true);
+      expect(db.foo.baz).to.equal(true);
+    });
+
+    it("passing in an async function to db config initializes the DB", async () => {
+      reset();
+      const m = await Mock.prepare({
+        db: async () => {
+          await wait(5);
+          return {
+            foo: { bar: true, baz: true }
+          };
+        }
+      });
+
+      expect(db).to.be.an("object");
+      expect(db.foo).to.be.an("object");
+      expect(db.foo.bar).to.equal(true);
+      expect(db.foo.baz).to.equal(true);
     });
   });
 
