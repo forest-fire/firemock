@@ -20,6 +20,7 @@ export function completeUserCredential(
 ): UserCredential {
   const fakeUserCredential: UserCredential = {
     user: {
+      tenantId: "fake-tenantId",
       async delete() {
         return;
       },
