@@ -103,7 +103,7 @@ class Queue {
         }
         if (typeof currently === "object" && typeof value === "object") {
             value[this.pkProperty] = key;
-            const updated = Object.assign({}, currently, value);
+            const updated = Object.assign(Object.assign({}, currently), value);
             this.enqueue(updated);
         }
         else {
@@ -130,9 +130,9 @@ class Queue {
                 // tslint:disable-next-line
                 const o = Object.assign({}, item);
                 delete o[this.pkProperty];
-                return Object.assign({}, obj, { [pk]: o });
+                return Object.assign(Object.assign({}, obj), { [pk]: o });
             }, new Object())
-            : queue.reduce((obj, item) => (obj = Object.assign({}, obj, { [item]: true })), new Object());
+            : queue.reduce((obj, item) => (obj = Object.assign(Object.assign({}, obj), { [item]: true })), new Object());
     }
     map(fn) {
         const queuedSchemas = Queue._queues[this._name];
@@ -164,6 +164,6 @@ class Queue {
         return result;
     }
 }
-Queue._queues = {};
 exports.default = Queue;
+Queue._queues = {};
 //# sourceMappingURL=queue.js.map

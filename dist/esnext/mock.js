@@ -60,7 +60,7 @@ export class Mock {
                 ? await options.db()
                 : options.db || defaultDbConfig
             : defaultDbConfig, options.auth
-            ? Object.assign({}, defaultAuthConfig, options.auth) : defaultAuthConfig);
+            ? Object.assign(Object.assign({}, defaultAuthConfig), options.auth) : defaultAuthConfig);
         await obj.importFakerLibrary();
         return obj;
     }

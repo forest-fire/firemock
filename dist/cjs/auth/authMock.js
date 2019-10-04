@@ -136,5 +136,5 @@ exports.implemented = {
     }
 };
 // tslint:disable-next-line:no-object-literal-type-assertion
-exports.authMockApi = Object.assign({}, notImplemented_1.notImplemented, exports.implemented);
+exports.authMockApi = Object.assign(Object.assign({}, notImplemented_1.notImplemented), exports.implemented);
 //# sourceMappingURL=authMock.js.map
