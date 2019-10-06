@@ -9,4 +9,5 @@ export { default as Deployment } from "./Deployment";
 export { reset as resetDatabase, silenceEvents, restoreEvents, shouldSendEvents } from "./database";
 export { MockHelper } from "./MockHelper";
 export * from "./auth/index";
+export { getMockHelper } from "./getMockHelper";
 //# sourceMappingURL=index.js.map

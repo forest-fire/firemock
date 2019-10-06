@@ -11,4 +11,5 @@ export { IDictionary } from "common-types";
 export { MockHelper } from "./MockHelper";
 export * from "./auth/index";
 export * from "./@types/db-types";
+export { getMockHelper } from "./getMockHelper";
 export { GenericEventHandler, HandleValueEvent, HandleChangeEvent, HandleMoveEvent, HandleNewEvent, HandleRemoveEvent } from "./query";
