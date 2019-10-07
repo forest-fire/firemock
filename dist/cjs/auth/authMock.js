@@ -20,10 +20,6 @@ exports.implemented = {
         authAdmin_1.authAdminApi.addAuthObserver(observer);
     },
     async setPersistence() {
-        // throw createError(
-        //   "auth/not-implemented",
-        //   "This feature is not implemented yet in FireMock auth module"
-        // );
         console.warn(`currently firemock does not object to the use of setPersistence() but it doesn't support it either.`);
     },
     signInAnonymously: async () => {
