@@ -44,9 +44,6 @@ exports.notImplemented = {
     async sendSignInLinkToEmail() {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
-    async setPersistence() {
-        throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
-    },
     async signInAndRetrieveDataWithCredential() {
         throw common_types_1.createError("auth/not-implemented", "This feature is not implemented yet in FireMock auth module");
     },
