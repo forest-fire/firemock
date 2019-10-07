@@ -149,7 +149,8 @@ const slashify = (path) => {
 function groupEventsByWatcher(data, dbSnapshot) {
     data = dotifyKeys(data);
     const getFromSnapshot = (path) => get(dbSnapshot, dotify(path));
-    const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path);
+    const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path) &&
+        (data[path] || getFromSnapshot(path));
     const eventPaths = Object.keys(data)
         .filter(ignoreUnchanged)
         .map(i => dotify(i));
