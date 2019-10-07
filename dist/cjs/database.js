@@ -259,10 +259,10 @@ function addListener(path, eventType, callback, cancelCallbackOrContext, context
         context
     });
     if (eventType === "value") {
-        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, getDb(util_1.join(path)));
+        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, fast_copy_1.default(Object.assign({}, exports.db)));
     }
     else if (eventType === "child_added") {
-        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, getDb(util_1.join(path)));
+        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, fast_copy_1.default(Object.assign({}, exports.db)));
     }
 }
 exports.addListener = addListener;

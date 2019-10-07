@@ -308,9 +308,9 @@ export function addListener(
   });
 
   if (eventType === "value") {
-    notify({ [join(path)]: getDb(join(path)) }, getDb(join(path)));
+    notify({ [join(path)]: getDb(join(path)) }, copy({ ...db }));
   } else if (eventType === "child_added") {
-    notify({ [join(path)]: getDb(join(path)) }, getDb(join(path)));
+    notify({ [join(path)]: getDb(join(path)) }, copy({ ...db }));
   }
 }
 
