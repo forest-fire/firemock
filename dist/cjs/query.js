@@ -98,6 +98,9 @@ class Query {
         this._queryFilters.push(filter);
         return this;
     }
+    /**
+     * Setup an event listener for a given eventType
+     */
     on(eventType, callback, cancelCallbackOrContext, context) {
         database_1.addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
         return null;
@@ -201,7 +204,7 @@ class Query {
                 key: "id"
             });
             const sorted = this.processSorting(mockDatabaseResults);
-            const remainingIds = new Set(this.processFilters(sorted).map((f) => (typeof f === "object" ? f.id : f)));
+            const remainingIds = new Set(this.processFilters(sorted).map((f) => typeof f === "object" ? f.id : f));
             const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
             snap = new snapshot_1.default(util_1.leafNode(this.path), convert.keyValueArrayToDictionary(resultset, { key: "id" }));
         }

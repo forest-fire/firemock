@@ -12,13 +12,25 @@ import * as convert from "typed-conversions";
 import Reference from "./reference";
 import { join, leafNode, DelayType, networkDelay } from "./util";
 
-export type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
+export type EventHandler =
+  | HandleValueEvent
+  | HandleNewEvent
+  | HandleRemoveEvent;
 export type GenericEventHandler = (snap: SnapShot, key?: string) => void;
 export type HandleValueEvent = (dataSnapShot: SnapShot) => void;
-export type HandleNewEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
+export type HandleNewEvent = (
+  childSnapshot: SnapShot,
+  prevChildKey: string
+) => void;
 export type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
-export type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
-export type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
+export type HandleMoveEvent = (
+  childSnapshot: SnapShot,
+  prevChildKey: string
+) => void;
+export type HandleChangeEvent = (
+  childSnapshot: SnapShot,
+  prevChildKey: string
+) => void;
 
 export type QueryValue = number | string | boolean | null;
 export enum OrderingType {
@@ -81,7 +93,9 @@ export default class Query<T = any> implements IQuery {
 
   public equalTo(value: QueryValue, key?: Extract<keyof T, string>): Query<T> {
     if (key && this._order.type === OrderingType.byKey) {
-      throw new Error("You can not use equalTo's key property when using a key sort!");
+      throw new Error(
+        "You can not use equalTo's key property when using a key sort!"
+      );
     }
     key = key ? key : this._order.value;
 
@@ -134,13 +148,22 @@ export default class Query<T = any> implements IQuery {
     return this;
   }
 
+  /**
+   * Setup an event listener for a given eventType
+   */
   public on(
     eventType: EventType,
     callback: (a: DataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
   ): (a: DataSnapshot, b?: null | string) => any {
-    addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
+    addListener(
+      this.path,
+      eventType,
+      callback,
+      cancelCallbackOrContext,
+      context
+    );
 
     return null;
   }
@@ -256,19 +279,24 @@ export default class Query<T = any> implements IQuery {
       if (typeof input !== "object") {
         return new SnapShot<T>(leafNode(this.path), input);
       }
-      const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(input, {
-        key: "id"
-      });
+      const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(
+        input,
+        {
+          key: "id"
+        }
+      );
       const sorted: any[] = this.processSorting(mockDatabaseResults);
       const remainingIds = new Set(
-        this.processFilters(sorted).map((f: any) => (typeof f === "object" ? f.id : f))
+        this.processFilters(sorted).map((f: any) =>
+          typeof f === "object" ? f.id : f
+        )
       );
       const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
 
-      snap = new SnapShot<T>(leafNode(this.path), convert.keyValueArrayToDictionary(
-        resultset,
-        { key: "id" }
-      ) as T);
+      snap = new SnapShot<T>(
+        leafNode(this.path),
+        convert.keyValueArrayToDictionary(resultset, { key: "id" }) as T
+      );
     } else {
       const mockDatabaseResults: any[] = convert.hashToArray(input);
       const sorted: any[] = this.processSorting(mockDatabaseResults);
