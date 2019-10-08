@@ -157,57 +157,51 @@ const slashify = (path) => {
  * Will aggregate the data passed in to dictionary objects of paths
  * which fire at the root of the listeners/watchers that are currently
  * on the database.
- *
- * **Note:** if there was NO actual change between old and new values
- * there will be no notification sent
  */
 function groupEventsByWatcher(data, dbSnapshot) {
     data = dotifyKeys(data);
     const getFromSnapshot = (path) => lodash_get_1.default(dbSnapshot, dotify(path));
-    const ignoreUnchanged = (path) => data[path] !== getFromSnapshot(path) &&
-        (data[path] || getFromSnapshot(path));
-    const eventPaths = Object.keys(data)
-        .filter(ignoreUnchanged)
-        .map(i => dotify(i));
+    const eventPaths = Object.keys(data).map(i => dotify(i));
     const response = [];
     const relativePath = (full, partial) => {
         return full.replace(partial, "");
     };
     const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
     const justValue = (obj) => justKey(obj) ? obj[justKey(obj)] : null;
-    getListeners().forEach(l => {
-        const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
+    getListeners().forEach(listener => {
+        const eventPathsUnderListener = eventPaths.filter(path => path.includes(listener.path));
         if (eventPathsUnderListener.length === 0) {
+            // if there are no listeners then there's nothing to do
             return;
         }
         const paths = [];
         const changeObject = eventPathsUnderListener.reduce((changes, path) => {
             paths.push(path);
-            if (l.path === path) {
+            if (listener.path === path) {
                 changes = data[path];
             }
             else {
-                lodash_set_1.default(changes, dotify(relativePath(path, l.path)), data[path]);
+                lodash_set_1.default(changes, dotify(relativePath(path, listener.path)), data[path]);
             }
             return changes;
         }, {});
-        const key = l.eventType === "value"
+        const key = listener.eventType === "value"
             ? changeObject
                 ? justKey(changeObject)
-                : l.path.split(".").pop()
-            : dotify(common_types_1.pathJoin(slashify(l.path), justKey(changeObject)));
+                : listener.path.split(".").pop()
+            : dotify(common_types_1.pathJoin(slashify(listener.path), justKey(changeObject)));
         const newResponse = {
-            listenerId: l.id,
-            listenerPath: l.path,
-            listenerEvent: l.eventType,
-            callback: l.callback,
+            listenerId: listener.id,
+            listenerPath: listener.path,
+            listenerEvent: listener.eventType,
+            callback: listener.callback,
             eventPaths: paths,
             key,
             changes: justValue(changeObject),
-            value: l.eventType === "value" ? getDb(l.path) : getDb(key),
-            priorValue: l.eventType === "value"
-                ? lodash_get_1.default(dbSnapshot, l.path)
-                : justValue(lodash_get_1.default(dbSnapshot, l.path))
+            value: listener.eventType === "value" ? getDb(listener.path) : getDb(key),
+            priorValue: listener.eventType === "value"
+                ? lodash_get_1.default(dbSnapshot, listener.path)
+                : justValue(lodash_get_1.default(dbSnapshot, listener.path))
         };
         response.push(newResponse);
     });
@@ -260,10 +254,12 @@ function addListener(path, eventType, callback, cancelCallbackOrContext, context
         context
     });
     if (eventType === "value") {
-        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, fast_copy_1.default(Object.assign({}, exports.db)));
+        callback(new index_1.SnapShot(util_1.join(path), getDb(util_1.join(path))));
+        // notify({ [join(path)]: undefined }, copy({ ...db }));
     }
     else if (eventType === "child_added") {
-        notify({ [util_1.join(path)]: getDb(util_1.join(path)) }, fast_copy_1.default(Object.assign({}, exports.db)));
+        // notify({ [join(path)]: undefined }, copy({ ...db }));
+        callback(new index_1.SnapShot(util_1.join(path), getDb(util_1.join(path))));
     }
 }
 exports.addListener = addListener;
@@ -401,45 +397,44 @@ function notify(data, dbSnapshot) {
         return;
     }
     const events = groupEventsByWatcher(data, dbSnapshot);
-    events.forEach(e => {
-        const isDeleteEvent = e.value === null || e.value === undefined;
-        switch (e.listenerEvent) {
+    events.forEach(evt => {
+        const isDeleteEvent = evt.value === null || evt.value === undefined;
+        switch (evt.listenerEvent) {
             case "child_removed":
                 if (isDeleteEvent) {
-                    e.callback(new index_1.SnapShot(e.key, e.priorValue));
+                    evt.callback(new index_1.SnapShot(evt.key, evt.priorValue));
                 }
                 return;
             case "child_added":
-                if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
-                    e.callback(new index_1.SnapShot(e.key, e.value));
+                if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
+                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "child_changed":
                 if (!isDeleteEvent) {
-                    e.callback(new index_1.SnapShot(e.key, e.value));
+                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "child_moved":
-                if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+                if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
                     // TODO: if we implement sorting then add the previousKey value
-                    e.callback(new index_1.SnapShot(e.key, e.value));
+                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "value":
-                const snapKey = new index_1.SnapShot(e.listenerPath, e.value).key;
-                if (snapKey === e.key) {
+                const snapKey = new index_1.SnapShot(evt.listenerPath, evt.value).key;
+                if (snapKey === evt.key) {
                     // root set
-                    e.callback(new index_1.SnapShot(e.listenerPath, e.value === null || e.value === undefined
+                    evt.callback(new index_1.SnapShot(evt.listenerPath, evt.value === null || evt.value === undefined
                         ? undefined
-                        : { [e.key]: e.value }));
+                        : { [evt.key]: evt.value }));
                 }
                 else {
                     // property set
-                    const value = e.value === null ? getDb(e.listenerPath) : e.value;
-                    e.callback(new index_1.SnapShot(e.listenerPath, value));
+                    const value = evt.value === null ? getDb(evt.listenerPath) : evt.value;
+                    evt.callback(new index_1.SnapShot(evt.listenerPath, value));
                 }
-                return;
-        }
+        } // end switch
     });
 }
 function priorKey(path, id) {

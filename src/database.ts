@@ -181,22 +181,15 @@ const slashify = (path: string) => {
  * Will aggregate the data passed in to dictionary objects of paths
  * which fire at the root of the listeners/watchers that are currently
  * on the database.
- *
- * **Note:** if there was NO actual change between old and new values
- * there will be no notification sent
  */
 function groupEventsByWatcher(
   data: IDictionary,
   dbSnapshot: IDictionary
 ): IMockWatcherGroupEvent[] {
   data = dotifyKeys(data);
+
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
-  const ignoreUnchanged = (path: string) =>
-    data[path] !== getFromSnapshot(path) &&
-    (data[path] || getFromSnapshot(path));
-  const eventPaths = Object.keys(data)
-    .filter(ignoreUnchanged)
-    .map(i => dotify(i));
+  const eventPaths = Object.keys(data).map(i => dotify(i));
 
   const response: IMockWatcherGroupEvent[] = [];
   const relativePath = (full: string, partial: string) => {
@@ -206,45 +199,52 @@ function groupEventsByWatcher(
   const justKey = (obj: IDictionary) => (obj ? Object.keys(obj)[0] : null);
   const justValue = (obj: IDictionary) =>
     justKey(obj) ? obj[justKey(obj)] : null;
-  getListeners().forEach(l => {
-    const eventPathsUnderListener = eventPaths.filter(e => e.includes(l.path));
+
+  getListeners().forEach(listener => {
+    const eventPathsUnderListener = eventPaths.filter(path =>
+      path.includes(listener.path)
+    );
+
     if (eventPathsUnderListener.length === 0) {
+      // if there are no listeners then there's nothing to do
       return;
     }
+
     const paths: string[] = [];
 
     const changeObject = eventPathsUnderListener.reduce(
       (changes: IDictionary<IMockWatcherGroupEvent>, path) => {
         paths.push(path);
-        if (l.path === path) {
+        if (listener.path === path) {
           changes = data[path];
         } else {
-          set(changes, dotify(relativePath(path, l.path)), data[path]);
+          set(changes, dotify(relativePath(path, listener.path)), data[path]);
         }
         return changes;
       },
       {}
     );
+
     const key: string =
-      l.eventType === "value"
+      listener.eventType === "value"
         ? changeObject
           ? justKey(changeObject)
-          : l.path.split(".").pop()
-        : dotify(pathJoin(slashify(l.path), justKey(changeObject)));
+          : listener.path.split(".").pop()
+        : dotify(pathJoin(slashify(listener.path), justKey(changeObject)));
 
     const newResponse = {
-      listenerId: l.id,
-      listenerPath: l.path,
-      listenerEvent: l.eventType,
-      callback: l.callback,
+      listenerId: listener.id,
+      listenerPath: listener.path,
+      listenerEvent: listener.eventType,
+      callback: listener.callback,
       eventPaths: paths,
       key,
       changes: justValue(changeObject),
-      value: l.eventType === "value" ? getDb(l.path) : getDb(key),
+      value: listener.eventType === "value" ? getDb(listener.path) : getDb(key),
       priorValue:
-        l.eventType === "value"
-          ? get(dbSnapshot, l.path)
-          : justValue(get(dbSnapshot, l.path))
+        listener.eventType === "value"
+          ? get(dbSnapshot, listener.path)
+          : justValue(get(dbSnapshot, listener.path))
     };
 
     response.push(newResponse);
@@ -309,9 +309,11 @@ export function addListener(
   });
 
   if (eventType === "value") {
-    notify({ [join(path)]: getDb(join(path)) }, copy({ ...db }));
+    callback(new SnapShot(join(path), getDb(join(path))));
+    // notify({ [join(path)]: undefined }, copy({ ...db }));
   } else if (eventType === "child_added") {
-    notify({ [join(path)]: getDb(join(path)) }, copy({ ...db }));
+    // notify({ [join(path)]: undefined }, copy({ ...db }));
+    callback(new SnapShot(join(path), getDb(join(path))));
   }
 }
 
@@ -476,51 +478,50 @@ function notify<T = any>(data: IDictionary, dbSnapshot: IDictionary) {
   }
   const events = groupEventsByWatcher(data, dbSnapshot);
 
-  events.forEach(e => {
-    const isDeleteEvent = e.value === null || e.value === undefined;
-    switch (e.listenerEvent) {
+  events.forEach(evt => {
+    const isDeleteEvent = evt.value === null || evt.value === undefined;
+    switch (evt.listenerEvent) {
       case "child_removed":
         if (isDeleteEvent) {
-          e.callback(new SnapShot(e.key, e.priorValue));
+          evt.callback(new SnapShot(evt.key, evt.priorValue));
         }
         return;
       case "child_added":
-        if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
-          e.callback(new SnapShot(e.key, e.value));
+        if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
+          evt.callback(new SnapShot(evt.key, evt.value));
         }
         return;
       case "child_changed":
         if (!isDeleteEvent) {
-          e.callback(new SnapShot(e.key, e.value));
+          evt.callback(new SnapShot(evt.key, evt.value));
         }
         return;
       case "child_moved":
-        if (!isDeleteEvent && keyDidNotPreviouslyExist(e, dbSnapshot)) {
+        if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
           // TODO: if we implement sorting then add the previousKey value
-          e.callback(new SnapShot(e.key, e.value));
+          evt.callback(new SnapShot(evt.key, evt.value));
         }
         return;
       case "value":
-        const snapKey = new SnapShot(e.listenerPath, e.value).key;
+        const snapKey = new SnapShot(evt.listenerPath, evt.value).key;
 
-        if (snapKey === e.key) {
+        if (snapKey === evt.key) {
           // root set
-          e.callback(
+          evt.callback(
             new SnapShot(
-              e.listenerPath,
-              e.value === null || e.value === undefined
+              evt.listenerPath,
+              evt.value === null || evt.value === undefined
                 ? undefined
-                : { [e.key]: e.value }
+                : { [evt.key]: evt.value }
             )
           );
         } else {
           // property set
-          const value = e.value === null ? getDb(e.listenerPath) : e.value;
-          e.callback(new SnapShot(e.listenerPath, value));
+          const value =
+            evt.value === null ? getDb(evt.listenerPath) : evt.value;
+          evt.callback(new SnapShot(evt.listenerPath, value));
         }
-
-        return;
-    }
+    } // end switch
   });
 }
 
