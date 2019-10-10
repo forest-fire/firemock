@@ -254,12 +254,16 @@ function addListener(path, eventType, callback, cancelCallbackOrContext, context
         context
     });
     if (eventType === "value") {
-        callback(new index_1.SnapShot(util_1.join(path), getDb(util_1.join(path))));
-        // notify({ [join(path)]: undefined }, copy({ ...db }));
+        const data = getDb(util_1.join(path));
+        const snap = new index_1.SnapShot(util_1.join(path), { [data.id]: data });
+        // notify watchers
+        callback(snap);
     }
     else if (eventType === "child_added") {
-        // notify({ [join(path)]: undefined }, copy({ ...db }));
-        callback(new index_1.SnapShot(util_1.join(path), getDb(util_1.join(path))));
+        const data = getDb(util_1.join(path));
+        const snap = new index_1.SnapShot(util_1.join(path), { [data.id]: data });
+        // notify watchers
+        callback(snap);
     }
 }
 exports.addListener = addListener;
