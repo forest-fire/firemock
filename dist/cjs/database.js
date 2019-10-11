@@ -260,10 +260,15 @@ function addListener(path, eventType, callback, cancelCallbackOrContext, context
         callback(snap);
     }
     else if (eventType === "child_added") {
-        const data = getDb(util_1.join(path));
-        const snap = new index_1.SnapShot(util_1.join(path), { [data.id]: data });
+        const list = getDb(util_1.join(path)) || {};
         // notify watchers
-        callback(snap);
+        Object.keys(list).forEach(key => {
+            const data = lodash_get_1.default(list, key);
+            if (data) {
+                const snap = new index_1.SnapShot(util_1.join(path, key), { [key]: data });
+                callback(snap);
+            }
+        });
     }
 }
 exports.addListener = addListener;

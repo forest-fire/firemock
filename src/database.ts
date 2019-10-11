@@ -314,10 +314,15 @@ export function addListener(
     // notify watchers
     callback(snap);
   } else if (eventType === "child_added") {
-    const data = getDb(join(path));
-    const snap = new SnapShot(join(path), { [data.id]: data });
+    const list = getDb(join(path)) || {};
     // notify watchers
-    callback(snap);
+    Object.keys(list).forEach(key => {
+      const data = get(list, key);
+      if (data) {
+        const snap = new SnapShot(join(path, key), { [key]: data });
+        callback(snap);
+      }
+    });
   }
 }
 
