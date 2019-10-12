@@ -256,19 +256,32 @@ function addListener(path, eventType, callback, cancelCallbackOrContext, context
     if (eventType === "value") {
         const data = getDb(util_1.join(path));
         const snap = new index_1.SnapShot(util_1.join(path), { [data.id]: data });
-        // notify watchers
+        // notify value-based watchers
         callback(snap);
     }
     else if (eventType === "child_added") {
         const list = getDb(util_1.join(path)) || {};
         // notify watchers
-        Object.keys(list).forEach(key => {
-            const data = lodash_get_1.default(list, key);
-            if (data) {
-                const snap = new index_1.SnapShot(util_1.join(path, key), { [key]: data });
-                callback(snap);
-            }
-        });
+        if (list) {
+            // there are already children in the newly setup watcher
+            // sending these will sync server/client as well as indicate
+            // that the watcher is initialized
+            Object.keys(list).forEach(key => {
+                const data = lodash_get_1.default(list, key);
+                if (data) {
+                    callback(new index_1.SnapShot(util_1.join(path, key), data));
+                }
+                else {
+                    // ideally would be notifying that watcher is initialized
+                    // but in a way that does NOT send a dispatch event (as the
+                    // actual DB does not)
+                }
+            });
+        }
+        else {
+            // there aren't any _children_ yet but we still need some way to indicate
+            // that the watcher _has initialized_ so we will instead manually
+        }
     }
 }
 exports.addListener = addListener;
