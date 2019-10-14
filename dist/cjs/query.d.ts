@@ -2,6 +2,7 @@ import { DataSnapshot, Query as IQuery, EventType, Reference as IReference } fro
 import SnapShot from "./snapshot";
 import Queue from "./queue";
 import Reference from "./reference";
+import { SerializedQuery } from "serialized-query";
 import { DelayType } from "./util";
 export declare type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
 export declare type GenericEventHandler = (snap: SnapShot, key?: string) => void;
@@ -23,8 +24,8 @@ export interface IOrdering {
 export interface IListener {
     /** random string */
     id: string;
-    /** path in db */
-    path: string;
+    /** the _query_ the listener is based off of */
+    query: SerializedQuery;
     eventType: EventType;
     callback: (a: DataSnapshot | null, b?: string) => any;
     cancelCallbackOrContext?: object | null;
@@ -35,12 +36,11 @@ export declare type IQueryFilter<T> = (resultset: T[]) => T[];
 export default class Query<T = any> implements IQuery {
     path: string;
     protected _delay: DelayType;
+    static deserialize(q: SerializedQuery): Query<any>;
     protected _order: IOrdering;
     protected _listeners: Queue<IListener>;
     protected _limitFilters: Array<IQueryFilter<T>>;
     protected _queryFilters: Array<IQueryFilter<T>>;
-    private queryParams_;
-    private orderByCalled_;
     constructor(path: string, _delay?: DelayType);
     readonly ref: Reference<T>;
     limitToLast(num: number): Query<T>;
@@ -52,7 +52,7 @@ export default class Query<T = any> implements IQuery {
     /**
      * Setup an event listener for a given eventType
      */
-    on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot, b?: null | string) => any;
+    on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot, b?: null | string) => Promise<null>;
     once(eventType: "value"): Promise<DataSnapshot>;
     off(): void;
     /** NOT IMPLEMENTED YET */
@@ -99,12 +99,12 @@ export default class Query<T = any> implements IQuery {
      */
     protected getRoot(): IReference;
     /**
-     * Reduce the dataset using filters (after sorts) but do not apply sort
+     * Reduce the dataset using _filters_ (after sorts) but do not apply sort
      * order to new SnapShot (so natural order is preserved)
      */
     private process;
     /**
-     * Processes all Filter Queries to reduce the resultset
+     * Processes all Query _filters_ (equalTo, startAt, endAt)
      */
     private processFilters;
     private processSorting;

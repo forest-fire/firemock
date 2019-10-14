@@ -14,6 +14,7 @@ const util_1 = require("./util");
 const index_1 = require("./index");
 const auth_1 = require("./auth");
 const deepmerge_1 = __importDefault(require("deepmerge"));
+const serialized_query_1 = require("serialized-query");
 exports.db = [];
 let _listeners = [];
 let _silenceEvents = false;
@@ -169,7 +170,7 @@ function groupEventsByWatcher(data, dbSnapshot) {
     const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
     const justValue = (obj) => justKey(obj) ? obj[justKey(obj)] : null;
     getListeners().forEach(listener => {
-        const eventPathsUnderListener = eventPaths.filter(path => path.includes(listener.path));
+        const eventPathsUnderListener = eventPaths.filter(path => path.includes(listener.query.path));
         if (eventPathsUnderListener.length === 0) {
             // if there are no listeners then there's nothing to do
             return;
@@ -177,31 +178,33 @@ function groupEventsByWatcher(data, dbSnapshot) {
         const paths = [];
         const changeObject = eventPathsUnderListener.reduce((changes, path) => {
             paths.push(path);
-            if (listener.path === path) {
+            if (listener.query.path === path) {
                 changes = data[path];
             }
             else {
-                lodash_set_1.default(changes, dotify(relativePath(path, listener.path)), data[path]);
+                lodash_set_1.default(changes, dotify(relativePath(path, listener.query.path)), data[path]);
             }
             return changes;
         }, {});
         const key = listener.eventType === "value"
             ? changeObject
                 ? justKey(changeObject)
-                : listener.path.split(".").pop()
-            : dotify(common_types_1.pathJoin(slashify(listener.path), justKey(changeObject)));
+                : listener.query.path.split(".").pop()
+            : dotify(common_types_1.pathJoin(slashify(listener.query.path), justKey(changeObject)));
         const newResponse = {
             listenerId: listener.id,
-            listenerPath: listener.path,
+            listenerPath: listener.query.path,
             listenerEvent: listener.eventType,
             callback: listener.callback,
             eventPaths: paths,
             key,
             changes: justValue(changeObject),
-            value: listener.eventType === "value" ? getDb(listener.path) : getDb(key),
+            value: listener.eventType === "value"
+                ? getDb(listener.query.path)
+                : getDb(key),
             priorValue: listener.eventType === "value"
-                ? lodash_get_1.default(dbSnapshot, listener.path)
-                : justValue(lodash_get_1.default(dbSnapshot, listener.path))
+                ? lodash_get_1.default(dbSnapshot, listener.query.path)
+                : justValue(lodash_get_1.default(dbSnapshot, listener.query.path))
         };
         response.push(newResponse);
     });
@@ -242,47 +245,57 @@ exports.pushDB = pushDB;
  * interested in the _paths_ which are being watched
  * you can call `listenerPaths()`.
  */
-function addListener(path, eventType, callback, cancelCallbackOrContext, context) {
+async function addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context) {
+    const query = (typeof pathOrQuery === "string"
+        ? new serialized_query_1.SerializedQuery(util_1.join(pathOrQuery))
+        : pathOrQuery);
+    pathOrQuery = (typeof pathOrQuery === "string"
+        ? util_1.join(pathOrQuery)
+        : query.path);
     _listeners.push({
         id: Math.random()
             .toString(36)
             .substr(2, 10),
-        path: util_1.join(path),
+        query,
         eventType,
         callback,
         cancelCallbackOrContext,
         context
     });
-    if (eventType === "value") {
-        const data = getDb(util_1.join(path));
-        const snap = new index_1.SnapShot(util_1.join(path), { [data.id]: data });
-        // notify value-based watchers
-        callback(snap);
+    function ref(dbPath) {
+        return new index_1.Reference(dbPath);
     }
-    else if (eventType === "child_added") {
-        const list = getDb(util_1.join(path)) || {};
-        // notify watchers
-        if (list) {
-            // there are already children in the newly setup watcher
-            // sending these will sync server/client as well as indicate
-            // that the watcher is initialized
-            Object.keys(list).forEach(key => {
-                const data = lodash_get_1.default(list, key);
-                if (data) {
-                    callback(new index_1.SnapShot(util_1.join(path, key), data));
-                }
-                else {
-                    // ideally would be notifying that watcher is initialized
-                    // but in a way that does NOT send a dispatch event (as the
-                    // actual DB does not)
-                }
-            });
-        }
-        else {
-            // there aren't any _children_ yet but we still need some way to indicate
-            // that the watcher _has initialized_ so we will instead manually
-        }
-    }
+    const snap1 = await query.deserialize({ ref }).once(eventType);
+    callback(snap1);
+    return snap1;
+    // if (eventType === "value") {
+    //   const data = getDb(path);
+    //   // const id = path.split(".").pop();
+    //   // const snap = new SnapShot(path, { [id]: data });
+    //   // notify value-based watchers
+    //   callback(snap1);
+    // } else if (eventType === "child_added") {
+    //   const list = getDb(query.path) || {};
+    //   // notify watchers
+    //   if (list) {
+    //     // there are already children in the newly setup watcher
+    //     // sending these will sync server/client as well as indicate
+    //     // that the watcher is initialized
+    //     Object.keys(list).forEach(key => {
+    //       const data = get(list, key);
+    //       if (data) {
+    //         callback(new SnapShot(join(query.path, key), data));
+    //       } else {
+    //         // ideally would be notifying that watcher is initialized
+    //         // but in a way that does NOT send a dispatch event (as the
+    //         // actual DB does not)
+    //       }
+    //     });
+    //   } else {
+    //     // there aren't any _children_ yet but we still need some way to indicate
+    //     // that the watcher _has initialized_ so we will instead manually
+    //   }
+    // }
 }
 exports.addListener = addListener;
 /**
@@ -376,8 +389,10 @@ function listenerPaths(lookFor) {
                 : [lookFor];
     }
     return lookFor
-        ? _listeners.filter(l => lookFor.includes(l.eventType)).map(l => l.path)
-        : _listeners.map(l => l.path);
+        ? _listeners
+            .filter(l => lookFor.includes(l.eventType))
+            .map(l => l.query.path)
+        : _listeners.map(l => l.query.path);
 }
 exports.listenerPaths = listenerPaths;
 /**
@@ -492,13 +507,13 @@ function findChildListeners(changePath, ...eventTypes) {
             : ["child_added", "child_changed", "child_moved", "child_removed"];
     const decendants = _listeners
         .filter(l => eventTypes.includes(l.eventType))
-        .filter(l => changePath.startsWith(l.path))
+        .filter(l => changePath.startsWith(dotify(l.query.path)))
         .reduce((acc, listener) => {
         const id = util_1.removeDots(changePath
-            .replace(listener.path, "")
+            .replace(listener.query.path, "")
             .split(".")
             .filter(i => i)[0]);
-        const remainingPath = util_1.stripLeadingDot(changePath.replace(util_1.stripLeadingDot(listener.path), ""));
+        const remainingPath = util_1.stripLeadingDot(changePath.replace(util_1.stripLeadingDot(listener.query.path), ""));
         const changeIsAtRoot = id === remainingPath;
         acc.push(Object.assign(Object.assign({}, listener), { id, changeIsAtRoot }));
         return acc;
@@ -514,7 +529,7 @@ exports.findChildListeners = findChildListeners;
  * @param path path to root listening point
  */
 function findValueListeners(path) {
-    return _listeners.filter(l => util_1.join(path).indexOf(util_1.join(l.path)) !== -1 && l.eventType === "value");
+    return _listeners.filter(l => util_1.join(path).indexOf(util_1.join(l.query.path)) !== -1 && l.eventType === "value");
 }
 exports.findValueListeners = findValueListeners;
 /** Clears the DB and removes all listeners */

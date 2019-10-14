@@ -26,7 +26,9 @@ class SnapShot {
         return new reference_1.default(this._key);
     }
     val() {
-        return Array.isArray(this._value) ? convert.arrayToHash(this._value) : this._value;
+        return Array.isArray(this._value)
+            ? convert.arrayToHash(this._value)
+            : this._value;
     }
     toJSON() {
         return JSON.stringify(this._value);

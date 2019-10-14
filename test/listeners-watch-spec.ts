@@ -22,6 +22,8 @@ import {
   clearDatabase,
   reset
 } from "../src/database";
+import { wait } from "common-types";
+import { listenerCount } from "cluster";
 
 const expect = chai.expect;
 
@@ -29,10 +31,20 @@ describe("Listener events ->", () => {
   it('listening on a "value" event detects changes', async () => {
     const queryRef = new Query("userProfile/1234", 10);
     let events: IDictionary[] = [];
+    let ready = false;
+
     const cb = (snap: DataSnapshot, prevKey: any) => {
-      events.push({ key: snap.key, snap: snap.val(), prevKey });
+      console.log(ready, snap);
+
+      if (ready) {
+        events.push({ key: snap.key, snap: snap.val(), prevKey });
+      }
     };
+
     queryRef.on("value", cb);
+    await wait(50);
+    ready = true;
+    expect(listenerCount("value")).to.equal(1);
     updateDB("userProfile/1234/name", "Bob Marley");
     expect(events).to.have.lengthOf(1);
     expect(events[0].snap).to.haveOwnProperty("name");
@@ -214,7 +226,11 @@ describe("Listener events ->", () => {
     const qEmployee = new Query("employees", 10);
     const qCompany = new Query("companies", 10);
 
-    const events: Array<{ eventType: string; key: string; value: IDictionary }> = [];
+    const events: Array<{
+      eventType: string;
+      key: string;
+      value: IDictionary;
+    }> = [];
     const cb = (eventType: string) => (event: DataSnapshot) =>
       events.push({ eventType, key: event.key, value: event.val() });
 

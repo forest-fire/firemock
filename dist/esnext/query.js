@@ -21,6 +21,11 @@ export default class Query {
         this._limitFilters = [];
         this._queryFilters = [];
     }
+    static deserialize(q) {
+        const obj = new Query(q.path);
+        q.identity.orderBy;
+        return obj;
+    }
     get ref() {
         return new Reference(this.path, this._delay);
     }
@@ -175,22 +180,25 @@ export default class Query {
         return null;
     }
     /**
-     * Reduce the dataset using filters (after sorts) but do not apply sort
+     * Reduce the dataset using _filters_ (after sorts) but do not apply sort
      * order to new SnapShot (so natural order is preserved)
      */
     process() {
         // typically a hash/object but could be a scalar type (string/number/boolean)
         const input = get(db, join(this.path), undefined);
+        /**
+         * Flag to indicate whether the path is of the query points to a Dictionary
+         * of Objects. This is indicative of a **Firemodel** list node.
+         */
         const hashOfHashes = typeof input === "object" &&
             Object.keys(input).every(i => typeof input[i] === "object");
         let snap;
         if (!hashOfHashes) {
             if (typeof input !== "object") {
+                // TODO: is this right? should it not be the FULL path?
                 return new SnapShot(leafNode(this.path), input);
             }
-            const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
-                key: "id"
-            });
+            const mockDatabaseResults = convert.keyValueDictionaryToArray(input, { key: "id" });
             const sorted = this.processSorting(mockDatabaseResults);
             const remainingIds = new Set(this.processFilters(sorted).map((f) => typeof f === "object" ? f.id : f));
             const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
@@ -206,7 +214,7 @@ export default class Query {
         return snap;
     }
     /**
-     * Processes all Filter Queries to reduce the resultset
+     * Processes all Query _filters_ (equalTo, startAt, endAt)
      */
     processFilters(inputArray) {
         let output = inputArray.slice(0);

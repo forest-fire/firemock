@@ -10,6 +10,7 @@ import SnapShot from "./snapshot";
 import Queue from "./queue";
 import * as convert from "typed-conversions";
 import Reference from "./reference";
+import { SerializedQuery } from "serialized-query";
 import { join, leafNode, DelayType, networkDelay } from "./util";
 
 export type EventHandler =
@@ -47,8 +48,8 @@ export interface IOrdering {
 export interface IListener {
   /** random string */
   id: string;
-  /** path in db */
-  path: string;
+  /** the _query_ the listener is based off of */
+  query: SerializedQuery;
 
   eventType: EventType;
   callback: (a: DataSnapshot | null, b?: string) => any;
@@ -60,12 +61,16 @@ export type IQueryFilter<T> = (resultset: T[]) => T[];
 
 /** tslint:ignore:member-ordering */
 export default class Query<T = any> implements IQuery {
+  public static deserialize(q: SerializedQuery) {
+    const obj = new Query(q.path);
+    q.identity.orderBy;
+    return obj;
+  }
+
   protected _order: IOrdering = { type: OrderingType.byKey, value: null };
   protected _listeners = new Queue<IListener>("listeners");
   protected _limitFilters: Array<IQueryFilter<T>> = [];
   protected _queryFilters: Array<IQueryFilter<T>> = [];
-  private queryParams_: any;
-  private orderByCalled_: any;
 
   constructor(public path: string, protected _delay: DelayType = 5) {}
 
@@ -156,7 +161,7 @@ export default class Query<T = any> implements IQuery {
     callback: (a: DataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: DataSnapshot, b?: null | string) => any {
+  ): (a: DataSnapshot, b?: null | string) => Promise<null> {
     addListener(
       this.path,
       eventType,
@@ -263,13 +268,17 @@ export default class Query<T = any> implements IQuery {
   }
 
   /**
-   * Reduce the dataset using filters (after sorts) but do not apply sort
+   * Reduce the dataset using _filters_ (after sorts) but do not apply sort
    * order to new SnapShot (so natural order is preserved)
    */
   private process(): SnapShot<T> {
     // typically a hash/object but could be a scalar type (string/number/boolean)
     const input = get(db, join(this.path), undefined);
 
+    /**
+     * Flag to indicate whether the path is of the query points to a Dictionary
+     * of Objects. This is indicative of a **Firemodel** list node.
+     */
     const hashOfHashes =
       typeof input === "object" &&
       Object.keys(input).every(i => typeof input[i] === "object");
@@ -277,13 +286,12 @@ export default class Query<T = any> implements IQuery {
     let snap;
     if (!hashOfHashes) {
       if (typeof input !== "object") {
+        // TODO: is this right? should it not be the FULL path?
         return new SnapShot<T>(leafNode(this.path), input);
       }
       const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(
         input,
-        {
-          key: "id"
-        }
+        { key: "id" }
       );
       const sorted: any[] = this.processSorting(mockDatabaseResults);
       const remainingIds = new Set(
@@ -316,7 +324,7 @@ export default class Query<T = any> implements IQuery {
   }
 
   /**
-   * Processes all Filter Queries to reduce the resultset
+   * Processes all Query _filters_ (equalTo, startAt, endAt)
    */
   private processFilters(inputArray: T[]): T[] {
     let output = inputArray.slice(0);

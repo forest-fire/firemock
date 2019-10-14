@@ -35,7 +35,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   },
   async setPersistence() {
     console.warn(
-      `currently firemock does not abject to the use of setPersistence() but it doesn't support it either.`
+      `currently firemock accepts calls to setPersistence() but it doesn't support it.`
     );
   },
   signInAnonymously: async (): Promise<UserCredential> => {
