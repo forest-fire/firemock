@@ -76,7 +76,7 @@ export default class Query<T = any> implements IQuery {
     orderByPriority(): Query<T>;
     toJSON(): {
         identity: string;
-        query: import("serialized-query").ISerializedQueryIdentity<import("common-types/dist/basics").IDictionary<any>>;
+        query: import("serialized-query").ISerializedQueryIdentity<import("common-types").IDictionary<any>>;
     };
     toString(): string;
     /**

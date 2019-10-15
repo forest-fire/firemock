@@ -327,10 +327,12 @@ export async function addListener(
   function ref(dbPath: string) {
     return new Reference(dbPath);
   }
-  const snap1: SnapShot = await query.deserialize({ ref }).once(eventType);
-  callback(snap1);
+  const snapshot: SnapShot = await query
+    .deserialize({ ref })
+    .once(eventType === "value" ? "value" : "child_added");
+  callback(snapshot);
 
-  return snap1;
+  return snapshot;
 
   // if (eventType === "value") {
   //   const data = getDb(path);
