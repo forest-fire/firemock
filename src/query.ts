@@ -4,13 +4,14 @@ import {
   EventType,
   Reference as IReference
 } from "@firebase/database-types";
-import { db, addListener } from "./database";
+import { db, addListener, getDb } from "./database";
 import get from "lodash.get";
 import SnapShot from "./snapshot";
-import Queue from "./queue";
 import * as convert from "typed-conversions";
 import Reference from "./reference";
+import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { join, leafNode, DelayType, networkDelay } from "./util";
+import { runQuery } from "./shared/runQuery";
 
 export type EventHandler =
   | HandleValueEvent
@@ -33,22 +34,12 @@ export type HandleChangeEvent = (
 ) => void;
 
 export type QueryValue = number | string | boolean | null;
-export enum OrderingType {
-  byChild = "child",
-  byKey = "key",
-  byValue = "value"
-}
-
-export interface IOrdering {
-  type: OrderingType;
-  value: any;
-}
 
 export interface IListener {
   /** random string */
   id: string;
-  /** path in db */
-  path: string;
+  /** the _query_ the listener is based off of */
+  query: SerializedQuery;
 
   eventType: EventType;
   callback: (a: DataSnapshot | null, b?: string) => any;
@@ -60,90 +51,60 @@ export type IQueryFilter<T> = (resultset: T[]) => T[];
 
 /** tslint:ignore:member-ordering */
 export default class Query<T = any> implements IQuery {
-  protected _order: IOrdering = { type: OrderingType.byKey, value: null };
-  protected _listeners = new Queue<IListener>("listeners");
-  protected _limitFilters: Array<IQueryFilter<T>> = [];
-  protected _queryFilters: Array<IQueryFilter<T>> = [];
-  private queryParams_: any;
-  private orderByCalled_: any;
+  /**
+   * A static initializer which returns a **Firemock** `Query`
+   * that has been configured with a `SerializedQuery`.
+   *
+   * @param query the _SerializedQuery_ to configure with
+   */
+  public static create(query: SerializedQuery) {
+    query.setPath(join(query.path)); // ensures dot notation
+    const obj = new Query(query.path);
+    obj._query = query;
+    return obj;
+  }
 
-  constructor(public path: string, protected _delay: DelayType = 5) {}
+  protected _query: SerializedQuery;
+
+  constructor(public path: string, protected _delay: DelayType = 5) {
+    this._query = SerializedQuery.path(path);
+  }
 
   public get ref(): Reference<T> {
     return new Reference<T>(this.path, this._delay);
   }
 
   public limitToLast(num: number): Query<T> {
-    const filter: IQueryFilter<T> = resultset => {
-      return resultset.slice(resultset.length - num);
-    };
-    this._limitFilters.push(filter);
+    this._query.limitToLast(num);
 
     return this as Query<T>;
   }
 
   public limitToFirst(num: number): Query<T> {
-    const filter: IQueryFilter<T> = resultset => {
-      return resultset.slice(0, num);
-    };
-    this._limitFilters.push(filter);
+    this._query.limitToFirst(num);
 
     return this;
   }
 
   public equalTo(value: QueryValue, key?: Extract<keyof T, string>): Query<T> {
-    if (key && this._order.type === OrderingType.byKey) {
+    if (key && this._query.identity.orderBy === QueryOrderType.orderByKey) {
       throw new Error(
-        "You can not use equalTo's key property when using a key sort!"
+        `You can not use "equalTo(val, key)" with a "key" property defined when using a key sort!`
       );
     }
-    key = key ? key : this._order.value;
-
-    const filter: IQueryFilter<T> = (resultset: T[]) => {
-      let comparison: (item: any) => any = item => item[key];
-      if (!key) {
-        switch (this._order.type) {
-          case OrderingType.byChild:
-            comparison = item => item[this._order.value];
-            break;
-          case OrderingType.byKey:
-            comparison = item => item.id;
-            break;
-          case OrderingType.byValue:
-            comparison = item => item;
-            break;
-
-          default:
-            throw new Error("unknown ordering type: " + this._order.type);
-        }
-      }
-      return resultset.filter((item: any) => comparison(item) === value) as T[];
-    };
-    this._queryFilters.push(filter);
+    this._query.equalTo(value, key);
 
     return this as Query<T>;
   }
   /** Creates a Query with the specified starting point. */
   public startAt(value: QueryValue, key?: string): Query<T> {
-    key = key ? key : this._order.value;
-    const filter: IQueryFilter<T> = resultset => {
-      return resultset.filter((record: any) => {
-        return key ? record[key] >= value : record >= value;
-      });
-    };
-    this._queryFilters.push(filter);
+    this._query.startAt(value, key);
 
-    return this;
+    return this as Query<T>;
   }
 
   public endAt(value: QueryValue, key?: string): Query<T> {
-    key = key ? key : this._order.value;
-    const filter: IQueryFilter<T> = resultset => {
-      return resultset.filter((record: any) => {
-        return key ? record[key] <= value : record <= value;
-      });
-    };
-    this._queryFilters.push(filter);
+    this._query.endAt(value, key);
 
     return this;
   }
@@ -156,9 +117,9 @@ export default class Query<T = any> implements IQuery {
     callback: (a: DataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: DataSnapshot, b?: null | string) => any {
+  ): (a: DataSnapshot, b?: null | string) => Promise<null> {
     addListener(
-      this.path,
+      this._query,
       eventType,
       callback,
       cancelCallbackOrContext,
@@ -169,16 +130,19 @@ export default class Query<T = any> implements IQuery {
   }
 
   public once(eventType: "value"): Promise<DataSnapshot> {
-    return networkDelay<DataSnapshot>(this.process()) as Promise<DataSnapshot>;
+    return networkDelay<DataSnapshot>(this.getQuerySnapShot());
   }
 
   public off() {
     console.log("off() not implemented yet");
   }
 
-  /** NOT IMPLEMENTED YET */
+  /**
+   * Returns a boolean flag based on whether the two queries --
+   * _this_ query and the one passed in -- are equivalen in scope.
+   */
   public isEqual(other: Query) {
-    return false;
+    return this._query.hashCode() === other._query.hashCode();
   }
 
   /**
@@ -187,10 +151,7 @@ export default class Query<T = any> implements IQuery {
    * index on this property in the database's config.
    */
   public orderByChild(prop: string): Query<T> {
-    this._order = {
-      type: OrderingType.byChild,
-      value: prop
-    };
+    this._query.orderByChild(prop);
 
     return this;
   }
@@ -200,22 +161,20 @@ export default class Query<T = any> implements IQuery {
    * can order the results by their (ascending) values
    */
   public orderByValue(): Query<T> {
-    this._order = {
-      type: OrderingType.byValue,
-      value: null
-    };
+    this._query.orderByValue();
 
     return this;
   }
 
   /**
-   * This is the default sort
+   * order is based on the order of the
+   * "key" which is time-based if you are using Firebase's
+   * _push-keys_.
+   *
+   * **Note:** this is the default sort if no sort is specified
    */
   public orderByKey(): Query<T> {
-    this._order = {
-      type: OrderingType.byKey,
-      value: null
-    };
+    this._query.orderByKey();
 
     return this;
   }
@@ -228,11 +187,7 @@ export default class Query<T = any> implements IQuery {
   public toJSON() {
     return {
       identity: this.toString(),
-      delay: this._delay,
-      ordering: this._order,
-      numListeners: this._listeners.length,
-      queryFilters: this._queryFilters.length > 0 ? this._queryFilters : "none",
-      limitFilters: this._limitFilters.length > 0 ? this._limitFilters : "none"
+      query: this._query.identity
     };
   }
 
@@ -263,100 +218,13 @@ export default class Query<T = any> implements IQuery {
   }
 
   /**
-   * Reduce the dataset using filters (after sorts) but do not apply sort
+   * Reduce the dataset using _filters_ (after sorts) but do not apply sort
    * order to new SnapShot (so natural order is preserved)
    */
-  private process(): SnapShot<T> {
-    // typically a hash/object but could be a scalar type (string/number/boolean)
-    const input = get(db, join(this.path), undefined);
+  private getQuerySnapShot(): SnapShot<T> {
+    const data = getDb(this._query.path);
+    const results = runQuery(this._query, data);
 
-    const hashOfHashes =
-      typeof input === "object" &&
-      Object.keys(input).every(i => typeof input[i] === "object");
-
-    let snap;
-    if (!hashOfHashes) {
-      if (typeof input !== "object") {
-        return new SnapShot<T>(leafNode(this.path), input);
-      }
-      const mockDatabaseResults: any[] = convert.keyValueDictionaryToArray(
-        input,
-        {
-          key: "id"
-        }
-      );
-      const sorted: any[] = this.processSorting(mockDatabaseResults);
-      const remainingIds = new Set(
-        this.processFilters(sorted).map((f: any) =>
-          typeof f === "object" ? f.id : f
-        )
-      );
-      const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
-
-      snap = new SnapShot<T>(
-        leafNode(this.path),
-        convert.keyValueArrayToDictionary(resultset, { key: "id" }) as T
-      );
-    } else {
-      const mockDatabaseResults: any[] = convert.hashToArray(input);
-      const sorted: any[] = this.processSorting(mockDatabaseResults);
-      const remainingIds = this.processFilters(sorted).map((f: any) =>
-        typeof f === "object" ? f.id : f
-      );
-      snap = new SnapShot<T>(
-        leafNode(this.path),
-        mockDatabaseResults.filter(
-          (record: any) => remainingIds.indexOf(record.id) !== -1
-        )
-      );
-    }
-
-    snap.sortingFunction(this.getSortingFunction(this._order));
-    return snap;
-  }
-
-  /**
-   * Processes all Filter Queries to reduce the resultset
-   */
-  private processFilters(inputArray: T[]): T[] {
-    let output = inputArray.slice(0);
-    this._queryFilters.forEach(q => (output = q(output)));
-    this._limitFilters.forEach(q => (output = q(output)));
-
-    return output as T[];
-  }
-
-  private processSorting(inputArray: T[]): T[] {
-    const sortFn = this.getSortingFunction(this._order);
-    const sorted = inputArray.slice(0).sort(sortFn);
-
-    return sorted;
-  }
-
-  /**
-   * Returns a sorting function for the given Sort Type
-   */
-  private getSortingFunction(sortType: any) {
-    let sort: (a: any, b: any) => number;
-    switch (sortType.type) {
-      case OrderingType.byKey:
-        sort = (a, b) => {
-          return a.id > b.id ? -1 : a.id === b.id ? 0 : 1;
-        };
-        break;
-      case OrderingType.byValue:
-        sort = (a, b) => {
-          return a.value > b.value ? -1 : a.value === b.value ? 0 : 1;
-        };
-        break;
-      case OrderingType.byChild:
-        const child = this._order.value;
-        sort = (a, b) => {
-          return a[child] > b[child] ? -1 : a[child] === b[child] ? 0 : 1;
-        };
-        break;
-    }
-
-    return sort;
+    return new SnapShot(leafNode(this._query.path), results);
   }
 }

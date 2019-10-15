@@ -2,7 +2,7 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import  {Mock, SchemaCallback } from "../src";
+import { Mock, SchemaCallback } from "../src";
 import SchemaHelper from "../src/schema-helper";
 import { difference } from "lodash";
 import { reset } from "../src/database";
@@ -138,18 +138,22 @@ describe("Reference functions", () => {
 
       const filteredMonkeys = snap.val();
       const allMonkeys = await m.ref("/monkeys").once("value");
-      const sortedMonkeys = convert.snapshotToOrderedHash(allMonkeys);
+      const sortedMonkeys = convert.hashToArray(allMonkeys.val());
       expect(snap.numChildren()).to.equal(10);
       expect(Object.keys(m.db.monkeys).length).to.equal(15);
-      expect(Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))).to.not.equal(
-        -1
-      );
-      expect(Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))).to.not.equal(
-        -1
-      );
+      expect(
+        Object.keys(m.db.monkeys).indexOf(firstKey(filteredMonkeys))
+      ).to.not.equal(-1);
+      expect(
+        Object.keys(m.db.monkeys).indexOf(lastKey(filteredMonkeys))
+      ).to.not.equal(-1);
       expect(Object.keys(filteredMonkeys)).to.include(lastKey(m.db.monkeys));
-      expect(Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))).to.equal(-1);
-      expect(Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))).to.equal(-1);
+      expect(
+        Object.keys(filteredMonkeys).indexOf(firstKey(m.db.monkeys))
+      ).to.equal(-1);
+      expect(
+        Object.keys(filteredMonkeys).indexOf(lastKey(sortedMonkeys))
+      ).to.equal(-1);
     });
 
     it("limitToFirst() an equalTo() query", async () => {
@@ -162,8 +166,9 @@ describe("Reference functions", () => {
         .ref("/monkeys")
         .orderByChild("name")
         .limitToFirst(1)
-        .equalTo("Space Monkey")
+        .equalTo("Space Monkey", "name")
         .once("value");
+
       expect(snap.numChildren()).to.equal(1);
       expect(helpers.firstRecord(snap.val()).name).to.equal("Space Monkey");
 
@@ -171,7 +176,7 @@ describe("Reference functions", () => {
         .ref("/monkeys")
         .orderByChild("name")
         .limitToFirst(4)
-        .equalTo("Space Monkey")
+        .equalTo("Space Monkey", "name")
         .once("value");
       expect(snap.numChildren()).to.equal(3);
       expect(helpers.firstRecord(snap.val()).name).to.equal("Space Monkey");
@@ -193,15 +198,21 @@ describe("Reference functions", () => {
           const listOf = snap.val();
           expect(snap.numChildren()).to.equal(10);
           expect(Object.keys(m.db.monkeys).length).to.equal(15);
-          expect(Object.keys(m.db.monkeys).indexOf(lastKey(listOf))).to.not.equal(-1);
-          expect(Object.keys(m.db.monkeys).indexOf(firstKey(listOf))).to.not.equal(-1);
-          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(-1);
+          expect(
+            Object.keys(m.db.monkeys).indexOf(lastKey(listOf))
+          ).to.not.equal(-1);
+          expect(
+            Object.keys(m.db.monkeys).indexOf(firstKey(listOf))
+          ).to.not.equal(-1);
+          expect(Object.keys(listOf).indexOf(lastKey(m.db.monkeys))).to.equal(
+            -1
+          );
         });
     });
 
     it("equalTo() and orderByChild() work", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper(); // imports faker lib
+      // await m.getMockHelper(); // imports faker lib
       const young = (h: SchemaHelper) => () => ({
         first: h.faker.name.firstName(),
         age: 12
@@ -210,21 +221,22 @@ describe("Reference functions", () => {
         first: h.faker.name.firstName(),
         age: 75
       });
+
       m.addSchema("oldPerson", old).modelName("person");
       m.addSchema("youngPerson", young).modelName("person");
       m.deploy
         .queueSchema("oldPerson", 10)
         .queueSchema("youngPerson", 10)
         .generate();
-      return m
+
+      const snap = await m
         .ref("/people")
         .orderByChild("name")
         .equalTo(12, "age")
-        .once("value")
-        .then(snap => {
-          expect(Object.keys(m.db.people).length).to.equal(20);
-          expect(snap.numChildren()).to.equal(10);
-        });
+        .once("value");
+
+      expect(Object.keys(m.db.people).length).to.equal(20);
+      expect(snap.numChildren()).to.equal(10);
     });
 
     it("startAt() filters a numeric property", async () => {
@@ -242,10 +254,13 @@ describe("Reference functions", () => {
       const results = await m.ref("/dogs").once("value");
       const gettingMature = await m
         .ref("/dogs")
+        .orderByValue()
         .startAt(5, "age")
         .once("value");
+
       const mature = await m
         .ref("/dogs")
+        .orderByValue()
         .startAt(9, "age")
         .once("value");
 
@@ -266,12 +281,16 @@ describe("Reference functions", () => {
       m.generate();
 
       const all = await m.ref("/dogs").once("value");
+
       const nov14 = await m
         .ref("/dogs")
+        .orderByChild("born")
         .startAt("2014-11-01T01:00:00-05:00", "born")
         .once("value");
+
       const pupsOnly = await m
         .ref("/dogs")
+        .orderByValue()
         .startAt("2016-12-01T08:02:17-05:00", "born")
         .once("value");
 
@@ -296,6 +315,7 @@ describe("Reference functions", () => {
       const results = await m.ref("/dogs").once("value");
       const pups = await m
         .ref("/dogs")
+        .orderByValue()
         .endAt(2, "age")
         .once("value");
 
@@ -317,6 +337,7 @@ describe("Reference functions", () => {
       const results = await m.ref("/dogs").once("value");
       const middling = await m
         .ref("/dogs")
+        .orderByChild("age")
         .startAt(3, "age")
         .endAt(9, "age")
         .once("value");
@@ -355,14 +376,17 @@ describe("Reference functions", () => {
         .orderByChild("name")
         .once("value");
 
-      const orderedPeople = convert.snapshotToOrderedArray(results);
+      const orderedPeople = convert.hashToArray(results.val());
       for (let i = 1; i <= 8; i++) {
-        expect(orderedPeople[i].name >= orderedPeople[i + 1].name).is.equal(true);
+        expect(orderedPeople[i].name >= orderedPeople[i + 1].name).is.equal(
+          true
+        );
       }
 
       const orderedKeys = orderedPeople.map(p => p.id);
-      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      const unorderedKeys = Object.keys(m.db.people);
+
+      expect(orderedKeys.join(".")).to.not.equal(unorderedKeys.join("."));
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
@@ -377,7 +401,7 @@ describe("Reference functions", () => {
         .orderByChild("inUSA")
         .once("value");
 
-      const orderedPeople = convert.snapshotToOrderedArray(results);
+      const orderedPeople = convert.hashToArray(results.val());
 
       for (let i = 1; i <= 8; i++) {
         const current = orderedPeople[i].inUSA ? 1 : 0;
@@ -386,8 +410,11 @@ describe("Reference functions", () => {
       }
 
       const orderedKeys = orderedPeople.map(p => p.id);
-      const unorderedKeys = convert.snapshotToArray(results).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      const unorderedKeys = Object.keys(m.db.people);
+
+      expect(JSON.stringify(orderedKeys)).to.not.equal(
+        JSON.stringify(unorderedKeys)
+      );
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
@@ -402,17 +429,23 @@ describe("Reference functions", () => {
         .once("value");
       const defaultPeople = await m.ref("/people").once("value");
       expect(JSON.stringify(people)).to.equal(JSON.stringify(defaultPeople));
-      const orderedPeople = convert.snapshotToOrderedArray(people);
+      const orderedPeople = convert.hashToArray(people.val());
+
       const orderedKeys = orderedPeople.map(p => p.id);
-      const unorderedKeys = convert.snapshotToArray(people).map(p => p.id);
-      expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
+      const unorderedKeys = Object.keys(m.db.people);
+
+      expect(JSON.stringify(orderedKeys)).to.not.equal(
+        JSON.stringify(unorderedKeys)
+      );
       expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
     });
 
-    it.skip("orderByValue() sorts on server correctly", async () => {
+    it("orderByValue() sorts on server correctly", async () => {
       const m = await Mock.prepare();
       await m.getMockHelper();
-      m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 10 }));
+      m.addSchema("number", h => () =>
+        h.faker.random.number({ min: 0, max: 10 })
+      );
       m.addSchema("number2", h => () =>
         h.faker.random.number({ min: 20, max: 30 })
       ).modelName("number");
@@ -426,15 +459,19 @@ describe("Reference functions", () => {
         .limitToFirst(5)
         .once("value");
 
-      // const orderedSnap = convert.snapshotToOrderedArray(snap);
-      // const orderedKeys = orderedSnap.map(p => p.id);
+      const naturalSort = Object.keys(m.db.numbers);
+      const orderedKeys = Object.keys(snap.val());
 
-      // const unorderedKeys = convert.snapshotToArray(snap).map(p => p.id);
-      // expect(JSON.stringify(orderedKeys)).to.not.equal(JSON.stringify(unorderedKeys));
-      // expect(difference(orderedKeys, unorderedKeys).length).to.equal(0);
-      // for (let i = 1; i <= 8; i++) {
-      //   expect(orderedSnap[i] >= orderedSnap[i + 1]).is.equal(true);
-      // }
+      expect(orderedKeys.join(".")).to.not.equal(
+        naturalSort.slice(0, 5).join(".")
+      );
+
+      const items = convert.hashToArray(snap.val()).map(i => i.value);
+      expect(items).to.have.lengthOf(5);
+
+      for (let i = 0; i <= 3; i++) {
+        expect(items[i] >= items[i + 1]).is.equal(true);
+      }
     });
 
     it('orderByChild() combines with limitToFirst() for "server-side" selection', async () => {
@@ -449,7 +486,7 @@ describe("Reference functions", () => {
         .orderByChild("age")
         .limitToFirst(10)
         .once("value");
-      const orderedPeople = convert.snapshotToOrderedArray(results);
+      const orderedPeople = convert.hashToArray(results.val());
       expect(orderedPeople).to.have.length(10);
       orderedPeople.map(person => {
         expect(person.age).to.equal(99);
@@ -467,7 +504,8 @@ describe("Reference functions", () => {
         .orderByChild("age")
         .limitToLast(10)
         .once("value");
-      const orderedPeople = convert.snapshotToOrderedArray(results);
+
+      const orderedPeople = convert.hashToArray(results.val());
       expect(orderedPeople).to.have.length(10);
       orderedPeople.map(person => {
         expect(person.age).to.equal(1);
@@ -582,7 +620,7 @@ describe("Reference functions", () => {
       expect(person.name).to.equal("Happy Jack");
     });
 
-    it("multi-path 'updates' behaves destructively like 'set' operations", async () => {
+    it("multi-path 'updates' behaves non-destructively like 'set' operations", async () => {
       const now = new Date().toISOString();
       const m = await Mock.prepare({
         db: {

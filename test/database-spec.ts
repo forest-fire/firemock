@@ -260,15 +260,16 @@ describe("Database", () => {
   });
 
   describe("Handle Events", () => {
-    it('"value" responds to NEW child', done => {
+    it('"value" responds to NEW child', async () => {
       reset();
       const callback: HandleValueEvent = snap => {
-        const record = helpers.firstRecord(snap.val());
-        expect(record.name).to.equal("Humpty Dumpty");
-        expect(record.age).to.equal(5);
-        done();
+        if (snap.val()) {
+          const record = helpers.firstRecord(snap.val());
+          expect(record.name).to.equal("Humpty Dumpty");
+          expect(record.age).to.equal(5);
+        }
       };
-      addListener("/people", "value", callback);
+      await addListener("/people", "value", callback);
       expect(listenerCount()).to.equal(1);
       const pushKey = pushDB("/people", {
         name: "Humpty Dumpty",
@@ -279,37 +280,46 @@ describe("Database", () => {
     it('"value" responds to UPDATED child', async () => {
       reset();
       const m = await Mock.prepare();
-      return new Promise((resolve, reject) => {
-        m.addSchema("person", personMock);
-        m.queueSchema("person", 10);
-        m.generate();
-        m.ref("/people")
-          .once("value")
-          .then(people => {
-            const firstKey = helpers.firstKey(people.val());
-            const firstRecord = helpers.firstRecord(people.val());
-            const callback: HandleValueEvent = snap => {
-              const list = snap.val();
-              const first = helpers.firstRecord(list);
-              expect(first.age).to.equal(firstRecord.age + 1);
-              resolve();
-            };
-            addListener("/people", "value", callback);
-            expect(listenerCount()).to.equal(1);
-            updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
-          });
-      });
+      m.addSchema("person", personMock);
+      m.queueSchema("person", 10);
+      m.generate();
+      let status = "no-listener";
+      let firstRecord;
+      let firstKey;
+
+      const callback: HandleValueEvent = snap => {
+        if (status === "has-listener") {
+          const list = snap.val();
+
+          const first = list[firstKey];
+          expect(first.age).to.equal(firstRecord.age + 1);
+        }
+      };
+
+      await addListener("/people", "value", callback);
+      expect(listenerCount()).to.equal(1);
+
+      status = "has-listener";
+      const people = await m.ref("/people").once("value");
+      firstKey = helpers.firstKey(people.val());
+      firstRecord = helpers.firstRecord(people.val());
+
+      updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
     });
 
-    it('"value" responds to deeply nested CHANGE', done => {
+    it('"value" responds to deeply nested CHANGE', async () => {
       reset();
       const callback: HandleValueEvent = snap => {
         const record = snap.val();
-        expect(record.a.b.c.d.name).to.equal("Humpty Dumpty");
-        expect(record.a.b.c.d.age).to.equal(5);
-        done();
+        if (record) {
+          expect(record.a.b.c.d.name).to.equal("Humpty Dumpty");
+          expect(record.a.b.c.d.age).to.equal(5);
+        } else {
+          // during initialization
+          expect(snap.val()).to.equal(undefined);
+        }
       };
-      addListener("/people", "value", callback);
+      await addListener("/people", "value", callback);
       expect(listenerCount()).to.equal(1);
       setDB("/people/a/b/c/d", {
         name: "Humpty Dumpty",
@@ -323,19 +333,31 @@ describe("Database", () => {
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
-
+      let status = "starting";
       const people = (await m.ref("/people").once("value")).val();
       expect(Object.keys(people)).to.have.lengthOf(10);
       const firstKey = helpers.firstKey(people);
+
       const callback: IFirebaseEventHandler = snap => {
         const list = snap.val();
-        expect(snap.numChildren()).to.equal(9);
-        expect(Object.keys(list)).to.not.include(firstKey);
+        if (list) {
+          expect(snap.numChildren()).to.equal(status === "starting" ? 10 : 9);
+          if (status === "starting") {
+            expect(Object.keys(list)).to.include(firstKey);
+          } else {
+            expect(Object.keys(list)).to.not.include(firstKey);
+          }
+        }
       };
-      addListener("/people", "value", callback);
+
+      await addListener("/people", "value", callback);
       expect(listenerCount()).to.equal(1);
+
+      status = "after";
       removeDB(`/people/${firstKey}`);
+
       const andThen = (await m.ref("/people").once("value")).val();
+
       expect(Object.keys(andThen)).to.have.lengthOf(9);
       expect(Object.keys(andThen)).to.not.include(firstKey);
     });
@@ -373,124 +395,144 @@ describe("Database", () => {
   });
 
   describe("Other", () => {
-    it('"value" responds to scalar value set', done => {
+    it('"value" responds to scalar value set', async () => {
       reset();
+      let status = "no-listener";
       const callback: IFirebaseEventHandler = snap => {
-        const scalar = snap.val();
-        expect(scalar).to.equal(53);
-        done();
+        if (status === "listener") {
+          const scalar = snap.val();
+          expect(scalar).to.equal(53);
+        }
       };
-      addListener("/scalar", "value", callback);
+      await addListener("/scalar", "value", callback);
+      status = "listener";
       setDB("/scalar", 53);
     });
 
-    it('"child_added" responds to NEW child', done => {
-      reset();
+    it('"child_added" responds to NEW child', async () => {
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        const person = snap.val();
-        expect(person.name).equal("Chris Christy");
-        expect(person.age).equal(100);
-        done();
+        if (ready) {
+          const person = snap.val();
+          expect(person.name).equal("Chris Christy");
+          expect(person.age).equal(100);
+        }
       };
-      addListener("/people", "child_added", callback);
+      await addListener("/people", "child_added", callback);
+      ready = true;
       pushDB("/people", {
         name: "Chris Christy",
         age: 100
       });
     });
 
-    it('"child_added" ignores changed child', done => {
+    it('"child_added" ignores changed child', async () => {
       reset();
       set(db, "people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        done("Should NOT have called callback!");
+        if (ready) {
+          throw new Error("Should NOT have called callback!");
+        }
       };
-      addListener("/people", "child_added", callback);
+      await addListener("/people", "child_added", callback);
+      ready = true;
       const christy = helpers.firstKey(db.people);
       updateDB(`/people/abcd`, {
         age: 150
       });
-      setTimeout(() => {
-        done();
-      }, 50);
     });
 
-    it('"child_added" ignores removed child', done => {
+    it('"child_added" ignores removed child', async () => {
       reset();
       set(db, "people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        done("Should NOT have called callback!");
+        if (ready) {
+          throw new Error("Should NOT have called callback!");
+        }
       };
-      addListener("/people", "child_added", callback);
+      await addListener("/people", "child_added", callback);
+      ready = true;
       removeDB(`/people/abcd`);
-      setTimeout(() => {
-        done();
-      }, 50);
     });
 
-    it('"child_removed" responds to removed child', done => {
+    it('"child_removed" responds to removed child', async () => {
       reset();
       set(db, "people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        expect(db.people).to.be.an("object");
-        expect(Object.keys(db.people)).length(0);
-        done();
+        if (ready) {
+          expect(db.people).to.be.an("object");
+          expect(Object.keys(db.people)).length(0);
+        } else {
+          expect(Object.keys(db.people)).length(1);
+        }
       };
-      addListener("/people", "child_removed", callback);
+      await addListener("/people", "child_removed", callback);
+      ready = true;
       removeDB(`/people/abcd`);
     });
 
-    it('"child_removed" ignores added child', done => {
+    it('"child_removed" ignores added child', async () => {
       reset();
-
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        done("Should NOT have called callback!");
+        if (ready) {
+          throw new Error("Should NOT have called callback!");
+        }
       };
-      addListener("/people", "child_removed", callback);
+
+      await addListener("/people", "child_removed", callback);
+      ready = true;
       setDB("people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
-      setTimeout(() => {
-        done();
-      }, 50);
     });
 
-    it('"child_removed" ignores removal of non-existing child', done => {
+    it('"child_removed" ignores removal of non-existing child', async () => {
       reset();
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        done(`Should NOT have called callback! [ ${snap.key}, ${snap.val()} ]`);
+        if (ready) {
+          throw new Error(
+            `Should NOT have called callback! [ ${snap.key}, ${snap.val()} ]`
+          );
+        }
       };
-      addListener("/people", "child_removed", callback);
+
+      await addListener("/people", "child_removed", callback);
+      ready = true;
       removeDB("people.abcdefg");
-      setTimeout(() => {
-        done();
-      }, 50);
     });
 
-    it('"child_changed" responds to a new child', done => {
+    it('"child_changed" responds to a new child', async () => {
       reset();
       set(db, "people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
+      let ready = false;
       const callback: HandleValueEvent = snap => {
-        expect(db.people).to.be.an("object");
-        expect(db.people).to.have.all.keys("abcd", snap.key);
-        expect(helpers.length(db.people)).to.equal(2);
-        expect(snap.val().name).to.equal("Barbara Streisand");
-        done();
+        if (ready) {
+          expect(db.people).to.be.an("object");
+          expect(db.people).to.have.all.keys("abcd", snap.key);
+          expect(helpers.length(db.people)).to.equal(2);
+          expect(snap.val().name).to.equal("Barbara Streisand");
+        }
       };
-      addListener("/people", "child_changed", callback);
+      await addListener("/people", "child_changed", callback);
+      ready = true;
       pushDB(`/people`, {
         name: "Barbara Streisand",
         age: 70

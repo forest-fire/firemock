@@ -7,11 +7,12 @@ import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
 import copy from "fast-copy";
 import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
-import { SnapShot, IMockWatcherGroupEvent } from "./index";
+import { SnapShot, IMockWatcherGroupEvent, Query, Reference } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { auth as mockedAuth } from "./auth";
 import { IFirebaseEventHandler } from "./@types/db-types";
 import deepmerge from "deepmerge";
+import { SerializedQuery } from "serialized-query";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
@@ -144,7 +145,7 @@ export function multiPathUpdateDB(data: IDictionary) {
     const value = data[key];
     const path = key;
     if (get(db, path) !== value) {
-      // silent sets
+      // silent set
       setDB(path, value, true);
     }
   });
@@ -190,6 +191,7 @@ function groupEventsByWatcher(
 
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
   const eventPaths = Object.keys(data).map(i => dotify(i));
+  console.log(eventPaths);
 
   const response: IMockWatcherGroupEvent[] = [];
   const relativePath = (full: string, partial: string) => {
@@ -202,7 +204,7 @@ function groupEventsByWatcher(
 
   getListeners().forEach(listener => {
     const eventPathsUnderListener = eventPaths.filter(path =>
-      path.includes(listener.path)
+      path.includes(dotify(listener.query.path))
     );
 
     if (eventPathsUnderListener.length === 0) {
@@ -212,14 +214,16 @@ function groupEventsByWatcher(
 
     const paths: string[] = [];
 
+    const listenerPath = dotify(listener.query.path);
     const changeObject = eventPathsUnderListener.reduce(
       (changes: IDictionary<IMockWatcherGroupEvent>, path) => {
         paths.push(path);
-        if (listener.path === path) {
+        if (dotify(listener.query.path) === path) {
           changes = data[path];
         } else {
-          set(changes, dotify(relativePath(path, listener.path)), data[path]);
+          set(changes, dotify(relativePath(path, listenerPath)), data[path]);
         }
+
         return changes;
       },
       {}
@@ -229,22 +233,27 @@ function groupEventsByWatcher(
       listener.eventType === "value"
         ? changeObject
           ? justKey(changeObject)
-          : listener.path.split(".").pop()
-        : dotify(pathJoin(slashify(listener.path), justKey(changeObject)));
+          : listener.query.path.split(".").pop()
+        : dotify(
+            pathJoin(slashify(listener.query.path), justKey(changeObject))
+          );
 
     const newResponse = {
       listenerId: listener.id,
-      listenerPath: listener.path,
+      listenerPath,
       listenerEvent: listener.eventType,
       callback: listener.callback,
       eventPaths: paths,
       key,
       changes: justValue(changeObject),
-      value: listener.eventType === "value" ? getDb(listener.path) : getDb(key),
+      value:
+        listener.eventType === "value"
+          ? getDb(listener.query.path)
+          : getDb(key),
       priorValue:
         listener.eventType === "value"
-          ? get(dbSnapshot, listener.path)
-          : justValue(get(dbSnapshot, listener.path))
+          ? get(dbSnapshot, listener.query.path)
+          : justValue(get(dbSnapshot, listener.query.path))
     };
 
     response.push(newResponse);
@@ -290,51 +299,68 @@ export function pushDB(path: string, value: any): string {
  * interested in the _paths_ which are being watched
  * you can call `listenerPaths()`.
  */
-export function addListener(
-  path: string,
+export async function addListener(
+  pathOrQuery: string | SerializedQuery<any>,
   eventType: EventType,
   callback: IFirebaseEventHandler,
   cancelCallbackOrContext?: (err?: Error) => void,
   context?: IDictionary
-) {
+): Promise<SnapShot> {
+  const query = (typeof pathOrQuery === "string"
+    ? new SerializedQuery(join(pathOrQuery))
+    : pathOrQuery) as SerializedQuery;
+  pathOrQuery = (typeof pathOrQuery === "string"
+    ? join(pathOrQuery)
+    : query.path) as string;
+
   _listeners.push({
     id: Math.random()
       .toString(36)
       .substr(2, 10),
-    path: join(path),
+    query,
     eventType,
     callback,
     cancelCallbackOrContext,
     context
   });
 
-  if (eventType === "value") {
-    const data = getDb(join(path));
-    const snap = new SnapShot(join(path), { [data.id]: data });
-    // notify value-based watchers
-    callback(snap);
-  } else if (eventType === "child_added") {
-    const list = getDb(join(path)) || {};
-    // notify watchers
-    if (list) {
-      // there are already children in the newly setup watcher
-      // sending these will sync server/client as well as indicate
-      // that the watcher is initialized
-      Object.keys(list).forEach(key => {
-        const data = get(list, key);
-        if (data) {
-          callback(new SnapShot(join(path, key), data));
-        } else {
-          // ideally would be notifying that watcher is initialized
-          // but in a way that does NOT send a dispatch event (as the
-          // actual DB does not)
-        }
-      });
-    } else {
-      // there aren't any _children_ yet but we still need some way to indicate
-      // that the watcher _has initialized_ so we will instead manually
-    }
+  function ref(dbPath: string) {
+    return new Reference(dbPath);
   }
+  const snap1: SnapShot = await query.deserialize({ ref }).once(eventType);
+  callback(snap1);
+
+  return snap1;
+
+  // if (eventType === "value") {
+  //   const data = getDb(path);
+  //   // const id = path.split(".").pop();
+
+  //   // const snap = new SnapShot(path, { [id]: data });
+  //   // notify value-based watchers
+  //   callback(snap1);
+  // } else if (eventType === "child_added") {
+  //   const list = getDb(query.path) || {};
+  //   // notify watchers
+  //   if (list) {
+  //     // there are already children in the newly setup watcher
+  //     // sending these will sync server/client as well as indicate
+  //     // that the watcher is initialized
+  //     Object.keys(list).forEach(key => {
+  //       const data = get(list, key);
+  //       if (data) {
+  //         callback(new SnapShot(join(query.path, key), data));
+  //       } else {
+  //         // ideally would be notifying that watcher is initialized
+  //         // but in a way that does NOT send a dispatch event (as the
+  //         // actual DB does not)
+  //       }
+  //     });
+  //   } else {
+  //     // there aren't any _children_ yet but we still need some way to indicate
+  //     // that the watcher _has initialized_ so we will instead manually
+  //   }
+  // }
 }
 
 /**
@@ -447,8 +473,10 @@ export function listenerPaths(
         : [lookFor];
   }
   return lookFor
-    ? _listeners.filter(l => lookFor.includes(l.eventType)).map(l => l.path)
-    : _listeners.map(l => l.path);
+    ? _listeners
+        .filter(l => lookFor.includes(l.eventType))
+        .map(l => l.query.path)
+    : _listeners.map(l => l.query.path);
 }
 
 /**
@@ -584,16 +612,16 @@ export function findChildListeners(
 
   const decendants = _listeners
     .filter(l => eventTypes.includes(l.eventType))
-    .filter(l => changePath.startsWith(l.path))
+    .filter(l => changePath.startsWith(dotify(l.query.path)))
     .reduce((acc: IListenerPlus[], listener) => {
       const id = removeDots(
         changePath
-          .replace(listener.path, "")
+          .replace(listener.query.path, "")
           .split(".")
           .filter(i => i)[0]
       );
       const remainingPath = stripLeadingDot(
-        changePath.replace(stripLeadingDot(listener.path), "")
+        changePath.replace(stripLeadingDot(listener.query.path), "")
       );
 
       const changeIsAtRoot = id === remainingPath;
@@ -613,7 +641,8 @@ export function findChildListeners(
  */
 export function findValueListeners(path: string) {
   return _listeners.filter(
-    l => join(path).indexOf(join(l.path)) !== -1 && l.eventType === "value"
+    l =>
+      join(path).indexOf(join(l.query.path)) !== -1 && l.eventType === "value"
   );
 }
 

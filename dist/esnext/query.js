@@ -1,107 +1,74 @@
-import { db, addListener } from "./database";
-import get from "lodash.get";
+import { addListener, getDb } from "./database";
 import SnapShot from "./snapshot";
-import Queue from "./queue";
-import * as convert from "typed-conversions";
 import Reference from "./reference";
+import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { join, leafNode, networkDelay } from "./util";
-export var OrderingType;
-(function (OrderingType) {
-    OrderingType["byChild"] = "child";
-    OrderingType["byKey"] = "key";
-    OrderingType["byValue"] = "value";
-})(OrderingType || (OrderingType = {}));
+import { runQuery } from "./shared/runQuery";
 /** tslint:ignore:member-ordering */
 export default class Query {
     constructor(path, _delay = 5) {
         this.path = path;
         this._delay = _delay;
-        this._order = { type: OrderingType.byKey, value: null };
-        this._listeners = new Queue("listeners");
-        this._limitFilters = [];
-        this._queryFilters = [];
+        this._query = SerializedQuery.path(path);
+    }
+    /**
+     * A static initializer which returns a **Firemock** `Query`
+     * that has been configured with a `SerializedQuery`.
+     *
+     * @param query the _SerializedQuery_ to configure with
+     */
+    static create(query) {
+        query.setPath(join(query.path)); // ensures dot notation
+        const obj = new Query(query.path);
+        obj._query = query;
+        return obj;
     }
     get ref() {
         return new Reference(this.path, this._delay);
     }
     limitToLast(num) {
-        const filter = resultset => {
-            return resultset.slice(resultset.length - num);
-        };
-        this._limitFilters.push(filter);
+        this._query.limitToLast(num);
         return this;
     }
     limitToFirst(num) {
-        const filter = resultset => {
-            return resultset.slice(0, num);
-        };
-        this._limitFilters.push(filter);
+        this._query.limitToFirst(num);
         return this;
     }
     equalTo(value, key) {
-        if (key && this._order.type === OrderingType.byKey) {
-            throw new Error("You can not use equalTo's key property when using a key sort!");
+        if (key && this._query.identity.orderBy === QueryOrderType.orderByKey) {
+            throw new Error(`You can not use "equalTo(val, key)" with a "key" property defined when using a key sort!`);
         }
-        key = key ? key : this._order.value;
-        const filter = (resultset) => {
-            let comparison = item => item[key];
-            if (!key) {
-                switch (this._order.type) {
-                    case OrderingType.byChild:
-                        comparison = item => item[this._order.value];
-                        break;
-                    case OrderingType.byKey:
-                        comparison = item => item.id;
-                        break;
-                    case OrderingType.byValue:
-                        comparison = item => item;
-                        break;
-                    default:
-                        throw new Error("unknown ordering type: " + this._order.type);
-                }
-            }
-            return resultset.filter((item) => comparison(item) === value);
-        };
-        this._queryFilters.push(filter);
+        this._query.equalTo(value, key);
         return this;
     }
     /** Creates a Query with the specified starting point. */
     startAt(value, key) {
-        key = key ? key : this._order.value;
-        const filter = resultset => {
-            return resultset.filter((record) => {
-                return key ? record[key] >= value : record >= value;
-            });
-        };
-        this._queryFilters.push(filter);
+        this._query.startAt(value, key);
         return this;
     }
     endAt(value, key) {
-        key = key ? key : this._order.value;
-        const filter = resultset => {
-            return resultset.filter((record) => {
-                return key ? record[key] <= value : record <= value;
-            });
-        };
-        this._queryFilters.push(filter);
+        this._query.endAt(value, key);
         return this;
     }
     /**
      * Setup an event listener for a given eventType
      */
     on(eventType, callback, cancelCallbackOrContext, context) {
-        addListener(this.path, eventType, callback, cancelCallbackOrContext, context);
+        addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
-        return networkDelay(this.process());
+        return networkDelay(this.getQuerySnapShot());
     }
     off() {
         console.log("off() not implemented yet");
     }
-    /** NOT IMPLEMENTED YET */
+    /**
+     * Returns a boolean flag based on whether the two queries --
+     * _this_ query and the one passed in -- are equivalen in scope.
+     */
     isEqual(other) {
-        return false;
+        return this._query.hashCode() === other._query.hashCode();
     }
     /**
      * When the children of a query are all objects, then you can sort them by a
@@ -109,10 +76,7 @@ export default class Query {
      * index on this property in the database's config.
      */
     orderByChild(prop) {
-        this._order = {
-            type: OrderingType.byChild,
-            value: prop
-        };
+        this._query.orderByChild(prop);
         return this;
     }
     /**
@@ -120,20 +84,18 @@ export default class Query {
      * can order the results by their (ascending) values
      */
     orderByValue() {
-        this._order = {
-            type: OrderingType.byValue,
-            value: null
-        };
+        this._query.orderByValue();
         return this;
     }
     /**
-     * This is the default sort
+     * order is based on the order of the
+     * "key" which is time-based if you are using Firebase's
+     * _push-keys_.
+     *
+     * **Note:** this is the default sort if no sort is specified
      */
     orderByKey() {
-        this._order = {
-            type: OrderingType.byKey,
-            value: null
-        };
+        this._query.orderByKey();
         return this;
     }
     /** NOT IMPLEMENTED */
@@ -143,11 +105,7 @@ export default class Query {
     toJSON() {
         return {
             identity: this.toString(),
-            delay: this._delay,
-            ordering: this._order,
-            numListeners: this._listeners.length,
-            queryFilters: this._queryFilters.length > 0 ? this._queryFilters : "none",
-            limitFilters: this._limitFilters.length > 0 ? this._limitFilters : "none"
+            query: this._query.identity
         };
     }
     toString() {
@@ -175,74 +133,13 @@ export default class Query {
         return null;
     }
     /**
-     * Reduce the dataset using filters (after sorts) but do not apply sort
+     * Reduce the dataset using _filters_ (after sorts) but do not apply sort
      * order to new SnapShot (so natural order is preserved)
      */
-    process() {
-        // typically a hash/object but could be a scalar type (string/number/boolean)
-        const input = get(db, join(this.path), undefined);
-        const hashOfHashes = typeof input === "object" &&
-            Object.keys(input).every(i => typeof input[i] === "object");
-        let snap;
-        if (!hashOfHashes) {
-            if (typeof input !== "object") {
-                return new SnapShot(leafNode(this.path), input);
-            }
-            const mockDatabaseResults = convert.keyValueDictionaryToArray(input, {
-                key: "id"
-            });
-            const sorted = this.processSorting(mockDatabaseResults);
-            const remainingIds = new Set(this.processFilters(sorted).map((f) => typeof f === "object" ? f.id : f));
-            const resultset = mockDatabaseResults.filter(i => remainingIds.has(i.id));
-            snap = new SnapShot(leafNode(this.path), convert.keyValueArrayToDictionary(resultset, { key: "id" }));
-        }
-        else {
-            const mockDatabaseResults = convert.hashToArray(input);
-            const sorted = this.processSorting(mockDatabaseResults);
-            const remainingIds = this.processFilters(sorted).map((f) => typeof f === "object" ? f.id : f);
-            snap = new SnapShot(leafNode(this.path), mockDatabaseResults.filter((record) => remainingIds.indexOf(record.id) !== -1));
-        }
-        snap.sortingFunction(this.getSortingFunction(this._order));
-        return snap;
-    }
-    /**
-     * Processes all Filter Queries to reduce the resultset
-     */
-    processFilters(inputArray) {
-        let output = inputArray.slice(0);
-        this._queryFilters.forEach(q => (output = q(output)));
-        this._limitFilters.forEach(q => (output = q(output)));
-        return output;
-    }
-    processSorting(inputArray) {
-        const sortFn = this.getSortingFunction(this._order);
-        const sorted = inputArray.slice(0).sort(sortFn);
-        return sorted;
-    }
-    /**
-     * Returns a sorting function for the given Sort Type
-     */
-    getSortingFunction(sortType) {
-        let sort;
-        switch (sortType.type) {
-            case OrderingType.byKey:
-                sort = (a, b) => {
-                    return a.id > b.id ? -1 : a.id === b.id ? 0 : 1;
-                };
-                break;
-            case OrderingType.byValue:
-                sort = (a, b) => {
-                    return a.value > b.value ? -1 : a.value === b.value ? 0 : 1;
-                };
-                break;
-            case OrderingType.byChild:
-                const child = this._order.value;
-                sort = (a, b) => {
-                    return a[child] > b[child] ? -1 : a[child] === b[child] ? 0 : 1;
-                };
-                break;
-        }
-        return sort;
+    getQuerySnapShot() {
+        const data = getDb(this._query.path);
+        const results = runQuery(this._query, data);
+        return new SnapShot(leafNode(this._query.path), results);
     }
 }
 //# sourceMappingURL=query.js.map

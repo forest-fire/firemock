@@ -18,7 +18,7 @@ export const implemented = {
         authAdminApi.addAuthObserver(observer);
     },
     async setPersistence() {
-        console.warn(`currently firemock does not abject to the use of setPersistence() but it doesn't support it either.`);
+        console.warn(`currently firemock accepts calls to setPersistence() but it doesn't support it.`);
     },
     signInAnonymously: async () => {
         await networkDelay();

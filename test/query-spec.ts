@@ -1,6 +1,5 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
-import * as helpers from "./testing/helpers";
 import { Mock } from "../src/mock";
 
 const expect = chai.expect;
@@ -34,12 +33,16 @@ describe("Query →", () => {
   it("limit queries with orderByValue() on scalar valued dictionary", async () => {
     const m = await Mock.prepare();
     m.updateDB({ ages: ages() });
+
     const result = await m
       .ref("ages")
       .orderByValue()
       .limitToFirst(3)
       .once("value");
+
     const values = result.val();
+    console.log(values);
+
     expect(Object.keys(values)).to.have.lengthOf(3);
     const validAges = new Set([100, 26, 13]);
     Object.keys(values).map(key => {

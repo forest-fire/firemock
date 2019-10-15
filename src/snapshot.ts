@@ -25,7 +25,9 @@ export default class SnapShot<T = any> implements DataSnapshot {
   }
 
   public val(): T | IDictionary<T> {
-    return Array.isArray(this._value) ? convert.arrayToHash(this._value) : this._value;
+    return Array.isArray(this._value)
+      ? convert.arrayToHash(this._value)
+      : this._value;
   }
 
   public toJSON() {
