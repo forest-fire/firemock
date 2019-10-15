@@ -1597,9 +1597,9 @@ autoprefixer@^9.5.1:
     postcss-value-parser "^4.0.2"
 
 aws-sdk@^2.512.0:
-  version "2.548.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.548.0.tgz#20a3c7a77e1c6fd694cdb5e0ecc0ccf0d0542674"
-  integrity sha512-dnG1MEc3uOonGDswHPiq7TYn6EOG3+IQhF2LSRambz9adaZxwRgFOII7UVPJjh33FtxKpMzOSmf62R+EX822Nw==
+  version "2.549.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.549.0.tgz#8338cd406c9e8b4b67edf2215b9b7c249a79f6e6"
+  integrity sha512-dzkdgZWRG9CyPNjQ/yt82XKjv5OO8Ce2SLJeBnd6KOKkxCwjldOsPRv0MSsx02hQv/Izva8yaUPesftqdJamew==
   dependencies:
     buffer "4.9.1"
     events "1.1.1"
@@ -6962,10 +6962,10 @@ serialize-javascript@^1.3.0, serialize-javascript@^1.7.0:
   resolved "https://registry.yarnpkg.com/serialize-javascript/-/serialize-javascript-1.9.1.tgz#cfc200aef77b600c47da9bb8149c943e798c2fdb"
   integrity sha512-0Vb/54WJ6k5v8sSWN09S0ora+Hnr+cX40r9F170nT+mSkaxltoE/7R3OrIdBSUv1OoiobH1QoWQbCnAO+e8J1A==
 
-serialized-query@^0.9.0:
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/serialized-query/-/serialized-query-0.9.0.tgz#f31387b308b0fae91069dfe2f4a9a6636fe4e788"
-  integrity sha512-kBxFS3k8kOXl0z+hKtoDdCdaatxelgPK1X1TDjEeaPcEML6G1fIc5LX4UCLq0AzGOWXs/Xs/k9aTaINx3pGj/Q==
+serialized-query@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/serialized-query/-/serialized-query-0.9.1.tgz#b3c3be56ec8f86241894011131338baaf6d4eeef"
+  integrity sha512-PRaPy2l4Y93YC9ItVojWqJWx8mhOHi6XfMtPVhOLO58H6I0HXwSUCfYO7z6V2xCGFVQjp3WvXEIRR7UcPEgxKA==
   dependencies:
     common-types "^1.12.9"
 
