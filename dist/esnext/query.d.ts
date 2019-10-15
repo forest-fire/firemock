@@ -1,6 +1,5 @@
 import { DataSnapshot, Query as IQuery, EventType, Reference as IReference } from "@firebase/database-types";
 import SnapShot from "./snapshot";
-import Queue from "./queue";
 import Reference from "./reference";
 import { SerializedQuery } from "serialized-query";
 import { DelayType } from "./util";
@@ -12,15 +11,6 @@ export declare type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
 export declare type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 export declare type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
 export declare type QueryValue = number | string | boolean | null;
-export declare enum OrderingType {
-    byChild = "child",
-    byKey = "key",
-    byValue = "value"
-}
-export interface IOrdering {
-    type: OrderingType;
-    value: any;
-}
 export interface IListener {
     /** random string */
     id: string;
@@ -36,11 +26,14 @@ export declare type IQueryFilter<T> = (resultset: T[]) => T[];
 export default class Query<T = any> implements IQuery {
     path: string;
     protected _delay: DelayType;
-    static deserialize(q: SerializedQuery): Query<any>;
-    protected _order: IOrdering;
-    protected _listeners: Queue<IListener>;
-    protected _limitFilters: Array<IQueryFilter<T>>;
-    protected _queryFilters: Array<IQueryFilter<T>>;
+    /**
+     * A static initializer which returns a **Firemock** `Query`
+     * that has been configured with a `SerializedQuery`.
+     *
+     * @param query the _SerializedQuery_ to configure with
+     */
+    static create(query: SerializedQuery): Query<any>;
+    protected _query: SerializedQuery;
     constructor(path: string, _delay?: DelayType);
     readonly ref: Reference<T>;
     limitToLast(num: number): Query<T>;
@@ -55,7 +48,10 @@ export default class Query<T = any> implements IQuery {
     on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot, b?: null | string) => Promise<null>;
     once(eventType: "value"): Promise<DataSnapshot>;
     off(): void;
-    /** NOT IMPLEMENTED YET */
+    /**
+     * Returns a boolean flag based on whether the two queries --
+     * _this_ query and the one passed in -- are equivalen in scope.
+     */
     isEqual(other: Query): boolean;
     /**
      * When the children of a query are all objects, then you can sort them by a
@@ -69,18 +65,18 @@ export default class Query<T = any> implements IQuery {
      */
     orderByValue(): Query<T>;
     /**
-     * This is the default sort
+     * order is based on the order of the
+     * "key" which is time-based if you are using Firebase's
+     * _push-keys_.
+     *
+     * **Note:** this is the default sort if no sort is specified
      */
     orderByKey(): Query<T>;
     /** NOT IMPLEMENTED */
     orderByPriority(): Query<T>;
     toJSON(): {
         identity: string;
-        delay: DelayType;
-        ordering: IOrdering;
-        numListeners: any;
-        queryFilters: string | IQueryFilter<T>[];
-        limitFilters: string | IQueryFilter<T>[];
+        query: import("serialized-query").ISerializedQueryIdentity<import("common-types/dist/basics").IDictionary<any>>;
     };
     toString(): string;
     /**
@@ -102,14 +98,5 @@ export default class Query<T = any> implements IQuery {
      * Reduce the dataset using _filters_ (after sorts) but do not apply sort
      * order to new SnapShot (so natural order is preserved)
      */
-    private process;
-    /**
-     * Processes all Query _filters_ (equalTo, startAt, endAt)
-     */
-    private processFilters;
-    private processSorting;
-    /**
-     * Returns a sorting function for the given Sort Type
-     */
-    private getSortingFunction;
+    private getQuerySnapShot;
 }

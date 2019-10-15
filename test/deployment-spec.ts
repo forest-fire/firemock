@@ -80,6 +80,7 @@ describe("Deployment", () => {
 
     const orderedOnServer = await m
       .ref("/animals")
+      .orderByValue()
       .startAt(14, "age")
       .once("value");
 

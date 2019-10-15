@@ -284,14 +284,14 @@ describe("Database", () => {
       m.queueSchema("person", 10);
       m.generate();
       let status = "no-listener";
+      let firstRecord;
+      let firstKey;
 
       const callback: HandleValueEvent = snap => {
-        console.log(status);
-
         if (status === "has-listener") {
           const list = snap.val();
-          const first = helpers.firstRecord(list);
-          console.log(first.age);
+
+          const first = list[firstKey];
           expect(first.age).to.equal(firstRecord.age + 1);
         }
       };
@@ -301,8 +301,9 @@ describe("Database", () => {
 
       status = "has-listener";
       const people = await m.ref("/people").once("value");
-      const firstKey = helpers.firstKey(people.val());
-      const firstRecord = helpers.firstRecord(people.val());
+      firstKey = helpers.firstKey(people.val());
+      firstRecord = helpers.firstRecord(people.val());
+
       updateDB(`/people/${firstKey}`, { age: firstRecord.age + 1 });
     });
 

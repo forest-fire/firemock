@@ -4,11 +4,17 @@ import get from "lodash.get";
 import {
   Reference as IReference,
   ThenableReference as IThenableReference,
-  DataSnapshot,
-  ThenableReference
+  DataSnapshot
 } from "@firebase/database-types";
 
-import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
+import {
+  db,
+  setDB,
+  updateDB,
+  pushDB,
+  removeDB,
+  multiPathUpdateDB
+} from "./database";
 import { parts, join, slashNotation, networkDelay } from "./util";
 
 function isMultiPath(data: IDictionary) {
@@ -18,7 +24,9 @@ function isMultiPath(data: IDictionary) {
     }
   });
   const indexesAreStrings = Object.keys(data).every(i => typeof i === "string");
-  const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
+  const indexesLookLikeAPath = Object.keys(data).every(
+    i => i.indexOf("/") !== -1
+  );
   return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
 export default class Reference<T = any> extends Query<T> implements IReference {
@@ -44,7 +52,10 @@ export default class Reference<T = any> extends Query<T> implements IReference {
     return new Reference("/", db);
   }
 
-  public push(value?: any, onComplete?: (a: Error | null) => any): IThenableReference {
+  public push(
+    value?: any,
+    onComplete?: (a: Error | null) => any
+  ): IThenableReference {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {

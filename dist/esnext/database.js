@@ -114,7 +114,7 @@ export function multiPathUpdateDB(data) {
         const value = data[key];
         const path = key;
         if (get(db, path) !== value) {
-            // silent sets
+            // silent set
             setDB(path, value, true);
         }
     });
@@ -148,6 +148,7 @@ function groupEventsByWatcher(data, dbSnapshot) {
     data = dotifyKeys(data);
     const getFromSnapshot = (path) => get(dbSnapshot, dotify(path));
     const eventPaths = Object.keys(data).map(i => dotify(i));
+    console.log(eventPaths);
     const response = [];
     const relativePath = (full, partial) => {
         return full.replace(partial, "");
@@ -155,19 +156,20 @@ function groupEventsByWatcher(data, dbSnapshot) {
     const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
     const justValue = (obj) => justKey(obj) ? obj[justKey(obj)] : null;
     getListeners().forEach(listener => {
-        const eventPathsUnderListener = eventPaths.filter(path => path.includes(listener.query.path));
+        const eventPathsUnderListener = eventPaths.filter(path => path.includes(dotify(listener.query.path)));
         if (eventPathsUnderListener.length === 0) {
             // if there are no listeners then there's nothing to do
             return;
         }
         const paths = [];
+        const listenerPath = dotify(listener.query.path);
         const changeObject = eventPathsUnderListener.reduce((changes, path) => {
             paths.push(path);
-            if (listener.query.path === path) {
+            if (dotify(listener.query.path) === path) {
                 changes = data[path];
             }
             else {
-                set(changes, dotify(relativePath(path, listener.query.path)), data[path]);
+                set(changes, dotify(relativePath(path, listenerPath)), data[path]);
             }
             return changes;
         }, {});
@@ -178,7 +180,7 @@ function groupEventsByWatcher(data, dbSnapshot) {
             : dotify(pathJoin(slashify(listener.query.path), justKey(changeObject)));
         const newResponse = {
             listenerId: listener.id,
-            listenerPath: listener.query.path,
+            listenerPath,
             listenerEvent: listener.eventType,
             callback: listener.callback,
             eventPaths: paths,

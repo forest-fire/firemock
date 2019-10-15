@@ -145,7 +145,7 @@ export function multiPathUpdateDB(data: IDictionary) {
     const value = data[key];
     const path = key;
     if (get(db, path) !== value) {
-      // silent sets
+      // silent set
       setDB(path, value, true);
     }
   });
@@ -191,6 +191,7 @@ function groupEventsByWatcher(
 
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
   const eventPaths = Object.keys(data).map(i => dotify(i));
+  console.log(eventPaths);
 
   const response: IMockWatcherGroupEvent[] = [];
   const relativePath = (full: string, partial: string) => {
@@ -203,7 +204,7 @@ function groupEventsByWatcher(
 
   getListeners().forEach(listener => {
     const eventPathsUnderListener = eventPaths.filter(path =>
-      path.includes(listener.query.path)
+      path.includes(dotify(listener.query.path))
     );
 
     if (eventPathsUnderListener.length === 0) {
@@ -213,18 +214,16 @@ function groupEventsByWatcher(
 
     const paths: string[] = [];
 
+    const listenerPath = dotify(listener.query.path);
     const changeObject = eventPathsUnderListener.reduce(
       (changes: IDictionary<IMockWatcherGroupEvent>, path) => {
         paths.push(path);
-        if (listener.query.path === path) {
+        if (dotify(listener.query.path) === path) {
           changes = data[path];
         } else {
-          set(
-            changes,
-            dotify(relativePath(path, listener.query.path)),
-            data[path]
-          );
+          set(changes, dotify(relativePath(path, listenerPath)), data[path]);
         }
+
         return changes;
       },
       {}
@@ -241,7 +240,7 @@ function groupEventsByWatcher(
 
     const newResponse = {
       listenerId: listener.id,
-      listenerPath: listener.query.path,
+      listenerPath,
       listenerEvent: listener.eventType,
       callback: listener.callback,
       eventPaths: paths,

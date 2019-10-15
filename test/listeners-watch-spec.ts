@@ -2,50 +2,43 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import {
-  Query,
-  SnapShot,
-  IMockWatcherGroupEvent,
-  IDictionary,
-  SchemaHelper,
-  Mock,
-  IFirebaseEventHandler
-} from "../src";
+import { Query, IDictionary, SchemaHelper, Mock, Reference } from "../src";
 import { DataSnapshot } from "@firebase/database-types";
 import {
   updateDB,
   removeDB,
   pushDB,
   setDB,
-  getDb,
   multiPathUpdateDB,
   clearDatabase,
+  listenerCount,
   reset
 } from "../src/database";
 import { wait } from "common-types";
-import { listenerCount } from "cluster";
+import { SerializedQuery } from "serialized-query";
 
 const expect = chai.expect;
 
 describe("Listener events ->", () => {
   it('listening on a "value" event detects changes', async () => {
-    const queryRef = new Query("userProfile/1234", 10);
+    const ref = () => new Reference("userProfile/1234");
+    const queryRef = SerializedQuery.path("userProfile/1234").deserialize({
+      ref
+    });
     let events: IDictionary[] = [];
     let ready = false;
 
     const cb = (snap: DataSnapshot, prevKey: any) => {
-      console.log(ready, snap);
-
       if (ready) {
         events.push({ key: snap.key, snap: snap.val(), prevKey });
       }
     };
 
     queryRef.on("value", cb);
-    await wait(50);
+    await wait(150);
     ready = true;
-    expect(listenerCount("value")).to.equal(1);
     updateDB("userProfile/1234/name", "Bob Marley");
+    expect(listenerCount("value")).to.equal(1);
     expect(events).to.have.lengthOf(1);
     expect(events[0].snap).to.haveOwnProperty("name");
     expect(events[0].snap.name).to.equal("Bob Marley");
