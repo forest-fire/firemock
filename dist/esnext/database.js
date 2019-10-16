@@ -253,36 +253,14 @@ export async function addListener(pathOrQuery, eventType, callback, cancelCallba
     const snapshot = await query
         .deserialize({ ref })
         .once(eventType === "value" ? "value" : "child_added");
-    callback(snapshot);
+    if (eventType === "value") {
+        callback(snapshot);
+    }
+    else {
+        const list = snapshot.val();
+        list.forEach((i) => callback(new SnapShot(join(query.path, i.id), i)));
+    }
     return snapshot;
-    // if (eventType === "value") {
-    //   const data = getDb(path);
-    //   // const id = path.split(".").pop();
-    //   // const snap = new SnapShot(path, { [id]: data });
-    //   // notify value-based watchers
-    //   callback(snap1);
-    // } else if (eventType === "child_added") {
-    //   const list = getDb(query.path) || {};
-    //   // notify watchers
-    //   if (list) {
-    //     // there are already children in the newly setup watcher
-    //     // sending these will sync server/client as well as indicate
-    //     // that the watcher is initialized
-    //     Object.keys(list).forEach(key => {
-    //       const data = get(list, key);
-    //       if (data) {
-    //         callback(new SnapShot(join(query.path, key), data));
-    //       } else {
-    //         // ideally would be notifying that watcher is initialized
-    //         // but in a way that does NOT send a dispatch event (as the
-    //         // actual DB does not)
-    //       }
-    //     });
-    //   } else {
-    //     // there aren't any _children_ yet but we still need some way to indicate
-    //     // that the watcher _has initialized_ so we will instead manually
-    //   }
-    // }
 }
 /**
  * **removeListener**
