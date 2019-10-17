@@ -15,6 +15,7 @@ const index_1 = require("./index");
 const auth_1 = require("./auth");
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const serialized_query_1 = require("serialized-query");
+const typed_conversions_1 = require("typed-conversions");
 exports.db = [];
 let _listeners = [];
 let _silenceEvents = false;
@@ -274,8 +275,10 @@ async function addListener(pathOrQuery, eventType, callback, cancelCallbackOrCon
         callback(snapshot);
     }
     else {
-        const list = snapshot.val();
-        list.forEach((i) => callback(new index_1.SnapShot(util_1.join(query.path, i.id), i)));
+        const list = typed_conversions_1.hashToArray(snapshot.val());
+        if (eventType === "child_added") {
+            list.forEach((i) => callback(new index_1.SnapShot(util_1.join(query.path, i.id), i)));
+        }
     }
     return snapshot;
 }

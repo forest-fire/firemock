@@ -13,6 +13,7 @@ import { auth as mockedAuth } from "./auth";
 import { IFirebaseEventHandler } from "./@types/db-types";
 import deepmerge from "deepmerge";
 import { SerializedQuery } from "serialized-query";
+import { hashToArray } from "typed-conversions";
 
 export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export let db: IDictionary = [];
@@ -334,11 +335,12 @@ export async function addListener(
   if (eventType === "value") {
     callback(snapshot);
   } else {
-    const list = snapshot.val();
-
-    list.forEach((i: IDictionary) =>
-      callback(new SnapShot(join(query.path, i.id), i))
-    );
+    const list = hashToArray(snapshot.val());
+    if (eventType === "child_added") {
+      list.forEach((i: IDictionary) =>
+        callback(new SnapShot(join(query.path, i.id), i))
+      );
+    }
   }
 
   return snapshot;
