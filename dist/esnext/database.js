@@ -10,6 +10,7 @@ import { SnapShot, Reference } from "./index";
 import { auth as mockedAuth } from "./auth";
 import deepmerge from "deepmerge";
 import { SerializedQuery } from "serialized-query";
+import { hashToArray } from "typed-conversions";
 export let db = [];
 let _listeners = [];
 let _silenceEvents = false;
@@ -257,8 +258,10 @@ export async function addListener(pathOrQuery, eventType, callback, cancelCallba
         callback(snapshot);
     }
     else {
-        const list = snapshot.val();
-        list.forEach((i) => callback(new SnapShot(join(query.path, i.id), i)));
+        const list = hashToArray(snapshot.val());
+        if (eventType === "child_added") {
+            list.forEach((i) => callback(new SnapShot(join(query.path, i.id), i)));
+        }
     }
     return snapshot;
 }
