@@ -158,7 +158,6 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     const u = completeUserCredential(partial);
     authAdminApi.addUserToAuth(u.user, password);
     authAdminApi.login(u.user);
-    console.log(u.user);
 
     return u;
   },

@@ -149,7 +149,6 @@ function groupEventsByWatcher(data, dbSnapshot) {
     data = dotifyKeys(data);
     const getFromSnapshot = (path) => get(dbSnapshot, dotify(path));
     const eventPaths = Object.keys(data).map(i => dotify(i));
-    console.log(eventPaths);
     const response = [];
     const relativePath = (full, partial) => {
         return full.replace(partial, "");
