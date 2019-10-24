@@ -39,7 +39,7 @@
     "@firebase/util": "^0.2.29",
     "@types/faker": "^4.1.6",
     "common-types": "^1.12.9",
-    "deepmerge": "^4.1.1",
+    "deepmerge": "^4.2.1",
     "email-validator": "^2.0.4",
     "faker": "^4.1.0",
     "fast-copy": "^2.0.3",
