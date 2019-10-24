@@ -192,7 +192,6 @@ function groupEventsByWatcher(
 
   const getFromSnapshot = (path: string) => get(dbSnapshot, dotify(path));
   const eventPaths = Object.keys(data).map(i => dotify(i));
-  console.log(eventPaths);
 
   const response: IMockWatcherGroupEvent[] = [];
   const relativePath = (full: string, partial: string) => {

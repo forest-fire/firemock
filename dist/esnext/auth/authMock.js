@@ -113,7 +113,6 @@ export const implemented = {
         const u = completeUserCredential(partial);
         authAdminApi.addUserToAuth(u.user, password);
         authAdminApi.login(u.user);
-        console.log(u.user);
         return u;
     },
     async confirmPasswordReset(code, newPassword) {

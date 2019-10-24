@@ -41,7 +41,6 @@ describe("Query →", () => {
       .once("value");
 
     const values = result.val();
-    console.log(values);
 
     expect(Object.keys(values)).to.have.lengthOf(3);
     const validAges = new Set([100, 26, 13]);
