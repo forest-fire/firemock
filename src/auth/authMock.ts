@@ -59,7 +59,10 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
         credential
       };
 
-      return completeUserCredential(credentials);
+      const userCredential = completeUserCredential(credentials);
+      authAdminApi.login(userCredential.user);
+
+      return userCredential;
     } else {
       throw createError(
         "auth/operation-not-allowed",

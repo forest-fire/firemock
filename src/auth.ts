@@ -11,6 +11,7 @@ export const auth = async (): Promise<typeof authApi> => {
   }
 
   await networkDelay();
+
   hasConnectedToAuthService = true;
   return authApi;
 };
