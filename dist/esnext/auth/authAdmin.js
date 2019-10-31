@@ -27,6 +27,15 @@ export const authAdminApi = {
      * @param config the new config parameters passed in
      */
     configureAuth(config) {
+        if (config.allowAnonymous ||
+            config.allowEmailLinks ||
+            config.allowEmailLogins ||
+            config.allowPhoneLogins) {
+            // if Auth is configured then the initial event
+            // should always be a "logout" event (this is what
+            // real DB does)
+            authObservers.map(o => o(undefined));
+        }
         authConfig = Object.assign(Object.assign({}, authConfig), config);
     },
     getValidEmailUsers() {
