@@ -30,15 +30,6 @@ exports.authAdminApi = {
      * @param config the new config parameters passed in
      */
     configureAuth(config) {
-        if (config.allowAnonymous ||
-            config.allowEmailLinks ||
-            config.allowEmailLogins ||
-            config.allowPhoneLogins) {
-            // if Auth is configured then the initial event
-            // should always be a "logout" event (this is what
-            // real DB does)
-            authObservers.map(o => o(undefined));
-        }
         authConfig = Object.assign(Object.assign({}, authConfig), config);
     },
     getValidEmailUsers() {
@@ -124,6 +115,7 @@ exports.authAdminApi = {
      */
     addAuthObserver(observer) {
         authObservers.push(observer);
+        observer(currentUser);
     },
     /**
      * Get a list of all the callback observers which have registered

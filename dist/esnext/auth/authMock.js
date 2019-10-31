@@ -39,7 +39,9 @@ export const implemented = {
                 user,
                 credential
             };
-            return completeUserCredential(credentials);
+            const userCredential = completeUserCredential(credentials);
+            authAdminApi.login(userCredential.user);
+            return userCredential;
         }
         else {
             throw createError("auth/operation-not-allowed", "you must enable anonymous auth in the Firebase Console");
