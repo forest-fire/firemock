@@ -56,7 +56,7 @@ export interface IMockWatcherGroupEvent {
   /** the path that the listener is listening at */
   listenerPath: string;
   /** the event which is being listened to */
-  listenerEvent: import("@firebase/database-types").EventType;
+  listenerEvent: import(/* webpackChunkName: "firebase-db-types" */ "@firebase/database-types").EventType;
   /** the dispatch function for this listener */
   callback: IFirebaseEventHandler;
   /** the path where the event took place */

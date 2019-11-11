@@ -54,7 +54,13 @@ export class Mock {
         ? { ...defaultAuthConfig, ...options.auth }
         : defaultAuthConfig
     );
-    await obj.importFakerLibrary();
+    try {
+      await obj.importFakerLibrary();
+    } catch (e) {
+      console.info(
+        `the Faker library was unable to be imported; this may or may not impact you based on your goals for this environment. The error was: ${e.message}`
+      );
+    }
     return obj;
   }
 

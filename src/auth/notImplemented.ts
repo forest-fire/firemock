@@ -2,7 +2,7 @@ import { FirebaseAuth, UserCredential } from "../@types/auth-types";
 import { completeUserCredential } from "./completeUserCredential";
 import { createError } from "common-types";
 
-type ActionCodeInfo = import("@firebase/auth-types").ActionCodeInfo;
+type ActionCodeInfo = import(/* webpackChunkName: "firebase-auth-types" */ "@firebase/auth-types").ActionCodeInfo;
 
 export const notImplemented: Partial<FirebaseAuth> = {
   async applyActionCode(code: string) {
