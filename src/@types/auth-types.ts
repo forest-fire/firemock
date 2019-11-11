@@ -6,7 +6,7 @@
 export interface IMockAuth extends FirebaseAuth, IMockAdminApi {}
 
 import { IMockAdminApi } from "../auth/authAdmin";
-import { Mock, IDictionary } from "..";
+import { Mock, IDictionary } from "../index";
 
 export type UserCredential = import("@firebase/auth-types").UserCredential;
 export type User = import("@firebase/auth-types").User;
