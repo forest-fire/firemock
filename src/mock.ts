@@ -19,6 +19,8 @@ import {
   SchemaCallback
 } from "./@types/db-types";
 import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
+import authProviders from "./auth/AuthProviders";
+import { FirebaseNamespace } from "@firebase/app-types";
 export let faker: Faker.FakerStatic;
 
 /* tslint:disable:max-classes-per-file */
@@ -140,6 +142,10 @@ export class Mock {
 
   public async auth() {
     return fireAuth();
+  }
+
+  public get authProviders(): FirebaseNamespace["auth"] {
+    return authProviders;
   }
 
   public get faker() {

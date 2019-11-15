@@ -20,6 +20,7 @@ import {
   emailValidationAllowed,
   emailIsValidFormat
 } from "./authMockHelpers";
+import { EmailAuthProvider } from "./AuthProviders";
 
 export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   app: {
@@ -45,7 +46,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       const user: Partial<User> = {
         isAnonymous: true,
         uid: authAdminApi.getAnonymousUid(),
-        emailVerified: true,
+        emailVerified: false,
         phoneNumber: ""
       };
       const credential: AuthCredential = {
@@ -194,6 +195,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
 
 // tslint:disable-next-line:no-object-literal-type-assertion
 export const authMockApi = {
+  ...EmailAuthProvider,
   ...notImplemented,
   ...implemented
 } as FirebaseAuth;
