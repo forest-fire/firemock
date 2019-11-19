@@ -27,7 +27,7 @@ export const implemented = {
             const user = {
                 isAnonymous: true,
                 uid: authAdminApi.getAnonymousUid(),
-                emailVerified: true,
+                emailVerified: false,
                 phoneNumber: ""
             };
             const credential = {
@@ -61,7 +61,7 @@ export const implemented = {
         if (!found) {
             throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
-        if (!emailHasCorrectPassword(email, found.password)) {
+        if (!emailHasCorrectPassword(email, password)) {
             throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {

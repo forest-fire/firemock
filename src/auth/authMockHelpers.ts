@@ -14,6 +14,8 @@ export function emailIsValidFormat(email: string) {
 
 export function emailHasCorrectPassword(email: string, password: string) {
   const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
+  console.log("compare", config.password, password);
+
   return config ? config.password === password : false;
 }
 
@@ -24,6 +26,7 @@ export function emailVerified(email: string) {
 
 export function userUid(email: string) {
   const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
+
   return config ? config.uid || createUid() : createUid();
 }
 

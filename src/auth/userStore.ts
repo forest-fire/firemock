@@ -1,4 +1,10 @@
+/**
+ * manages the users in the identity system
+ */
+
 const users = {};
+
+export function initializeUsers() {}
 
 export function currentUser() {
   //

@@ -35,7 +35,7 @@ export default class Query<T = any> implements IQuery {
     static create(query: SerializedQuery): Query<any>;
     protected _query: SerializedQuery;
     constructor(path: string, _delay?: DelayType);
-    readonly ref: Reference<T>;
+    get ref(): Reference<T>;
     limitToLast(num: number): Query<T>;
     limitToFirst(num: number): Query<T>;
     equalTo(value: QueryValue, key?: Extract<keyof T, string>): Query<T>;

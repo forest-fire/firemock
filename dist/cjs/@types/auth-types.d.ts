@@ -3,10 +3,14 @@
  * parts are un-implementated currently) as well as extending
  * to add an "administrative" API for mocking
  */
-export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
+export interface IMockAuth extends FirebaseAuth, IMockAdminApi, IAuthProviders {
+}
+export interface IAuthProviders {
+    EmailAuthProvider: EmailAuthProvider;
 }
 import { IMockAdminApi } from "../auth/authAdmin";
 import { Mock, IDictionary } from "../index";
+import { EmailAuthProvider } from "@firebase/auth-types";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;
 export declare type AuthSettings = import("@firebase/auth-types").AuthSettings;

@@ -54,6 +54,28 @@ describe("Firebase Auth →", () => {
     expect(user.user.emailVerified).to.equal(true);
   });
 
+  it("signInWithEmail with valid email but invalid password fails", async () => {
+    const m = await Mock.prepare({
+      auth: {
+        allowEmailLogins: true,
+        validEmailUsers: [
+          { email: "test@test.com", password: "foobar", verified: true }
+        ]
+      }
+    });
+    const auth = await m.auth();
+    try {
+      const user = await auth.signInWithEmailAndPassword(
+        "test@test.com",
+        "bad-password"
+      );
+      throw new Error("Login attempt should have failed with error!");
+    } catch (e) {
+      expect(e.name).is.equal("auth/wrong-password");
+      expect(e.code).is.equal("wrong-password");
+    }
+  });
+
   it("createUserWithEmailAndPassword created unverified user", async () => {
     const m = await Mock.prepare({
       auth: {

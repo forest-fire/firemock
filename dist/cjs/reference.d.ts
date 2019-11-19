@@ -2,10 +2,10 @@ import { IDictionary } from "common-types";
 import Query from "./query";
 import { Reference as IReference, ThenableReference as IThenableReference, DataSnapshot } from "@firebase/database-types";
 export default class Reference<T = any> extends Query<T> implements IReference {
-    readonly key: string | null;
-    readonly parent: IReference | null;
+    get key(): string | null;
+    get parent(): IReference | null;
     child<C = any>(path: string): Reference;
-    readonly root: Reference;
+    get root(): Reference;
     push(value?: any, onComplete?: (a: Error | null) => any): IThenableReference;
     remove(onComplete?: (a: Error | null) => any): Promise<void>;
     set(value: any, onComplete?: (a: Error | null) => any): Promise<void>;

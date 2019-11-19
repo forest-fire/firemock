@@ -12,8 +12,8 @@ export default class SnapShot<T = any> implements DataSnapshot {
     private _value;
     private _sortingFunction;
     constructor(_key: string, _value: T[] | T);
-    readonly key: string;
-    readonly ref: Reference<T>;
+    get key(): string;
+    get ref(): Reference<T>;
     val(): T | IDictionary<T>;
     toJSON(): string;
     child<TC = IDictionary>(path: string): SnapShot<TC>;

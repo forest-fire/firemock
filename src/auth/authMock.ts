@@ -20,7 +20,6 @@ import {
   emailValidationAllowed,
   emailIsValidFormat
 } from "./authMockHelpers";
-import { EmailAuthProvider } from "./AuthProviders";
 
 export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   app: {
@@ -92,7 +91,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       );
     }
 
-    if (!emailHasCorrectPassword(email, found.password)) {
+    if (!emailHasCorrectPassword(email, password)) {
       throw new FireMockError(
         `Invalid password for ${email}`,
         "auth/wrong-password"
@@ -195,7 +194,6 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
 
 // tslint:disable-next-line:no-object-literal-type-assertion
 export const authMockApi = {
-  ...EmailAuthProvider,
   ...notImplemented,
   ...implemented
 } as FirebaseAuth;

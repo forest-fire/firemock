@@ -13,7 +13,7 @@ export default class Queue<T = any> {
     private static _queues;
     pkProperty: string;
     constructor(_name: string);
-    readonly name: string;
+    get name(): string;
     /**
      * Allows adding another item to the queue. It is expected
      * that this item WILL have the primary key included ('id' by
@@ -36,7 +36,7 @@ export default class Queue<T = any> {
     includes(key: Key): boolean;
     replace(key: Key, value: any): this;
     update(key: Key, value: any): this;
-    readonly length: any;
+    get length(): any;
     /** returns the Queue as a JS array */
     toArray(): any;
     /** returns the Queue as a JS Object */

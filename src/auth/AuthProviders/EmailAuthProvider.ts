@@ -1,18 +1,17 @@
-import {
-  AuthCredential,
-  EmailAuthProvider_Instance,
-  EmailAuthProvider as GoogleEmailAuthProvider
-} from "@firebase/auth-types";
+type AuthCredential = import("@firebase/auth-types").AuthCredential;
+type EmailAuthProvider_Instance = import("@firebase/auth-types").EmailAuthProvider_Instance;
+type GoogleEmailAuthProvider = import("@firebase/auth-types").EmailAuthProvider;
 
 /**
  * **EmailAuthProvider** API mocking. Details on the API can be found
  * here: https://firebase.google.com/docs/reference/js/firebase.auth.EmailAuthProvider
  */
-export class EmailAuthProvider extends EmailAuthProvider_Instance
-  implements GoogleEmailAuthProvider {
+export class EmailAuthProvider
+  implements EmailAuthProvider_Instance, GoogleEmailAuthProvider {
   public static PROVIDER_ID: string;
   public static EMAIL_PASSWORD_SIGN_IN_METHOD: string;
   public static EMAIL_LINK_SIGN_IN_METHOD: string;
+
   /**
    * Produces a `credential` to a user account (typically an anonymous account)
    * which can then be linked to the account using `linkWithCredential`.
@@ -51,4 +50,6 @@ export class EmailAuthProvider extends EmailAuthProvider_Instance
       }
     };
   }
+
+  public providerId: string = "mock-provider-id";
 }
