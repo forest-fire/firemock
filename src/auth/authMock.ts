@@ -45,7 +45,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       const user: Partial<User> = {
         isAnonymous: true,
         uid: authAdminApi.getAnonymousUid(),
-        emailVerified: true,
+        emailVerified: false,
         phoneNumber: ""
       };
       const credential: AuthCredential = {
@@ -91,7 +91,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       );
     }
 
-    if (!emailHasCorrectPassword(email, found.password)) {
+    if (!emailHasCorrectPassword(email, password)) {
       throw new FireMockError(
         `Invalid password for ${email}`,
         "auth/wrong-password"

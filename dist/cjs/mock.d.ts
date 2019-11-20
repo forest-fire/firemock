@@ -5,6 +5,7 @@ import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
 import { SchemaCallback } from "./@types/db-types";
 import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
+import { FirebaseNamespace } from "@firebase/app-types";
 export declare let faker: Faker.FakerStatic;
 export declare class Mock {
     /**
@@ -19,8 +20,8 @@ export declare class Mock {
      * DB to be setup via mocking.
      */
     ): Promise<Mock>;
-    readonly db: IDictionary<any>;
-    readonly deploy: Deployment;
+    get db(): IDictionary<any>;
+    get deploy(): Deployment;
     private _schemas;
     private _relationships;
     private _queues;
@@ -54,7 +55,8 @@ export declare class Mock {
      */
     restoreEvents(): void;
     auth(): Promise<import(".").IMockAuth>;
-    readonly faker: Faker.FakerStatic;
+    get authProviders(): FirebaseNamespace["auth"];
+    get faker(): Faker.FakerStatic;
     /**
      * **importFakerLibrary**
      *

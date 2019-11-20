@@ -1,4 +1,7 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -14,6 +17,7 @@ const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
 const authAdmin_1 = require("./auth/authAdmin");
 const FireMockError_1 = require("./errors/FireMockError");
+const AuthProviders_1 = __importDefault(require("./auth/AuthProviders"));
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(
@@ -113,6 +117,9 @@ class Mock {
     }
     async auth() {
         return auth_1.auth();
+    }
+    get authProviders() {
+        return AuthProviders_1.default;
     }
     get faker() {
         return exports.faker;

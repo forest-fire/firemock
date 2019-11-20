@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const authAdmin_1 = require("./authAdmin");
 const deepmerge_1 = __importDefault(require("deepmerge"));
+const atRandom_1 = require("../shared/atRandom");
 /**
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental
@@ -30,7 +31,21 @@ function completeUserCredential(partial) {
                 };
             },
             async getIdToken() {
-                return "abc";
+                const user = authAdmin_1.authAdminApi.getCurrentUser();
+                const userConfig = authAdmin_1.authAdminApi
+                    .getAuthConfig()
+                    .validEmailUsers.find(i => i.email === user.email);
+                if (!user) {
+                    throw new Error("not logged in");
+                }
+                if (userConfig.tokenIds) {
+                    return atRandom_1.atRandom(userConfig.tokenIds);
+                }
+                else {
+                    return Math.random()
+                        .toString(36)
+                        .substr(2, 10);
+                }
             },
             async linkAndRetrieveDataWithCredential(credential) {
                 return completeUserCredential({});

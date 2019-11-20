@@ -54,6 +54,28 @@ describe("Firebase Auth →", () => {
     expect(user.user.emailVerified).to.equal(true);
   });
 
+  it("signInWithEmail with valid email but invalid password fails", async () => {
+    const m = await Mock.prepare({
+      auth: {
+        allowEmailLogins: true,
+        validEmailUsers: [
+          { email: "test@test.com", password: "foobar", verified: true }
+        ]
+      }
+    });
+    const auth = await m.auth();
+    try {
+      const user = await auth.signInWithEmailAndPassword(
+        "test@test.com",
+        "bad-password"
+      );
+      throw new Error("Login attempt should have failed with error!");
+    } catch (e) {
+      expect(e.name).is.equal("auth/wrong-password");
+      expect(e.code).is.equal("wrong-password");
+    }
+  });
+
   it("createUserWithEmailAndPassword created unverified user", async () => {
     const m = await Mock.prepare({
       auth: {
@@ -96,6 +118,31 @@ describe("Firebase Auth →", () => {
     expect(userCredential.user.updatePassword).to.be.a("function");
     await userCredential.user.updatePassword("foobar");
     await auth.signInWithEmailAndPassword("test@test.com", "foobar");
+  });
+
+  it("calls to getIdToken() respond with value configured when available", async () => {
+    const expectedToken = "123456789";
+    const m = await Mock.prepare({
+      auth: {
+        allowEmailLogins: true,
+        validEmailUsers: [
+          {
+            email: "test@company.com",
+            password: "foobar",
+            tokenIds: [expectedToken]
+          }
+        ]
+      }
+    });
+
+    const auth = await m.auth();
+    const user = await auth.signInWithEmailAndPassword(
+      "test@company.com",
+      "foobar"
+    );
+    const token = await user.user.getIdToken();
+
+    expect(token).to.equal(expectedToken);
   });
 });
 

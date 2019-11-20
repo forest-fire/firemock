@@ -24,6 +24,9 @@ export declare const authAdminApi: {
      * State explicitly what UID an anonymous user
      * should get; if not stated the default is to
      * generate a random UID.
+     *
+     * **Note:** this is a administrative admin function
+     * and _not_ a part of the Firebase API.
      */
     setAnonymousUid(uid: string): import("../@types/auth-types").IMockAuth;
     /**

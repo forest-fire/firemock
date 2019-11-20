@@ -29,7 +29,7 @@ exports.implemented = {
             const user = {
                 isAnonymous: true,
                 uid: authAdmin_1.authAdminApi.getAnonymousUid(),
-                emailVerified: true,
+                emailVerified: false,
                 phoneNumber: ""
             };
             const credential = {
@@ -63,7 +63,7 @@ exports.implemented = {
         if (!found) {
             throw common_types_1.createError(`auth/user-not-found`, `The email "${email}" was not found`);
         }
-        if (!authMockHelpers_1.emailHasCorrectPassword(email, found.password)) {
+        if (!authMockHelpers_1.emailHasCorrectPassword(email, password)) {
             throw new FireMockError_1.FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
         }
         const partial = {

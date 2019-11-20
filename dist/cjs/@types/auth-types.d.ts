@@ -3,10 +3,14 @@
  * parts are un-implementated currently) as well as extending
  * to add an "administrative" API for mocking
  */
-export interface IMockAuth extends FirebaseAuth, IMockAdminApi {
+export interface IMockAuth extends FirebaseAuth, IMockAdminApi, IAuthProviders {
+}
+export interface IAuthProviders {
+    EmailAuthProvider: EmailAuthProvider;
 }
 import { IMockAdminApi } from "../auth/authAdmin";
 import { Mock, IDictionary } from "../index";
+import { EmailAuthProvider } from "@firebase/auth-types";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;
 export declare type AuthSettings = import("@firebase/auth-types").AuthSettings;
@@ -27,6 +31,12 @@ export interface IEmailUser {
     uid?: string;
     /** optionally give the user a set of claims */
     claims?: string[];
+    /**
+     * Optionally state token Ids which should be returned when calling
+     * the `getTokenId()` method. This is useful if you have an associated
+     * set of "valid (or invalid) tokens" in your testing environment.
+     */
+    tokenIds?: string[];
 }
 export declare type IMockSetup = (mock: Mock) => () => Promise<void>;
 export interface IPartialUserCredential {

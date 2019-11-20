@@ -2,5 +2,5 @@
 export default class SchemaHelper {
     context: any;
     constructor(context: any);
-    readonly faker: Faker.FakerStatic;
+    get faker(): Faker.FakerStatic;
 }

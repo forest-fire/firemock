@@ -5,6 +5,7 @@ import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
 import { authAdminApi, clearAuthUsers } from "./auth/authAdmin";
 import { FireMockError } from "./errors/FireMockError";
+import authProviders from "./auth/AuthProviders";
 export let faker;
 /* tslint:disable:max-classes-per-file */
 export class Mock {
@@ -105,6 +106,9 @@ export class Mock {
     }
     async auth() {
         return fireAuth();
+    }
+    get authProviders() {
+        return authProviders;
     }
     get faker() {
         return faker;
