@@ -1,9 +1,9 @@
 import {
   TwitterAuthProvider as GoogleTwitterAuthProvider,
   AuthCredential,
+  TwitterAuthProvider_Instance,
   AuthProvider
 } from "@firebase/auth-types";
-import { TwitterAuthProvider_Instance } from "./TwitterAuthProvider_Instance";
 import { IDictionary } from "common-types";
 
 export class TwitterAuthProvider

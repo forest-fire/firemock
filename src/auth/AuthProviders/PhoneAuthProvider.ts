@@ -1,11 +1,12 @@
 import {
   PhoneAuthProvider as GooglePhoneAuthProvider,
-  AuthCredential
+  AuthCredential,
+  PhoneAuthProvider_Instance,
+  ApplicationVerifier
 } from "@firebase/auth-types";
-import { PhoneAuthProvider_Instance } from "./PhoneAuthProvider_Instance";
 
-export class PhoneAuthProvider extends PhoneAuthProvider_Instance
-  implements GooglePhoneAuthProvider {
+export class PhoneAuthProvider
+  implements PhoneAuthProvider_Instance, GooglePhoneAuthProvider {
   public static PROVIDER_ID: string;
   public static PHONE_SIGN_IN_METHOD: string;
 
@@ -14,5 +15,13 @@ export class PhoneAuthProvider extends PhoneAuthProvider_Instance
     verificationCode: string
   ): AuthCredential {
     throw new Error("not implemented");
+  }
+
+  public providerId: string;
+  public async verifyPhoneNumber(
+    phoneNumber: string,
+    applicationVerifier: ApplicationVerifier
+  ): Promise<string> {
+    throw new Error("not-implemented");
   }
 }

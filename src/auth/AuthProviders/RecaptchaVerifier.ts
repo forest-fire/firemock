@@ -1,5 +1,7 @@
-import { RecaptchaVerifier as GoogleRecaptchaVerifier } from "@firebase/auth-types";
-import { RecaptchaVerifier_Instance } from "./RecaptchaVerifier_Instance";
+import {
+  RecaptchaVerifier as GoogleRecaptchaVerifier,
+  RecaptchaVerifier_Instance
+} from "@firebase/auth-types";
 
 export class RecaptchaVerifier
   implements RecaptchaVerifier_Instance, GoogleRecaptchaVerifier {

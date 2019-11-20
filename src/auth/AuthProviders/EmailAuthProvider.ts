@@ -2,6 +2,11 @@ type AuthCredential = import("@firebase/auth-types").AuthCredential;
 type EmailAuthProvider_Instance = import("@firebase/auth-types").EmailAuthProvider_Instance;
 type GoogleEmailAuthProvider = import("@firebase/auth-types").EmailAuthProvider;
 
+const data = {
+  providerId: "mock-provider-id-for-EmailAuthProvider",
+  signInMethod: "email-and-password"
+};
+
 /**
  * **EmailAuthProvider** API mocking. Details on the API can be found
  * here: https://firebase.google.com/docs/reference/js/firebase.auth.EmailAuthProvider
@@ -17,11 +22,6 @@ export class EmailAuthProvider
    * which can then be linked to the account using `linkWithCredential`.
    */
   public static credential(email: string, password: string): AuthCredential {
-    const data = {
-      providerId: "mock-provider-id-for-EmailAuthProvider",
-      signInMethod: "email-and-password"
-    };
-
     return {
       ...data,
       toJSON() {
@@ -38,11 +38,6 @@ export class EmailAuthProvider
     email: string,
     emailLink: string
   ): AuthCredential {
-    const data = {
-      providerId: "mock-provider-id-for-EmailAuthProvider",
-      signInMethod: "email-and-password"
-    };
-
     return {
       ...data,
       toJSON() {
@@ -51,5 +46,5 @@ export class EmailAuthProvider
     };
   }
 
-  public providerId: string = "mock-provider-id";
+  public providerId: string = data.providerId;
 }

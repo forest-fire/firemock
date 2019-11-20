@@ -1,9 +1,9 @@
 import {
   GithubAuthProvider as GoogleGithubAuthProvider,
   AuthCredential,
-  AuthProvider
+  AuthProvider,
+  GithubAuthProvider_Instance
 } from "@firebase/auth-types";
-import { GithubAuthProvider_Instance } from "./GithubAuthProvider_Instance";
 import { IDictionary } from "common-types";
 
 export class GithubAuthProvider

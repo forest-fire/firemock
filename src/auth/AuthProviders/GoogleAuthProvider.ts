@@ -3,11 +3,9 @@ import {
   AuthCredential,
   AuthProvider
 } from "@firebase/auth-types";
-import { GoogleAuthProvider_Instance } from "./GoogleAuthProvider_Instance";
 import { IDictionary } from "common-types";
 
-export class GoogleAuthProvider
-  implements GoogleAuthProvider_Instance, GoogleGoogleAuthProvider {
+export class GoogleAuthProvider implements GoogleGoogleAuthProvider {
   public static PROVIDER_ID: string;
   public static GOOGLE_SIGN_IN_METHOD: string;
 
