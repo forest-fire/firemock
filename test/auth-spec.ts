@@ -119,6 +119,31 @@ describe("Firebase Auth →", () => {
     await userCredential.user.updatePassword("foobar");
     await auth.signInWithEmailAndPassword("test@test.com", "foobar");
   });
+
+  it("calls to getIdToken() respond with value configured when available", async () => {
+    const expectedToken = "123456789";
+    const m = await Mock.prepare({
+      auth: {
+        allowEmailLogins: true,
+        validEmailUsers: [
+          {
+            email: "test@company.com",
+            password: "foobar",
+            tokenIds: [expectedToken]
+          }
+        ]
+      }
+    });
+
+    const auth = await m.auth();
+    const user = await auth.signInWithEmailAndPassword(
+      "test@company.com",
+      "foobar"
+    );
+    const token = await user.user.getIdToken();
+
+    expect(token).to.equal(expectedToken);
+  });
 });
 
 async function createUser(mock: Mock, email: string, password: string) {

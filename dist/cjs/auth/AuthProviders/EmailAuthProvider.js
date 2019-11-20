@@ -1,22 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const data = {
+    providerId: "mock-provider-id-for-EmailAuthProvider",
+    signInMethod: "email-and-password"
+};
 /**
  * **EmailAuthProvider** API mocking. Details on the API can be found
  * here: https://firebase.google.com/docs/reference/js/firebase.auth.EmailAuthProvider
  */
 class EmailAuthProvider {
     constructor() {
-        this.providerId = "mock-provider-id";
+        this.providerId = data.providerId;
     }
     /**
      * Produces a `credential` to a user account (typically an anonymous account)
      * which can then be linked to the account using `linkWithCredential`.
      */
     static credential(email, password) {
-        const data = {
-            providerId: "mock-provider-id-for-EmailAuthProvider",
-            signInMethod: "email-and-password"
-        };
         return Object.assign(Object.assign({}, data), { toJSON() {
                 return JSON.stringify(data);
             } });
@@ -26,10 +26,6 @@ class EmailAuthProvider {
      * a sign in with email link operation.
      */
     static credentialWithLink(email, emailLink) {
-        const data = {
-            providerId: "mock-provider-id-for-EmailAuthProvider",
-            signInMethod: "email-and-password"
-        };
         return Object.assign(Object.assign({}, data), { toJSON() {
                 return JSON.stringify(data);
             } });

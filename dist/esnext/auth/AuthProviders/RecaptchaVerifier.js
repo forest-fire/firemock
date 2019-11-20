@@ -1,4 +1,12 @@
-import { RecaptchaVerifier_Instance } from "./RecaptchaVerifier_Instance";
-export class RecaptchaVerifier extends RecaptchaVerifier_Instance {
+export class RecaptchaVerifier {
+    clear() {
+        //
+    }
+    async render() {
+        throw new Error("not-implemented");
+    }
+    async verify() {
+        throw new Error("not-implemented");
+    }
 }
 //# sourceMappingURL=RecaptchaVerifier.js.map

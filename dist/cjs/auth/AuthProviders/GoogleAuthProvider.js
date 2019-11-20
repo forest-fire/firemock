@@ -1,8 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const GoogleAuthProvider_Instance_1 = require("./GoogleAuthProvider_Instance");
-class GoogleAuthProvider extends GoogleAuthProvider_Instance_1.GoogleAuthProvider_Instance {
+class GoogleAuthProvider {
     static credential(idToken, accessToken) {
+        throw new Error("not implemented");
+    }
+    addScope(scope) {
+        throw new Error("not implemented");
+    }
+    setCustomParameters(params) {
         throw new Error("not implemented");
     }
 }

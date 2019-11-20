@@ -1,6 +1,11 @@
-import { GoogleAuthProvider_Instance } from "./GoogleAuthProvider_Instance";
-export class GoogleAuthProvider extends GoogleAuthProvider_Instance {
+export class GoogleAuthProvider {
     static credential(idToken, accessToken) {
+        throw new Error("not implemented");
+    }
+    addScope(scope) {
+        throw new Error("not implemented");
+    }
+    setCustomParameters(params) {
         throw new Error("not implemented");
     }
 }

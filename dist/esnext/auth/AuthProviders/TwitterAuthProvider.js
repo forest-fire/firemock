@@ -1,6 +1,11 @@
-import { TwitterAuthProvider_Instance } from "./TwitterAuthProvider_Instance";
-export class TwitterAuthProvider extends TwitterAuthProvider_Instance {
+export class TwitterAuthProvider {
     static credential(idToken, accessToken) {
+        throw new Error("not implemented");
+    }
+    addScope(scope) {
+        throw new Error("not implemented");
+    }
+    setCustomParameters(params) {
         throw new Error("not implemented");
     }
 }

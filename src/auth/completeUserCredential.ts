@@ -10,6 +10,7 @@ import {
 } from "@firebase/auth-types";
 import { authAdminApi } from "./authAdmin";
 import merge from "deepmerge";
+import { atRandom } from "../shared/atRandom";
 
 /**
  * takes a partial user auth and adds enough to make it officially
@@ -38,7 +39,21 @@ export function completeUserCredential(
         };
       },
       async getIdToken() {
-        return "abc";
+        const user = authAdminApi.getCurrentUser();
+        const userConfig = authAdminApi
+          .getAuthConfig()
+          .validEmailUsers.find(i => i.email === user.email);
+
+        if (!user) {
+          throw new Error("not logged in");
+        }
+        if (userConfig.tokenIds) {
+          return atRandom(userConfig.tokenIds);
+        } else {
+          return Math.random()
+            .toString(36)
+            .substr(2, 10);
+        }
       },
       async linkAndRetrieveDataWithCredential(credential: AuthCredential) {
         return completeUserCredential({});

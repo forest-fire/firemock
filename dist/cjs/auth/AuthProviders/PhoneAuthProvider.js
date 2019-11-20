@@ -1,9 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const PhoneAuthProvider_Instance_1 = require("./PhoneAuthProvider_Instance");
-class PhoneAuthProvider extends PhoneAuthProvider_Instance_1.PhoneAuthProvider_Instance {
+class PhoneAuthProvider {
     static credential(verificationId, verificationCode) {
         throw new Error("not implemented");
+    }
+    async verifyPhoneNumber(phoneNumber, applicationVerifier) {
+        throw new Error("not-implemented");
     }
 }
 exports.PhoneAuthProvider = PhoneAuthProvider;

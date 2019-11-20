@@ -1,7 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const RecaptchaVerifier_Instance_1 = require("./RecaptchaVerifier_Instance");
-class RecaptchaVerifier extends RecaptchaVerifier_Instance_1.RecaptchaVerifier_Instance {
+class RecaptchaVerifier {
+    clear() {
+        //
+    }
+    async render() {
+        throw new Error("not-implemented");
+    }
+    async verify() {
+        throw new Error("not-implemented");
+    }
 }
 exports.RecaptchaVerifier = RecaptchaVerifier;
 //# sourceMappingURL=RecaptchaVerifier.js.map

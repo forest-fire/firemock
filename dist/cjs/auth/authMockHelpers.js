@@ -13,7 +13,6 @@ function emailIsValidFormat(email) {
 exports.emailIsValidFormat = emailIsValidFormat;
 function emailHasCorrectPassword(email, password) {
     const config = authAdmin_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
-    console.log("compare", config.password, password);
     return config ? config.password === password : false;
 }
 exports.emailHasCorrectPassword = emailHasCorrectPassword;
