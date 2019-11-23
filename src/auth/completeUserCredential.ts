@@ -27,6 +27,11 @@ export function completeUserCredential(
       },
       emailVerified: false,
       async getIdTokenResult() {
+        const user = authAdminApi
+          .getValidEmailUsers()
+          .find(i => i.uid === partial.user.uid);
+        const token =
+          user && user.tokenIds ? atRandom(user.tokenIds) : "random-token";
         return {
           token: "abc",
           expirationTime: "format?",

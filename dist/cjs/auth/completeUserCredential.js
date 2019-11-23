@@ -19,6 +19,10 @@ function completeUserCredential(partial) {
             },
             emailVerified: false,
             async getIdTokenResult() {
+                const user = authAdmin_1.authAdminApi
+                    .getValidEmailUsers()
+                    .find(i => i.uid === partial.user.uid);
+                const token = user && user.tokenIds ? atRandom_1.atRandom(user.tokenIds) : "random-token";
                 return {
                     token: "abc",
                     expirationTime: "format?",
