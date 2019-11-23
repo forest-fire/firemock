@@ -30,7 +30,7 @@ export interface IEmailUser {
     /** optionally set a fixed UID for this user */
     uid?: string;
     /** optionally give the user a set of claims */
-    claims?: string[];
+    claims?: IDictionary;
     /**
      * Optionally state token Ids which should be returned when calling
      * the `getTokenId()` method. This is useful if you have an associated
