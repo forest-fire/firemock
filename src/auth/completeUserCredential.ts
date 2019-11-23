@@ -27,15 +27,19 @@ export function completeUserCredential(
       },
       emailVerified: false,
       async getIdTokenResult() {
+        const user = authAdminApi
+          .getValidEmailUsers()
+          .find(i => i.uid === partial.user.uid);
+        const token =
+          user && user.tokenIds ? atRandom(user.tokenIds) : "random-token";
+        const claims = user && user.claims ? user.claims : {};
         return {
-          token: "abc",
+          token,
           expirationTime: "format?",
           authTime: "format?",
           issuedAtTime: "format?",
           signInProvider: "fake",
-          claims: {
-            foobar: "abc"
-          }
+          claims
         };
       },
       async getIdToken() {
