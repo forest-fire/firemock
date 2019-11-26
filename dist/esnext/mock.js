@@ -66,7 +66,7 @@ export class Mock {
             await obj.importFakerLibrary();
         }
         catch (e) {
-            console.info(`the Faker library was unable to be imported; this may or may not impact you based on your goals for this environment. The error was: ${e.message}`);
+            console.info(`the Faker library was unable to be imported; if this is a browser environment (or other runtime) this is probably what you want as Faker is pretty large; however, if you do want or need to Fake things in the runtime then the error was: ${e.message}`);
         }
         return obj;
     }
