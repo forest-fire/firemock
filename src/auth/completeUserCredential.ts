@@ -27,9 +27,12 @@ export function completeUserCredential(
       },
       emailVerified: false,
       async getIdTokenResult() {
-        const user = authAdminApi
-          .getValidEmailUsers()
-          .find(i => i.uid === partial.user.uid);
+        const user =
+          partial.user && partial.user.uid
+            ? authAdminApi
+                .getValidEmailUsers()
+                .find(i => i.uid === partial.user.uid)
+            : undefined;
         const token =
           user && user.tokenIds ? atRandom(user.tokenIds) : "random-token";
         const claims = user && user.claims ? user.claims : {};
