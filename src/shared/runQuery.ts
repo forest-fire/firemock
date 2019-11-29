@@ -39,6 +39,7 @@ export function runQuery(query: SerializedQuery, data: any) {
         ] as sortFns.ISortFns);
 
   const list = limitFilter(queryFilter(dataList.sort(sortFn)));
+
   return isListOfObjects
     ? // this is list of records to convert back to hash for Firebase compatability
       arrayToHash(list)
