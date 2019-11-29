@@ -8,7 +8,7 @@ import {
 import { networkDelay } from "../util";
 import { authAdminApi, Observer } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
-import { createError, Omit } from "common-types";
+import { Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { ActionCodeSettings } from "@firebase/auth-types";
 import { FireMockError } from "../errors/FireMockError";
@@ -64,9 +64,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
 
       return userCredential;
     } else {
-      throw createError(
-        "auth/operation-not-allowed",
-        "you must enable anonymous auth in the Firebase Console"
+      throw new FireMockError(
+        "you must enable anonymous auth in the Firebase Console",
+        "auth/operation-not-allowed"
       );
     }
   },
@@ -85,9 +85,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       .getAuthConfig()
       .validEmailUsers.find(i => i.email === email);
     if (!found) {
-      throw createError(
+      throw new FireMockError(
+        `The email "${email}" was not found`,
         `auth/user-not-found`,
-        `The email "${email}" was not found`
       );
     }
 

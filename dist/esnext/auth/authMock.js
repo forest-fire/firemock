@@ -1,7 +1,6 @@
 import { networkDelay } from "../util";
 import { authAdminApi } from "./authAdmin";
 import { completeUserCredential } from "./completeUserCredential";
-import { createError } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { FireMockError } from "../errors/FireMockError";
 import { emailExistsAsUserInAuth, emailHasCorrectPassword, emailVerified, userUid, emailValidationAllowed, emailIsValidFormat } from "./authMockHelpers";
@@ -44,7 +43,7 @@ export const implemented = {
             return userCredential;
         }
         else {
-            throw createError("auth/operation-not-allowed", "you must enable anonymous auth in the Firebase Console");
+            throw new FireMockError("you must enable anonymous auth in the Firebase Console", "auth/operation-not-allowed");
         }
     },
     async signInWithEmailAndPassword(email, password) {
@@ -59,7 +58,7 @@ export const implemented = {
             .getAuthConfig()
             .validEmailUsers.find(i => i.email === email);
         if (!found) {
-            throw createError(`auth/user-not-found`, `The email "${email}" was not found`);
+            throw new FireMockError(`The email "${email}" was not found`, `auth/user-not-found`);
         }
         if (!emailHasCorrectPassword(email, password)) {
             throw new FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
