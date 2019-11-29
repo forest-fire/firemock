@@ -1,5 +1,5 @@
 export function startAt(query) {
-    const key = query.identity.startAtKey;
+    const key = query.identity.startAtKey || query.identity.orderByKey;
     const value = query.identity.startAt;
     return (record) => {
         if (value === undefined) {
@@ -9,7 +9,7 @@ export function startAt(query) {
     };
 }
 export function endAt(query) {
-    const key = query.identity.endAtKey;
+    const key = query.identity.endAtKey || query.identity.orderByKey;
     const value = query.identity.endAt;
     return (record) => {
         if (value === undefined) {
@@ -20,7 +20,7 @@ export function endAt(query) {
 }
 /** a filter function for queries with a `equalTo` value */
 export function equalTo(query) {
-    const key = query.identity.equalToKey;
+    const key = query.identity.equalToKey || query.identity.orderByKey;
     const value = query.identity.equalTo;
     return (record) => {
         if (value === undefined) {

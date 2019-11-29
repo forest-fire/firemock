@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function startAt(query) {
-    const key = query.identity.startAtKey;
+    const key = query.identity.startAtKey || query.identity.orderByKey;
     const value = query.identity.startAt;
     return (record) => {
         if (value === undefined) {
@@ -12,7 +12,7 @@ function startAt(query) {
 }
 exports.startAt = startAt;
 function endAt(query) {
-    const key = query.identity.endAtKey;
+    const key = query.identity.endAtKey || query.identity.orderByKey;
     const value = query.identity.endAt;
     return (record) => {
         if (value === undefined) {
@@ -24,7 +24,7 @@ function endAt(query) {
 exports.endAt = endAt;
 /** a filter function for queries with a `equalTo` value */
 function equalTo(query) {
-    const key = query.identity.equalToKey;
+    const key = query.identity.equalToKey || query.identity.orderByKey;
     const value = query.identity.equalTo;
     return (record) => {
         if (value === undefined) {

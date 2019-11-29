@@ -1,7 +1,7 @@
 import { SerializedQuery } from "serialized-query";
 
 export function startAt(query: SerializedQuery) {
-  const key = query.identity.startAtKey;
+  const key = query.identity.startAtKey || query.identity.orderByKey;
   const value = query.identity.startAt;
 
   return (record: any) => {
@@ -14,7 +14,7 @@ export function startAt(query: SerializedQuery) {
 }
 
 export function endAt(query: SerializedQuery) {
-  const key = query.identity.endAtKey;
+  const key = query.identity.endAtKey || query.identity.orderByKey;
   const value = query.identity.endAt;
 
   return (record: any) => {
@@ -28,7 +28,7 @@ export function endAt(query: SerializedQuery) {
 
 /** a filter function for queries with a `equalTo` value */
 export function equalTo(query: SerializedQuery) {
-  const key = query.identity.equalToKey;
+  const key = query.identity.equalToKey || query.identity.orderByKey;
   const value = query.identity.equalTo;
 
   return (record: any) => {
