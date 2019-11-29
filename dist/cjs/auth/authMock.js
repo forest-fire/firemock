@@ -3,7 +3,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("../util");
 const authAdmin_1 = require("./authAdmin");
 const completeUserCredential_1 = require("./completeUserCredential");
-const common_types_1 = require("common-types");
 const notImplemented_1 = require("./notImplemented");
 const FireMockError_1 = require("../errors/FireMockError");
 const authMockHelpers_1 = require("./authMockHelpers");
@@ -46,7 +45,7 @@ exports.implemented = {
             return userCredential;
         }
         else {
-            throw common_types_1.createError("auth/operation-not-allowed", "you must enable anonymous auth in the Firebase Console");
+            throw new FireMockError_1.FireMockError("you must enable anonymous auth in the Firebase Console", "auth/operation-not-allowed");
         }
     },
     async signInWithEmailAndPassword(email, password) {
@@ -61,7 +60,7 @@ exports.implemented = {
             .getAuthConfig()
             .validEmailUsers.find(i => i.email === email);
         if (!found) {
-            throw common_types_1.createError(`auth/user-not-found`, `The email "${email}" was not found`);
+            throw new FireMockError_1.FireMockError(`The email "${email}" was not found`, `auth/user-not-found`);
         }
         if (!authMockHelpers_1.emailHasCorrectPassword(email, password)) {
             throw new FireMockError_1.FireMockError(`Invalid password for ${email}`, "auth/wrong-password");
