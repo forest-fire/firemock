@@ -54,13 +54,7 @@ export default class Query {
      * Setup an event listener for a given eventType
      */
     on(eventType, callback, cancelCallbackOrContext, context) {
-        const fn = (a, b) => {
-            const f = 5;
-            const e = new Error();
-            console.log(e.stack);
-            callback(a, b);
-        };
-        addListener(this._query, eventType, fn, cancelCallbackOrContext, context);
+        addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
