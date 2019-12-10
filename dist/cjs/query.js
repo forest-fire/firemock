@@ -59,7 +59,13 @@ class Query {
      * Setup an event listener for a given eventType
      */
     on(eventType, callback, cancelCallbackOrContext, context) {
-        database_1.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
+        const fn = (a, b) => {
+            const f = 5;
+            const e = new Error();
+            console.log(e.stack);
+            callback(a, b);
+        };
+        database_1.addListener(this._query, eventType, fn, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
