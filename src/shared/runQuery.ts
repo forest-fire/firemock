@@ -22,6 +22,13 @@ export function runQuery(query: SerializedQuery, data: any) {
   const anArrayOfScalar =
     Array.isArray(data) && data.every(i => typeof i !== "object");
   const dataIsAnObject = !Array.isArray(data) && typeof data === "object";
+
+  if (dataIsAnObject && !isListOfObjects) {
+    // allows non-array data that can come from a 'value' listener
+    // to pass through at this point
+    return data;
+  }
+
   const dataList = isListOfObjects || dataIsAnObject ? hashToArray(data) : data;
 
   if (!dataList) {

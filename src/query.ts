@@ -118,13 +118,14 @@ export default class Query<T = any> implements IQuery {
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
   ): (a: DataSnapshot, b?: null | string) => Promise<null> {
-    addListener(
-      this._query,
-      eventType,
-      callback,
-      cancelCallbackOrContext,
-      context
-    );
+    const fn = (a: DataSnapshot, b?: string) => {
+      const f = 5;
+      const e = new Error();
+      console.log(e.stack);
+
+      callback(a, b);
+    };
+    addListener(this._query, eventType, fn, cancelCallbackOrContext, context);
 
     return null;
   }
