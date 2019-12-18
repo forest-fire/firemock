@@ -305,7 +305,7 @@ export async function addListener(
   callback: IFirebaseEventHandler,
   cancelCallbackOrContext?: (err?: Error) => void,
   context?: IDictionary
-): Promise<SnapShot> {
+): Promise<DataSnapshot> {
   const query = (typeof pathOrQuery === "string"
     ? new SerializedQuery(join(pathOrQuery))
     : pathOrQuery) as SerializedQuery;
@@ -327,7 +327,7 @@ export async function addListener(
   function ref(dbPath: string) {
     return new Reference(dbPath);
   }
-  const snapshot: SnapShot = await query
+  const snapshot = await query
     .deserialize({ ref })
     .once(eventType === "value" ? "value" : "child_added");
 

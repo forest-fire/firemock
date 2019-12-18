@@ -1,6 +1,5 @@
 import { IDictionary } from "common-types";
 import { IListener } from "./query";
-import { SnapShot } from "./index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
 import { IFirebaseEventHandler } from "./@types/db-types";
 import { SerializedQuery } from "serialized-query";
@@ -66,7 +65,7 @@ export declare function pushDB(path: string, value: any): string;
  * interested in the _paths_ which are being watched
  * you can call `listenerPaths()`.
  */
-export declare function addListener(pathOrQuery: string | SerializedQuery<any>, eventType: EventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<SnapShot>;
+export declare function addListener(pathOrQuery: string | SerializedQuery<any>, eventType: EventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<DataSnapshot>;
 /**
  * **removeListener**
  *
