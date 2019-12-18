@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.35.9",
+  "version": "0.35.10",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -33,12 +33,12 @@
     "info": "yarn do info"
   },
   "dependencies": {
-    "@firebase/app-types": "^0.4.8",
-    "@firebase/auth-types": "^0.9.1",
-    "@firebase/database-types": "^0.4.8",
-    "@firebase/util": "^0.2.34",
+    "@firebase/app-types": "0.4.9",
+    "@firebase/auth-types": "0.9.3",
+    "@firebase/database-types": "0.4.9",
+    "@firebase/util": "0.2.36",
     "@types/faker": "^4.1.8",
-    "common-types": "^1.12.13",
+    "common-types": "^1.12.15",
     "deepmerge": "^4.2.2",
     "email-validator": "^2.0.4",
     "faker": "^4.1.0",
