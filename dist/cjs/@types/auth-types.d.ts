@@ -45,10 +45,6 @@ export interface IPartialUserCredential {
     operationType?: string | null;
     user?: Partial<User> | null;
 }
-export interface IMockConfigOptions {
-    auth?: IMockAuthConfig;
-    db?: IDictionary;
-}
 /**
  * Provides a full FirebaseAuth implementation (although many
  * parts are un-implementated currently) as well as extending

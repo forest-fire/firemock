@@ -3,8 +3,7 @@ import { IDictionary } from "common-types";
 import { Schema, Reference, Deployment, IMockSetup } from "./index";
 import { DelayType } from "./util";
 import { MockHelper } from "./MockHelper";
-import { SchemaCallback } from "./@types/db-types";
-import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
+import { SchemaCallback, IMockConfigOptions, IMockAuthConfig } from "./@types/index";
 import { FirebaseNamespace } from "@firebase/app-types";
 export declare let faker: Faker.FakerStatic;
 export declare class Mock {

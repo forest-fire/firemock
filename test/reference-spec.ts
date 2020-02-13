@@ -456,7 +456,7 @@ describe("Reference functions", () => {
       const snap = await m
         .ref("/numbers")
         .orderByValue()
-        .limitToFirst(5)
+        .limitToLast(5)
         .once("value");
 
       const naturalSort = Object.keys(m.db.numbers);
@@ -467,11 +467,14 @@ describe("Reference functions", () => {
       );
 
       const items = convert.hashToArray(snap.val()).map(i => i.value);
+      console.log(snap);
+
       expect(items).to.have.lengthOf(5);
 
-      for (let i = 0; i <= 3; i++) {
-        expect(items[i] >= items[i + 1]).is.equal(true);
-      }
+      items.forEach(item => {
+        expect(item).to.be.greaterThan(19);
+        expect(item).to.be.lessThan(31);
+      });
     });
 
     it('orderByChild() combines with limitToFirst() for "server-side" selection', async () => {
