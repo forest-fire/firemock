@@ -26,6 +26,7 @@ exports.shouldSendEvents = database_1.shouldSendEvents;
 var MockHelper_1 = require("./MockHelper");
 exports.MockHelper = MockHelper_1.MockHelper;
 __export(require("./auth/index"));
+__export(require("./@types/index"));
 var getMockHelper_1 = require("./getMockHelper");
 exports.getMockHelper = getMockHelper_1.getMockHelper;
 //# sourceMappingURL=index.js.map
