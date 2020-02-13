@@ -16,9 +16,10 @@ import {
   IRelationship,
   ISchema,
   IQueue,
-  SchemaCallback
-} from "./@types/db-types";
-import { IMockConfigOptions, IMockAuthConfig } from "./@types/config-types";
+  SchemaCallback,
+  IMockConfigOptions,
+  IMockAuthConfig
+} from "./@types/index";
 import authProviders from "./auth/AuthProviders";
 import { FirebaseNamespace } from "@firebase/app-types";
 export let faker: Faker.FakerStatic;

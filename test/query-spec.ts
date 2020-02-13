@@ -1,7 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
 import { Mock } from "../src/mock";
-import { atRandom } from "../src/shared/atRandom";
+import { SerializedQuery } from "serialized-query";
 
 const expect = chai.expect;
 
@@ -43,13 +43,13 @@ describe("Query →", () => {
       .once("value");
     const values = result.val();
     expect(Object.keys(values)).to.have.lengthOf(3);
-    const ids = new Set(["asdfasdfas6", "asdfasdfas5", "asdfasdfas4"]);
+    const ids = new Set(["asdfasdfas1", "asdfasdfas2", "asdfasdfas3"]);
     Object.keys(values).map(key => {
       expect(ids.has(key)).to.equal(true);
     });
   });
 
-  it.only("limit queries with orderByChild() on Firemodel model", async () => {
+  it("limit queries with orderByChild() on Firemodel model", async () => {
     const m = await Mock.prepare();
 
     m.updateDB({ ponies: MyPony() });
@@ -70,16 +70,18 @@ describe("Query →", () => {
     const result = await m
       .ref("ages")
       .orderByValue()
-      .limitToFirst(3)
+      .limitToLast(3)
       .once("value");
 
     const values = result.val();
 
     expect(Object.keys(values)).to.have.lengthOf(3);
-    const validAges = new Set([100, 26, 13]);
-    Object.keys(values).map(key => {
-      expect(validAges.has(values[key])).to.equal(true);
-    });
+    const resultValues = Object.values(values);
+    const validAges = [100, 26, 13];
+    resultValues.forEach(v => expect(validAges).to.include(v));
+    // Object.keys(values).map(key => {
+    //   expect(validAges.has(values[key])).to.equal(true);
+    // });
   });
 
   it("getValue() of a scalar returns a scalar", async () => {
@@ -93,5 +95,44 @@ describe("Query →", () => {
     });
     const snap = await m.ref(`/foo`).once("value");
     expect(snap.val()).to.equal(5);
+  });
+
+  it.skip("getList() with limit query on orderByKey of scalar values", async () => {
+    const m = await Mock.prepare();
+    m.updateDB({
+      ages: {
+        asdfasdfas: 13,
+        dfddffdfd: 5,
+        adsffdffdfd: 26,
+        ddfdfdfd: 1,
+        werqerqer: 2,
+        erwrewrw: 100
+      }
+    });
+    const query = SerializedQuery.path("ages")
+      .orderByKey()
+      .limitToFirst(3);
+    const ages = await query.execute();
+
+    expect(ages).to.have.lengthOf(3);
+  });
+
+  it.skip("getList() with limit query on orderByValue", async () => {
+    const m = await Mock.prepare();
+    m.updateDB({
+      ages: {
+        asdfasdfas: 13,
+        dfddffdfd: 5,
+        adsffdffdfd: 26,
+        ddfdfdfd: 1,
+        werqerqer: 2,
+        erwrewrw: 100
+      }
+    });
+    const query = SerializedQuery.path("ages")
+      .orderByValue()
+      .limitToFirst(3);
+    const ages = await m.db.getList(query);
+    expect(ages).to.have.lengthOf(3);
   });
 });

@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class FireMockError extends Error {
-    constructor(message, name = "firemock/error") {
+    constructor(message, classification = "firemock/error") {
         super(message);
         this.firemodel = true;
-        this.code = name;
+        const [cat, subcat] = classification.split("/");
+        this.code = subcat || "error";
+        this.name = classification;
     }
 }
 exports.FireMockError = FireMockError;

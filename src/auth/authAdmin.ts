@@ -1,9 +1,7 @@
 import { authApi } from "../auth";
 import { createUid } from "./authMockHelpers";
 import { FireMockError } from "../errors/FireMockError";
-import { IMockAuthConfig } from "../@types/config-types";
-import { User } from "@firebase/auth-types";
-import { IEmailUser } from "../@types/auth-types";
+import { User, IMockAuthConfig, IEmailUser } from "../@types/index";
 
 /**
  * The **Auth** configuration dictionary
@@ -42,11 +40,11 @@ export const authAdminApi = {
     authConfig = { ...authConfig, ...config };
   },
 
-  getValidEmailUsers() {
+  getValidEmailUsers(): IEmailUser[] {
     return authConfig.validEmailUsers || [];
   },
 
-  getAuthConfig() {
+  getAuthConfig(): IMockAuthConfig {
     return authConfig;
   },
 

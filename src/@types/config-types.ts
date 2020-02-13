@@ -1,28 +1,11 @@
 import { IDictionary } from "common-types";
-import { IEmailUser } from "./auth-types";
+import { IEmailUser, IMockAuthConfig } from "./auth-types";
 
 /** an _async_ mock function which returns a dictionary data structure */
 export type AsyncMockData = () => Promise<IDictionary>;
 export interface IMockConfigOptions {
   auth?: IMockAuthConfig;
   db?: IDictionary | AsyncMockData;
-}
-
-export interface IMockAuthConfig {
-  /**
-   * a list of email logins which are already setup as valid
-   * in the mock authentication module; this will be used for
-   * email logins as well as email links
-   */
-  validEmailUsers?: IEmailUser[];
-  /** allow anonymous logins */
-  allowAnonymous?: boolean;
-  /** allow email/password logins */
-  allowEmailLogins?: boolean;
-  /** allow logins via links sent to email */
-  allowEmailLinks?: boolean;
-  /** allow logins via a code sent via SMS */
-  allowPhoneLogins?: boolean;
 }
 
 export interface IMockFirebaseUidOnlyPath<T extends object = IDictionary>
