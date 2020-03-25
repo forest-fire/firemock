@@ -3,6 +3,7 @@ import SnapShot from "./snapshot";
 import Reference from "./reference";
 import { SerializedQuery } from "serialized-query";
 import { DelayType } from "./util";
+import { IDictionary } from "common-types";
 export declare type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
 export declare type GenericEventHandler = (snap: SnapShot, key?: string) => void;
 export declare type HandleValueEvent = (dataSnapShot: SnapShot) => void;
@@ -76,7 +77,7 @@ export default class Query<T = any> implements IQuery {
     orderByPriority(): Query<T>;
     toJSON(): {
         identity: string;
-        query: import("serialized-query").ISerializedQueryIdentity<import("common-types").IDictionary<any>>;
+        query: IDictionary<any>;
     };
     toString(): string;
     /**

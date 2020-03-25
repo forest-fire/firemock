@@ -12,6 +12,7 @@ import Reference from "./reference";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { join, leafNode, DelayType, networkDelay } from "./util";
 import { runQuery } from "./shared/runQuery";
+import { IDictionary } from "common-types";
 
 export type EventHandler =
   | HandleValueEvent
@@ -187,7 +188,7 @@ export default class Query<T = any> implements IQuery {
   public toJSON() {
     return {
       identity: this.toString(),
-      query: this._query.identity
+      query: this._query.identity as IDictionary
     };
   }
 
