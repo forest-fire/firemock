@@ -69,10 +69,13 @@ class Mock {
         const defaultDbConfig = {};
         const obj = new Mock(options.db
             ? typeof options.db === "function"
-                ? await options.db()
+                ? {}
                 : options.db || defaultDbConfig
             : defaultDbConfig, options.auth
             ? Object.assign(Object.assign({}, defaultAuthConfig), options.auth) : defaultAuthConfig);
+        if (typeof options.db === "function") {
+            obj.updateDB(await options.db(obj));
+        }
         try {
             await obj.importFakerLibrary();
         }
