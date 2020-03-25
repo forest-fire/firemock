@@ -18,7 +18,8 @@ import {
   IQueue,
   SchemaCallback,
   IMockConfigOptions,
-  IMockAuthConfig
+  IMockAuthConfig,
+  AsyncMockData
 } from "./@types/index";
 import authProviders from "./auth/AuthProviders";
 import { FirebaseNamespace } from "@firebase/app-types";
@@ -50,13 +51,16 @@ export class Mock {
     const obj = new Mock(
       options.db
         ? typeof options.db === "function"
-          ? await options.db()
+          ? {}
           : options.db || defaultDbConfig
         : defaultDbConfig,
       options.auth
         ? { ...defaultAuthConfig, ...options.auth }
         : defaultAuthConfig
     );
+    if (typeof options.db === "function") {
+      obj.updateDB(await (options.db as AsyncMockData)(obj));
+    }
     try {
       await obj.importFakerLibrary();
     } catch (e) {
