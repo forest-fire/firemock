@@ -15,6 +15,7 @@ declare const _default: {
     SAMLAuthProvider: typeof import("@firebase/auth-types").SAMLAuthProvider;
     PhoneAuthProvider: typeof import("@firebase/auth-types").PhoneAuthProvider;
     PhoneAuthProvider_Instance: typeof import("@firebase/auth-types").PhoneAuthProvider_Instance;
+    PhoneMultiFactorGenerator: typeof import("@firebase/auth-types").PhoneMultiFactorGenerator;
     RecaptchaVerifier: typeof import("@firebase/auth-types").RecaptchaVerifier;
     RecaptchaVerifier_Instance: typeof import("@firebase/auth-types").RecaptchaVerifier_Instance;
     TwitterAuthProvider: typeof import("@firebase/auth-types").TwitterAuthProvider;
