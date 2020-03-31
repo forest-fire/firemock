@@ -13,6 +13,21 @@ const atRandom_1 = require("../shared/atRandom");
 function completeUserCredential(partial) {
     const fakeUserCredential = {
         user: {
+            verifyBeforeUpdateEmail: (newEmail, actionCodeSettings) => {
+                return Promise.resolve();
+            },
+            multiFactor: {
+                enroll: (assertion, displayName) => {
+                    return Promise.resolve();
+                },
+                enrolledFactors: [],
+                getSession: () => {
+                    return Promise.resolve({});
+                },
+                unenroll: option => {
+                    return Promise.resolve();
+                }
+            },
             tenantId: "fake-tenantId",
             async delete() {
                 return;
@@ -32,6 +47,7 @@ function completeUserCredential(partial) {
                     authTime: "format?",
                     issuedAtTime: "format?",
                     signInProvider: "fake",
+                    signInSecondFactor: "fake-2nd-factor",
                     claims
                 };
             },

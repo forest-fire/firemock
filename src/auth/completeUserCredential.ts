@@ -21,6 +21,21 @@ export function completeUserCredential(
 ): UserCredential {
   const fakeUserCredential: UserCredential = {
     user: {
+      verifyBeforeUpdateEmail: (newEmail, actionCodeSettings) => {
+        return Promise.resolve();
+      },
+      multiFactor: {
+        enroll: (assertion, displayName) => {
+          return Promise.resolve();
+        },
+        enrolledFactors: [],
+        getSession: () => {
+          return Promise.resolve({});
+        },
+        unenroll: option => {
+          return Promise.resolve();
+        }
+      },
       tenantId: "fake-tenantId",
       async delete() {
         return;
@@ -42,6 +57,7 @@ export function completeUserCredential(
           authTime: "format?",
           issuedAtTime: "format?",
           signInProvider: "fake",
+          signInSecondFactor: "fake-2nd-factor",
           claims
         };
       },
