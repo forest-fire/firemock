@@ -8,7 +8,7 @@ export interface IMockAuth extends FirebaseAuth, IMockAdminApi, IAuthProviders {
 export interface IAuthProviders {
     EmailAuthProvider: EmailAuthProvider;
 }
-import { IMockAdminApi } from "../auth/authAdmin";
+import { IMockAdminApi } from "../auth/authAdminApi";
 import { Mock, IDictionary } from "../index";
 import { EmailAuthProvider } from "@firebase/auth-types";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
