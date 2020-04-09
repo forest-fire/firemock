@@ -3,7 +3,7 @@ import { db, clearDatabase, updateDatabase, silenceEvents, restoreEvents } from 
 import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { authAdminApi, clearAuthUsers } from "./auth/authAdmin";
+import { authAdminApi, clearAuthUsers } from "./auth/authAdminApi";
 import { FireMockError } from "./errors/FireMockError";
 import authProviders from "./auth/AuthProviders";
 export let faker;

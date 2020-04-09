@@ -3,7 +3,7 @@ function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("./authAdminApi"));
-__export(require("./completeUserCredential"));
-__export(require("./notImplemented"));
+__export(require("./updateEmail"));
+__export(require("./updatePassword"));
+__export(require("./getIdToken"));
 //# sourceMappingURL=index.js.map

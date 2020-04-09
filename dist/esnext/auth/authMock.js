@@ -1,5 +1,5 @@
 import { networkDelay } from "../util";
-import { authAdminApi } from "./authAdmin";
+import { authAdminApi } from "./authAdminApi";
 import { completeUserCredential } from "./completeUserCredential";
 import { notImplemented } from "./notImplemented";
 import { FireMockError } from "../errors/FireMockError";

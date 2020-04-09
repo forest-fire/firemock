@@ -3,9 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const authAdmin_1 = require("./authAdmin");
+const authAdminApi_1 = require("./authAdminApi");
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const atRandom_1 = require("../shared/atRandom");
+const UserObject_1 = require("./UserObject");
 /**
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental
@@ -35,7 +36,7 @@ function completeUserCredential(partial) {
             emailVerified: false,
             async getIdTokenResult() {
                 const user = partial.user && partial.user.uid
-                    ? authAdmin_1.authAdminApi
+                    ? authAdminApi_1.authAdminApi
                         .getValidEmailUsers()
                         .find(i => i.uid === partial.user.uid)
                     : undefined;
@@ -51,23 +52,9 @@ function completeUserCredential(partial) {
                     claims
                 };
             },
-            async getIdToken() {
-                const user = authAdmin_1.authAdminApi.getCurrentUser();
-                const userConfig = authAdmin_1.authAdminApi
-                    .getAuthConfig()
-                    .validEmailUsers.find(i => i.email === user.email);
-                if (!user) {
-                    throw new Error("not logged in");
-                }
-                if (userConfig.tokenIds) {
-                    return atRandom_1.atRandom(userConfig.tokenIds);
-                }
-                else {
-                    return Math.random()
-                        .toString(36)
-                        .substr(2, 10);
-                }
-            },
+            updateEmail: UserObject_1.updateEmail,
+            updatePassword: UserObject_1.updatePassword,
+            getIdToken: UserObject_1.getIdToken,
             async linkAndRetrieveDataWithCredential(credential) {
                 return completeUserCredential({});
             },
@@ -86,9 +73,6 @@ function completeUserCredential(partial) {
             async reauthenticateAndRetrieveDataWithCredential(credential) {
                 return completeUserCredential({});
             },
-            // async reauthenticateWithCredential(credential: AuthCredential) {
-            //   return;
-            // },
             async reauthenticateWithCredential(credential) {
                 return completeUserCredential({});
             },
@@ -113,14 +97,6 @@ function completeUserCredential(partial) {
             async unlink(provider) {
                 return completeUserCredential({}).user;
             },
-            async updateEmail(newEmail) {
-                return;
-            },
-            updatePassword: async (password) => {
-                if (partial.user.email) {
-                    authAdmin_1.authAdminApi.updateEmailUser(partial.user.email, { password });
-                }
-            },
             async updatePhoneNumber(phoneCredential) {
                 return;
             },
@@ -136,7 +112,7 @@ function completeUserCredential(partial) {
             providerData: [],
             providerId: "",
             refreshToken: "",
-            uid: authAdmin_1.authAdminApi.getAnonymousUid()
+            uid: authAdminApi_1.authAdminApi.getAnonymousUid()
         },
         additionalUserInfo: {
             isNewUser: false,

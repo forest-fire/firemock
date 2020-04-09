@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("../util");
-const authAdmin_1 = require("./authAdmin");
+const authAdminApi_1 = require("./authAdminApi");
 const completeUserCredential_1 = require("./completeUserCredential");
 const notImplemented_1 = require("./notImplemented");
 const FireMockError_1 = require("../errors/FireMockError");
@@ -16,18 +16,18 @@ exports.implemented = {
         automaticDataCollectionEnabled: false
     },
     onAuthStateChanged(observer) {
-        authAdmin_1.authAdminApi.addAuthObserver(observer);
+        authAdminApi_1.authAdminApi.addAuthObserver(observer);
     },
     async setPersistence() {
         console.warn(`currently firemock accepts calls to setPersistence() but it doesn't support it.`);
     },
     signInAnonymously: async () => {
         await util_1.networkDelay();
-        const authConfig = authAdmin_1.authAdminApi.getAuthConfig();
+        const authConfig = authAdminApi_1.authAdminApi.getAuthConfig();
         if (authConfig.allowAnonymous) {
             const user = {
                 isAnonymous: true,
-                uid: authAdmin_1.authAdminApi.getAnonymousUid(),
+                uid: authAdminApi_1.authAdminApi.getAnonymousUid(),
                 emailVerified: false,
                 phoneNumber: ""
             };
@@ -41,7 +41,7 @@ exports.implemented = {
                 credential
             };
             const userCredential = completeUserCredential_1.completeUserCredential(credentials);
-            authAdmin_1.authAdminApi.login(userCredential.user);
+            authAdminApi_1.authAdminApi.login(userCredential.user);
             return userCredential;
         }
         else {
@@ -56,7 +56,7 @@ exports.implemented = {
         if (!authMockHelpers_1.emailIsValidFormat(email)) {
             throw new FireMockError_1.FireMockError(`invalid email: ${email}`, "auth/invalid-email");
         }
-        const found = authAdmin_1.authAdminApi
+        const found = authAdminApi_1.authAdminApi
             .getAuthConfig()
             .validEmailUsers.find(i => i.email === email);
         if (!found) {
@@ -81,7 +81,7 @@ exports.implemented = {
             }
         };
         const u = completeUserCredential_1.completeUserCredential(partial);
-        authAdmin_1.authAdminApi.login(u.user);
+        authAdminApi_1.authAdminApi.login(u.user);
         return u;
     },
     /**
@@ -114,8 +114,8 @@ exports.implemented = {
             }
         };
         const u = completeUserCredential_1.completeUserCredential(partial);
-        authAdmin_1.authAdminApi.addUserToAuth(u.user, password);
-        authAdmin_1.authAdminApi.login(u.user);
+        authAdminApi_1.authAdminApi.addUserToAuth(u.user, password);
+        authAdminApi_1.authAdminApi.login(u.user);
         return u;
     },
     async confirmPasswordReset(code, newPassword) {
@@ -125,7 +125,7 @@ exports.implemented = {
         return;
     },
     async signOut() {
-        authAdmin_1.authAdminApi.logout();
+        authAdminApi_1.authAdminApi.logout();
     },
     get currentUser() {
         return completeUserCredential_1.completeUserCredential({}).user;

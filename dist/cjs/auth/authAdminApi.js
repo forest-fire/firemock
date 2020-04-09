@@ -23,6 +23,9 @@ const authObservers = [];
  * The currently logged in user
  */
 let currentUser;
+/**
+ * primary API for administrating the MOCK state/config
+ */
 exports.authAdminApi = {
     /**
      * Updates the Auth configuration
@@ -46,6 +49,12 @@ exports.authAdminApi = {
             verified: u.emailVerified
         });
     },
+    /**
+     * Updates a given user identified in the `validEmailUser` dictionary
+     *
+     * @param email the email which identifies the user
+     * @param updates a _partial_ `IEmailUser` that non-destructively is used for updating
+     */
     updateEmailUser(email, updates) {
         let found = false;
         authConfig.validEmailUsers = authConfig.validEmailUsers.map(i => {
@@ -127,4 +136,4 @@ exports.authAdminApi = {
         return authObservers;
     }
 };
-//# sourceMappingURL=authAdmin.js.map
+//# sourceMappingURL=authAdminApi.js.map
