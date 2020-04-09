@@ -1,5 +1,5 @@
 import { networkDelay } from "./util";
-import { authAdminApi } from "./auth/authAdmin";
+import { authAdminApi } from "./auth/authAdminApi";
 import { authMockApi } from "./auth/authMock";
 let hasConnectedToAuthService = false;
 export const auth = async () => {

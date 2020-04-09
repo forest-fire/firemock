@@ -15,7 +15,7 @@ const database_1 = require("./database");
 const util_1 = require("./util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
-const authAdmin_1 = require("./auth/authAdmin");
+const authAdminApi_1 = require("./auth/authAdminApi");
 const FireMockError_1 = require("./errors/FireMockError");
 const AuthProviders_1 = __importDefault(require("./auth/AuthProviders"));
 /* tslint:disable:max-classes-per-file */
@@ -38,14 +38,14 @@ class Mock {
         this._queues = new index_1.Queue("queues").clear();
         index_1.Queue.clearAll();
         database_1.clearDatabase();
-        authAdmin_1.clearAuthUsers();
+        authAdminApi_1.clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
         }
         if (dataOrMock && typeof dataOrMock === "function") {
             this._mockInitializer = dataOrMock(this);
         }
-        authAdmin_1.authAdminApi.configureAuth(authConfig);
+        authAdminApi_1.authAdminApi.configureAuth(authConfig);
     }
     /**
      * returns a Mock object while also ensuring that the

@@ -1,4 +1,4 @@
-import { authAdminApi } from "./authAdmin";
+import { authAdminApi } from "./authAdminApi";
 import { validate } from "email-validator";
 export function emailExistsAsUserInAuth(email) {
     const emails = authAdminApi.getValidEmailUsers().map(i => i.email);

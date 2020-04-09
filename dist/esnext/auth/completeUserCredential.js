@@ -1,6 +1,7 @@
-import { authAdminApi } from "./authAdmin";
+import { authAdminApi } from "./authAdminApi";
 import merge from "deepmerge";
 import { atRandom } from "../shared/atRandom";
+import { updateEmail, updatePassword, getIdToken } from "./UserObject";
 /**
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental
@@ -46,23 +47,9 @@ export function completeUserCredential(partial) {
                     claims
                 };
             },
-            async getIdToken() {
-                const user = authAdminApi.getCurrentUser();
-                const userConfig = authAdminApi
-                    .getAuthConfig()
-                    .validEmailUsers.find(i => i.email === user.email);
-                if (!user) {
-                    throw new Error("not logged in");
-                }
-                if (userConfig.tokenIds) {
-                    return atRandom(userConfig.tokenIds);
-                }
-                else {
-                    return Math.random()
-                        .toString(36)
-                        .substr(2, 10);
-                }
-            },
+            updateEmail,
+            updatePassword,
+            getIdToken,
             async linkAndRetrieveDataWithCredential(credential) {
                 return completeUserCredential({});
             },
@@ -81,9 +68,6 @@ export function completeUserCredential(partial) {
             async reauthenticateAndRetrieveDataWithCredential(credential) {
                 return completeUserCredential({});
             },
-            // async reauthenticateWithCredential(credential: AuthCredential) {
-            //   return;
-            // },
             async reauthenticateWithCredential(credential) {
                 return completeUserCredential({});
             },
@@ -107,14 +91,6 @@ export function completeUserCredential(partial) {
             },
             async unlink(provider) {
                 return completeUserCredential({}).user;
-            },
-            async updateEmail(newEmail) {
-                return;
-            },
-            updatePassword: async (password) => {
-                if (partial.user.email) {
-                    authAdminApi.updateEmailUser(partial.user.email, { password });
-                }
             },
             async updatePhoneNumber(phoneCredential) {
                 return;

@@ -2,6 +2,9 @@ import { User, IMockAuthConfig, IEmailUser } from "../@types/index";
 export declare function clearAuthUsers(): void;
 export declare type Observer = (user: User | null) => any;
 export declare type IMockAdminApi = typeof authAdminApi;
+/**
+ * primary API for administrating the MOCK state/config
+ */
 export declare const authAdminApi: {
     /**
      * Updates the Auth configuration
@@ -12,6 +15,12 @@ export declare const authAdminApi: {
     getValidEmailUsers(): IEmailUser[];
     getAuthConfig(): IMockAuthConfig;
     addUserToAuth(u: import("@firebase/auth-types").User, p: string): void;
+    /**
+     * Updates a given user identified in the `validEmailUser` dictionary
+     *
+     * @param email the email which identifies the user
+     * @param updates a _partial_ `IEmailUser` that non-destructively is used for updating
+     */
     updateEmailUser(email: string, updates: Partial<IEmailUser>): void;
     /**
      * For an already existing user in the Auth user pool, allows
