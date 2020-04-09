@@ -30,6 +30,9 @@ let currentUser: User;
 
 export type IMockAdminApi = typeof authAdminApi;
 
+/**
+ * primary API for administrating the MOCK state/config
+ */
 export const authAdminApi = {
   /**
    * Updates the Auth configuration
@@ -57,6 +60,12 @@ export const authAdminApi = {
     });
   },
 
+  /**
+   * Updates a given user identified in the `validEmailUser` dictionary
+   *
+   * @param email the email which identifies the user
+   * @param updates a _partial_ `IEmailUser` that non-destructively is used for updating
+   */
   updateEmailUser(email: string, updates: Partial<IEmailUser>) {
     let found = false;
     authConfig.validEmailUsers = authConfig.validEmailUsers.map(i => {

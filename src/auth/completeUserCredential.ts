@@ -8,9 +8,10 @@ import {
   AuthProvider,
   ActionCodeSettings
 } from "@firebase/auth-types";
-import { authAdminApi } from "./authAdmin";
+import { authAdminApi } from "./authAdminApi";
 import merge from "deepmerge";
 import { atRandom } from "../shared/atRandom";
+import { updateEmail, updatePassword, getIdToken } from "./UserObject";
 
 /**
  * takes a partial user auth and adds enough to make it officially
@@ -61,23 +62,10 @@ export function completeUserCredential(
           claims
         };
       },
-      async getIdToken() {
-        const user = authAdminApi.getCurrentUser();
-        const userConfig = authAdminApi
-          .getAuthConfig()
-          .validEmailUsers.find(i => i.email === user.email);
+      updateEmail,
+      updatePassword,
+      getIdToken,
 
-        if (!user) {
-          throw new Error("not logged in");
-        }
-        if (userConfig.tokenIds) {
-          return atRandom(userConfig.tokenIds);
-        } else {
-          return Math.random()
-            .toString(36)
-            .substr(2, 10);
-        }
-      },
       async linkAndRetrieveDataWithCredential(credential: AuthCredential) {
         return completeUserCredential({});
       },
@@ -102,9 +90,6 @@ export function completeUserCredential(
       ) {
         return completeUserCredential({});
       },
-      // async reauthenticateWithCredential(credential: AuthCredential) {
-      //   return;
-      // },
       async reauthenticateWithCredential(credential: AuthCredential) {
         return completeUserCredential({});
       },
@@ -132,14 +117,7 @@ export function completeUserCredential(
       async unlink(provider: string) {
         return completeUserCredential({}).user;
       },
-      async updateEmail(newEmail: string) {
-        return;
-      },
-      updatePassword: async (password: string) => {
-        if (partial.user.email) {
-          authAdminApi.updateEmailUser(partial.user.email, { password });
-        }
-      },
+
       async updatePhoneNumber(phoneCredential: AuthCredential) {
         return;
       },

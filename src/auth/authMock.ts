@@ -6,7 +6,7 @@ import {
   IPartialUserCredential
 } from "../@types/auth-types";
 import { networkDelay } from "../util";
-import { authAdminApi, Observer } from "./authAdmin";
+import { authAdminApi, Observer } from "./authAdminApi";
 import { completeUserCredential } from "./completeUserCredential";
 import { Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
@@ -87,7 +87,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     if (!found) {
       throw new FireMockError(
         `The email "${email}" was not found`,
-        `auth/user-not-found`,
+        `auth/user-not-found`
       );
     }
 
