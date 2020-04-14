@@ -1,5 +1,5 @@
-import { FireMockError } from "../../errors/FireMockError";
-import { authAdminApi } from "../authAdminApi";
+import { FireMockError } from "../../../errors/FireMockError";
+import { authAdminApi } from "../../authAdminApi";
 
 /**
  * **updatePassword**

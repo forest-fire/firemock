@@ -1,4 +1,4 @@
-import { FireMockError } from "../../errors/FireMockError";
+import { FireMockError } from "../../../errors/FireMockError";
 
 /**
  * **updateEmail**

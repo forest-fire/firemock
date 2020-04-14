@@ -4,14 +4,14 @@ import {
   AuthCredential,
   User,
   IPartialUserCredential
-} from "../@types/auth-types";
-import { networkDelay } from "../util";
-import { authAdminApi, Observer } from "./authAdminApi";
+} from "../../@types/auth-types";
+import { networkDelay } from "../../util";
+import { authAdminApi, Observer } from "../authAdminApi";
 import { completeUserCredential } from "./completeUserCredential";
 import { Omit } from "common-types";
 import { notImplemented } from "./notImplemented";
 import { ActionCodeSettings } from "@firebase/auth-types";
-import { FireMockError } from "../errors/FireMockError";
+import { FireMockError } from "../../errors/FireMockError";
 import {
   emailExistsAsUserInAuth,
   emailHasCorrectPassword,

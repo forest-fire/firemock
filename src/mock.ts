@@ -21,7 +21,7 @@ import {
   IMockAuthConfig,
   AsyncMockData
 } from "./@types/index";
-import authProviders from "./auth/AuthProviders";
+import authProviders from "./auth/client-sdk/AuthProviders";
 import { FirebaseNamespace } from "@firebase/app-types";
 export let faker: Faker.FakerStatic;
 

@@ -1,5 +1,5 @@
 import { authApi } from "../auth";
-import { createUid } from "./authMockHelpers";
+import { createUid } from "./client-sdk/authMockHelpers";
 import { FireMockError } from "../errors/FireMockError";
 import { User, IMockAuthConfig, IEmailUser } from "../@types/index";
 

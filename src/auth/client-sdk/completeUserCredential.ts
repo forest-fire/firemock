@@ -2,15 +2,15 @@ import {
   IPartialUserCredential,
   UserCredential,
   AuthCredential
-} from "../@types/auth-types";
+} from "../../@types/auth-types";
 import {
   ApplicationVerifier,
   AuthProvider,
   ActionCodeSettings
 } from "@firebase/auth-types";
-import { authAdminApi } from "./authAdminApi";
+import { authAdminApi } from "../authAdminApi";
 import merge from "deepmerge";
-import { atRandom } from "../shared/atRandom";
+import { atRandom } from "../../shared/atRandom";
 import { updateEmail, updatePassword, getIdToken } from "./UserObject";
 
 /**

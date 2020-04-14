@@ -1,5 +1,5 @@
-import { authAdminApi } from "../authAdminApi";
-import { atRandom } from "../../shared/atRandom";
+import { authAdminApi } from "../../authAdminApi";
+import { atRandom } from "../../../shared/atRandom";
 
 export async function getIdToken() {
   const user = authAdminApi.getCurrentUser();

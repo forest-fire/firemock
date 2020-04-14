@@ -1,7 +1,7 @@
 import { networkDelay } from "./util";
 import { IMockAuth } from "./@types/auth-types";
 import { authAdminApi } from "./auth/authAdminApi";
-import { authMockApi } from "./auth/authMock";
+import { authMockApi } from "./auth/client-sdk/authMock";
 
 let hasConnectedToAuthService: boolean = false;
 
