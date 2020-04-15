@@ -7,6 +7,7 @@ const authAdminApi_1 = require("../state-mgmt/authAdminApi");
 const deepmerge_1 = __importDefault(require("deepmerge"));
 const atRandom_1 = require("../../shared/atRandom");
 const UserObject_1 = require("./UserObject");
+const state_mgmt_1 = require("../state-mgmt");
 /**
  * takes a partial user auth and adds enough to make it officially
  * a full UserCrediental
@@ -36,9 +37,7 @@ function completeUserCredential(partial) {
             emailVerified: false,
             async getIdTokenResult() {
                 const user = partial.user && partial.user.uid
-                    ? authAdminApi_1.authAdminApi
-                        .getValidEmailUsers()
-                        .find(i => i.uid === partial.user.uid)
+                    ? state_mgmt_1.allUsers().find(i => i.uid === partial.user.uid)
                     : undefined;
                 const token = user && user.tokenIds ? atRandom_1.atRandom(user.tokenIds) : "random-token";
                 const claims = user && user.claims ? user.claims : {};

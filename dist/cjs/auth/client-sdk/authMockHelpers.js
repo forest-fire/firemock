@@ -2,8 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const authAdminApi_1 = require("../state-mgmt/authAdminApi");
 const email_validator_1 = require("email-validator");
+const state_mgmt_1 = require("../state-mgmt");
 function emailExistsAsUserInAuth(email) {
-    const emails = authAdminApi_1.authAdminApi.getValidEmailUsers().map(i => i.email);
+    const emails = state_mgmt_1.allUsers().map(i => i.email);
     return emails.includes(email);
 }
 exports.emailExistsAsUserInAuth = emailExistsAsUserInAuth;
@@ -12,17 +13,17 @@ function emailIsValidFormat(email) {
 }
 exports.emailIsValidFormat = emailIsValidFormat;
 function emailHasCorrectPassword(email, password) {
-    const config = authAdminApi_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
+    const config = state_mgmt_1.allUsers().find(i => i.email === email);
     return config ? config.password === password : false;
 }
 exports.emailHasCorrectPassword = emailHasCorrectPassword;
 function emailVerified(email) {
-    const config = authAdminApi_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
-    return config ? config.verified || false : false;
+    const user = state_mgmt_1.allUsers().find(i => i.email === email);
+    return user ? user.emailVerified || false : false;
 }
 exports.emailVerified = emailVerified;
 function userUid(email) {
-    const config = authAdminApi_1.authAdminApi.getValidEmailUsers().find(i => i.email === email);
+    const config = state_mgmt_1.allUsers().find(i => i.email === email);
     return config ? config.uid || createUid() : createUid();
 }
 exports.userUid = userUid;
@@ -34,7 +35,7 @@ function createUid() {
 }
 exports.createUid = createUid;
 function emailValidationAllowed() {
-    return authAdminApi_1.authAdminApi.getAuthConfig().allowEmailLogins;
+    return state_mgmt_1.authProviders().includes("emailPassword");
 }
 exports.emailValidationAllowed = emailValidationAllowed;
 function loggedIn(user) {

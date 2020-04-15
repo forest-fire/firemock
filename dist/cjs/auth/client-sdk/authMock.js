@@ -6,6 +6,7 @@ const completeUserCredential_1 = require("./completeUserCredential");
 const notImplemented_1 = require("./notImplemented");
 const FireMockError_1 = require("../../errors/FireMockError");
 const authMockHelpers_1 = require("./authMockHelpers");
+const state_mgmt_1 = require("../state-mgmt");
 exports.implemented = {
     app: {
         name: "mocked-app",
@@ -23,8 +24,7 @@ exports.implemented = {
     },
     signInAnonymously: async () => {
         await util_1.networkDelay();
-        const authConfig = authAdminApi_1.authAdminApi.getAuthConfig();
-        if (authConfig.allowAnonymous) {
+        if (state_mgmt_1.authProviders().includes("anonymous")) {
             const user = {
                 isAnonymous: true,
                 uid: authAdminApi_1.authAdminApi.getAnonymousUid(),
@@ -56,9 +56,7 @@ exports.implemented = {
         if (!authMockHelpers_1.emailIsValidFormat(email)) {
             throw new FireMockError_1.FireMockError(`invalid email: ${email}`, "auth/invalid-email");
         }
-        const found = authAdminApi_1.authAdminApi
-            .getAuthConfig()
-            .validEmailUsers.find(i => i.email === email);
+        const found = state_mgmt_1.allUsers().find(i => i.email === email);
         if (!found) {
             throw new FireMockError_1.FireMockError(`The email "${email}" was not found`, `auth/user-not-found`);
         }
@@ -114,7 +112,7 @@ exports.implemented = {
             }
         };
         const u = completeUserCredential_1.completeUserCredential(partial);
-        authAdminApi_1.authAdminApi.addUserToAuth(u.user, password);
+        state_mgmt_1.addUser({ uid: partial.user.uid, email, password });
         authAdminApi_1.authAdminApi.login(u.user);
         return u;
     },

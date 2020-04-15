@@ -15,7 +15,7 @@ const database_1 = require("./database");
 const util_1 = require("./util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
-const authAdminApi_1 = require("./auth/state-mgmt/authAdminApi");
+const state_mgmt_1 = require("./auth/state-mgmt");
 const FireMockError_1 = require("./errors/FireMockError");
 const AuthProviders_1 = __importDefault(require("./auth/client-sdk/AuthProviders"));
 /* tslint:disable:max-classes-per-file */
@@ -28,24 +28,22 @@ class Mock {
      * DB to be setup via mocking.
      */
     dataOrMock, authConfig = {
-        allowAnonymous: true,
-        allowEmailLogins: false,
-        allowEmailLinks: false,
-        allowPhoneLogins: false
+        providers: ["anonymous"],
+        users: []
     }) {
         this._schemas = new index_1.Queue("schemas").clear();
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
         index_1.Queue.clearAll();
         database_1.clearDatabase();
-        authAdminApi_1.clearAuthUsers();
+        state_mgmt_1.clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
         }
         if (dataOrMock && typeof dataOrMock === "function") {
             this._mockInitializer = dataOrMock(this);
         }
-        authAdminApi_1.authAdminApi.configureAuth(authConfig);
+        state_mgmt_1.initializeAuth(authConfig);
     }
     /**
      * returns a Mock object while also ensuring that the
@@ -59,20 +57,12 @@ class Mock {
      * DB to be setup via mocking.
      */
     ) {
-        const defaultAuthConfig = {
-            allowAnonymous: true,
-            allowEmailLogins: false,
-            allowEmailLinks: false,
-            allowPhoneLogins: false,
-            validEmailUsers: []
-        };
         const defaultDbConfig = {};
         const obj = new Mock(options.db
             ? typeof options.db === "function"
                 ? {}
                 : options.db || defaultDbConfig
-            : defaultDbConfig, options.auth
-            ? Object.assign(Object.assign({}, defaultAuthConfig), options.auth) : defaultAuthConfig);
+            : defaultDbConfig, options.auth);
         if (typeof options.db === "function") {
             obj.updateDB(await options.db(obj));
         }

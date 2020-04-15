@@ -1,5 +1,6 @@
 import { FireMockError } from "../../../errors/FireMockError";
 import { authAdminApi } from "../../state-mgmt/authAdminApi";
+import { updateUser, currentUser } from "../../state-mgmt";
 
 /**
  * **updatePassword**
@@ -28,7 +29,7 @@ export async function updatePassword(
     );
   }
 
-  authAdminApi.updateEmailUser(authAdminApi.getCurrentUser().email, {
+  updateUser(currentUser().email, {
     password: newPassword
   });
 }

@@ -20,6 +20,7 @@ import {
   emailValidationAllowed,
   emailIsValidFormat
 } from "./authMockHelpers";
+import { addUser, allUsers, authProviders } from "../state-mgmt";
 
 export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   app: {
@@ -40,8 +41,8 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
   },
   signInAnonymously: async (): Promise<UserCredential> => {
     await networkDelay();
-    const authConfig = authAdminApi.getAuthConfig();
-    if (authConfig.allowAnonymous) {
+
+    if (authProviders().includes("anonymous")) {
       const user: Partial<User> = {
         isAnonymous: true,
         uid: authAdminApi.getAnonymousUid(),
@@ -81,9 +82,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
     if (!emailIsValidFormat(email)) {
       throw new FireMockError(`invalid email: ${email}`, "auth/invalid-email");
     }
-    const found = authAdminApi
-      .getAuthConfig()
-      .validEmailUsers.find(i => i.email === email);
+    const found = allUsers().find(i => i.email === email);
     if (!found) {
       throw new FireMockError(
         `The email "${email}" was not found`,
@@ -159,7 +158,7 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       }
     };
     const u = completeUserCredential(partial);
-    authAdminApi.addUserToAuth(u.user, password);
+    addUser({ uid: partial.user.uid, email, password });
     authAdminApi.login(u.user);
 
     return u;

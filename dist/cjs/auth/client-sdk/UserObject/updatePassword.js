@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const FireMockError_1 = require("../../../errors/FireMockError");
-const authAdminApi_1 = require("../../state-mgmt/authAdminApi");
+const state_mgmt_1 = require("../../state-mgmt");
 /**
  * **updatePassword**
  *
@@ -22,7 +22,7 @@ async function updatePassword(newPassword, notRecentLogin) {
     if (notRecentLogin) {
         throw new FireMockError_1.FireMockError("updating a user's password requires that the user have recently logged in; use 'reauthenticateWithCredential' to address this error.", "auth/required-recent-login");
     }
-    authAdminApi_1.authAdminApi.updateEmailUser(authAdminApi_1.authAdminApi.getCurrentUser().email, {
+    state_mgmt_1.updateUser(state_mgmt_1.currentUser().email, {
         password: newPassword
     });
 }

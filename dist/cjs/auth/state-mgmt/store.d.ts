@@ -1,0 +1,11 @@
+import { IMockUser, IMockAuthConfig } from "../../@types";
+export declare function initializeAuth(config: IMockAuthConfig): void;
+export declare function currentUser(): IMockUser;
+export declare function clearAuthUsers(): void;
+export declare function addUser(user: Partial<IMockUser>): void;
+export declare function getUserById(uid: string): IMockUser;
+export declare function getUserByEmail(email: string): IMockUser;
+export declare function updateUser(uid: string, update: Partial<IMockUser>): void;
+export declare function allUsers(): IMockUser[];
+export declare function removeUser(uid: string): void;
+export declare function authProviders(): ("emailPassword" | "phone" | "google" | "playGames" | "gameCenter" | "facebook" | "twitter" | "github" | "yahoo" | "microsoft" | "apple" | "anonymous")[];

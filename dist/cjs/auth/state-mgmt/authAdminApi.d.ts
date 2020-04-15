@@ -1,32 +1,10 @@
-import { User, IMockAuthConfig, IEmailUser } from "../../@types/index";
-export declare function clearAuthUsers(): void;
+import { User } from "../../@types/index";
 export declare type Observer = (user: User | null) => any;
 export declare type IMockAdminApi = typeof authAdminApi;
 /**
  * primary API for administrating the MOCK state/config
  */
 export declare const authAdminApi: {
-    /**
-     * Updates the Auth configuration
-     *
-     * @param config the new config parameters passed in
-     */
-    configureAuth(config: IMockAuthConfig): void;
-    getValidEmailUsers(): IEmailUser[];
-    getAuthConfig(): IMockAuthConfig;
-    addUserToAuth(u: import("@firebase/auth-types").User, p: string): void;
-    /**
-     * Updates a given user identified in the `validEmailUser` dictionary
-     *
-     * @param email the email which identifies the user
-     * @param updates a _partial_ `IEmailUser` that non-destructively is used for updating
-     */
-    updateEmailUser(email: string, updates: Partial<IEmailUser>): void;
-    /**
-     * For an already existing user in the Auth user pool, allows
-     * the addition of _custom claims_.
-     */
-    grantUserCustomClaims(email: string, claims: string[]): void;
     /**
      * State explicitly what UID an anonymous user
      * should get; if not stated the default is to

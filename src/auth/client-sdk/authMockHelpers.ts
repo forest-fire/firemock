@@ -1,9 +1,10 @@
 import { authAdminApi } from "../state-mgmt/authAdminApi";
 import { User } from "@firebase/auth-types";
 import { validate } from "email-validator";
+import { allUsers, authProviders } from "../state-mgmt";
 
 export function emailExistsAsUserInAuth(email: string) {
-  const emails = authAdminApi.getValidEmailUsers().map(i => i.email);
+  const emails = allUsers().map(i => i.email);
 
   return emails.includes(email);
 }
@@ -13,18 +14,18 @@ export function emailIsValidFormat(email: string) {
 }
 
 export function emailHasCorrectPassword(email: string, password: string) {
-  const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
+  const config = allUsers().find(i => i.email === email);
 
   return config ? config.password === password : false;
 }
 
 export function emailVerified(email: string) {
-  const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
-  return config ? config.verified || false : false;
+  const user = allUsers().find(i => i.email === email);
+  return user ? user.emailVerified || false : false;
 }
 
 export function userUid(email: string) {
-  const config = authAdminApi.getValidEmailUsers().find(i => i.email === email);
+  const config = allUsers().find(i => i.email === email);
 
   return config ? config.uid || createUid() : createUid();
 }
@@ -37,7 +38,7 @@ export function createUid() {
 }
 
 export function emailValidationAllowed() {
-  return authAdminApi.getAuthConfig().allowEmailLogins;
+  return authProviders().includes("emailPassword");
 }
 
 export function loggedIn(user: User) {

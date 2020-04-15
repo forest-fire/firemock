@@ -3,17 +3,6 @@ import { createUid } from "../client-sdk/authMockHelpers";
 import { FireMockError } from "../../errors/FireMockError";
 import { User, IMockAuthConfig, IEmailUser } from "../../@types/index";
 
-/**
- * The **Auth** configuration dictionary
- */
-let authConfig: IMockAuthConfig = {
-  allowAnonymous: true
-};
-
-export function clearAuthUsers() {
-  authConfig.validEmailUsers = [];
-}
-
 let ANONYMOUS_USER_ID: string;
 
 export type Observer = (user: User | null) => any;
@@ -34,65 +23,6 @@ export type IMockAdminApi = typeof authAdminApi;
  * primary API for administrating the MOCK state/config
  */
 export const authAdminApi = {
-  /**
-   * Updates the Auth configuration
-   *
-   * @param config the new config parameters passed in
-   */
-  configureAuth(config: IMockAuthConfig) {
-    authConfig = { ...authConfig, ...config };
-  },
-
-  getValidEmailUsers(): IEmailUser[] {
-    return authConfig.validEmailUsers || [];
-  },
-
-  getAuthConfig(): IMockAuthConfig {
-    return authConfig;
-  },
-
-  addUserToAuth(u: User, p: string) {
-    authConfig.validEmailUsers.push({
-      email: u.email,
-      password: p,
-      uid: u.uid,
-      verified: u.emailVerified
-    });
-  },
-
-  /**
-   * Updates a given user identified in the `validEmailUser` dictionary
-   *
-   * @param email the email which identifies the user
-   * @param updates a _partial_ `IEmailUser` that non-destructively is used for updating
-   */
-  updateEmailUser(email: string, updates: Partial<IEmailUser>) {
-    let found = false;
-    authConfig.validEmailUsers = authConfig.validEmailUsers.map(i => {
-      if (i.email === email) {
-        found = true;
-        return { ...i, ...updates };
-      }
-
-      return i;
-    });
-
-    if (!found) {
-      throw new FireMockError(
-        `Attempt to update email [${email}] failed because that user was not a known user email!`,
-        "auth/not-found"
-      );
-    }
-  },
-
-  /**
-   * For an already existing user in the Auth user pool, allows
-   * the addition of _custom claims_.
-   */
-  grantUserCustomClaims(email: string, claims: string[]) {
-    authAdminApi.updateEmailUser(email, { claims });
-  },
-
   /**
    * State explicitly what UID an anonymous user
    * should get; if not stated the default is to

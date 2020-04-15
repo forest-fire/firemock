@@ -1,11 +1,10 @@
 import { authAdminApi } from "../../state-mgmt/authAdminApi";
 import { atRandom } from "../../../shared/atRandom";
+import { allUsers } from "../../state-mgmt";
 
 export async function getIdToken() {
   const user = authAdminApi.getCurrentUser();
-  const userConfig = authAdminApi
-    .getAuthConfig()
-    .validEmailUsers.find(i => i.email === user.email);
+  const userConfig = allUsers().find(i => i.email === user.email);
 
   if (!user) {
     throw new Error("not logged in");

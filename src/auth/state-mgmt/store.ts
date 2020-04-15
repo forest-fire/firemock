@@ -1,8 +1,6 @@
 import { IMockUser, IMockAuthConfig, IAuthProvider } from "../../@types";
 import { pk } from "common-types";
-import { atRandom } from "../../shared/atRandom";
 import { FireMockError } from "../../errors/FireMockError";
-import { networkDelay } from "../../util";
 
 /**
  * The recognized users in the mock Auth system
@@ -29,6 +27,10 @@ export function initializeAuth(config: IMockAuthConfig) {
 
 export function currentUser() {
   return _currentUser ? _users.find(u => u.uid === _currentUser) : undefined;
+}
+
+export function clearAuthUsers() {
+  _users = [];
 }
 
 export function addUser(user: Partial<IMockUser>) {
@@ -69,6 +71,10 @@ export function updateUser(uid: string, update: Partial<IMockUser>) {
   _users = _users.map(u => (u.uid === uid ? { ...u, ...update } : u));
 }
 
+export function allUsers() {
+  return _users;
+}
+
 export function removeUser(uid: string) {
   if (!_users.find(u => u.uid === uid)) {
     throw new FireMockError(
@@ -76,4 +82,8 @@ export function removeUser(uid: string) {
     );
   }
   _users = _users.filter(u => u.uid !== uid);
+}
+
+export function authProviders() {
+  return _providers;
 }

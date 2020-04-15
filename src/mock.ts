@@ -10,7 +10,11 @@ import {
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { authAdminApi, clearAuthUsers } from "./auth/state-mgmt/authAdminApi";
+import {
+  authAdminApi,
+  clearAuthUsers,
+  initializeAuth
+} from "./auth/state-mgmt";
 import { FireMockError } from "./errors/FireMockError";
 import {
   IRelationship,
@@ -40,13 +44,6 @@ export class Mock {
      * DB to be setup via mocking.
      */
   ) {
-    const defaultAuthConfig: IMockAuthConfig = {
-      allowAnonymous: true,
-      allowEmailLogins: false,
-      allowEmailLinks: false,
-      allowPhoneLogins: false,
-      validEmailUsers: []
-    };
     const defaultDbConfig = {};
     const obj = new Mock(
       options.db
@@ -55,8 +52,6 @@ export class Mock {
           : options.db || defaultDbConfig
         : defaultDbConfig,
       options.auth
-        ? { ...defaultAuthConfig, ...options.auth }
-        : defaultAuthConfig
     );
     if (typeof options.db === "function") {
       obj.updateDB(await (options.db as AsyncMockData)(obj));
@@ -94,10 +89,8 @@ export class Mock {
      */
     dataOrMock?: IDictionary | IMockSetup,
     authConfig: IMockAuthConfig = {
-      allowAnonymous: true,
-      allowEmailLogins: false,
-      allowEmailLinks: false,
-      allowPhoneLogins: false
+      providers: ["anonymous"],
+      users: []
     }
   ) {
     Queue.clearAll();
@@ -110,7 +103,7 @@ export class Mock {
       this._mockInitializer = dataOrMock(this) as IMockSetup;
     }
 
-    authAdminApi.configureAuth(authConfig);
+    initializeAuth(authConfig);
   }
 
   /**

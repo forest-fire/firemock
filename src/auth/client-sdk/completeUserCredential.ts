@@ -12,6 +12,7 @@ import { authAdminApi } from "../state-mgmt/authAdminApi";
 import merge from "deepmerge";
 import { atRandom } from "../../shared/atRandom";
 import { updateEmail, updatePassword, getIdToken } from "./UserObject";
+import { allUsers } from "../state-mgmt";
 
 /**
  * takes a partial user auth and adds enough to make it officially
@@ -45,9 +46,7 @@ export function completeUserCredential(
       async getIdTokenResult() {
         const user =
           partial.user && partial.user.uid
-            ? authAdminApi
-                .getValidEmailUsers()
-                .find(i => i.uid === partial.user.uid)
+            ? allUsers().find(i => i.uid === partial.user.uid)
             : undefined;
         const token =
           user && user.tokenIds ? atRandom(user.tokenIds) : "random-token";
