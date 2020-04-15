@@ -1,4 +1,4 @@
-import { authAdminApi } from "../../authAdminApi";
+import { authAdminApi } from "../../state-mgmt/authAdminApi";
 import { atRandom } from "../../../shared/atRandom";
 
 export async function getIdToken() {

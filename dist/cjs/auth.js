@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("./util");
-const authAdminApi_1 = require("./auth/authAdminApi");
-const authMock_1 = require("./auth/authMock");
+const authAdminApi_1 = require("./auth/state-mgmt/authAdminApi");
+const authMock_1 = require("./auth/client-sdk/authMock");
 let hasConnectedToAuthService = false;
 exports.auth = async () => {
     if (hasConnectedToAuthService) {

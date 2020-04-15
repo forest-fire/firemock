@@ -1,3 +1,5 @@
 import { Auth } from "./index";
 
-export const notImplemented: Partial<Auth> = {};
+export const notImplemented: Partial<Auth> = {
+  //
+};

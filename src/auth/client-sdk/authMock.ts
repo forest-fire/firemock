@@ -6,7 +6,7 @@ import {
   IPartialUserCredential
 } from "../../@types/auth-types";
 import { networkDelay } from "../../util";
-import { authAdminApi, Observer } from "../authAdminApi";
+import { authAdminApi, Observer } from "../state-mgmt/authAdminApi";
 import { completeUserCredential } from "./completeUserCredential";
 import { Omit } from "common-types";
 import { notImplemented } from "./notImplemented";

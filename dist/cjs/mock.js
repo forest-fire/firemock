@@ -15,9 +15,9 @@ const database_1 = require("./database");
 const util_1 = require("./util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("./auth");
-const authAdminApi_1 = require("./auth/authAdminApi");
+const authAdminApi_1 = require("./auth/state-mgmt/authAdminApi");
 const FireMockError_1 = require("./errors/FireMockError");
-const AuthProviders_1 = __importDefault(require("./auth/AuthProviders"));
+const AuthProviders_1 = __importDefault(require("./auth/client-sdk/AuthProviders"));
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(

@@ -8,7 +8,7 @@ import {
   AuthProvider,
   ActionCodeSettings
 } from "@firebase/auth-types";
-import { authAdminApi } from "../authAdminApi";
+import { authAdminApi } from "../state-mgmt/authAdminApi";
 import merge from "deepmerge";
 import { atRandom } from "../../shared/atRandom";
 import { updateEmail, updatePassword, getIdToken } from "./UserObject";

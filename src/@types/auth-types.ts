@@ -12,7 +12,7 @@ export interface IAuthProviders {
   EmailAuthProvider: EmailAuthProvider;
 }
 
-import { IMockAdminApi } from "../auth/authAdminApi";
+import { IMockAdminApi } from "../auth/state-mgmt/authAdminApi";
 import { Mock, IDictionary } from "../index";
 import { EmailAuthProvider } from "@firebase/auth-types";
 

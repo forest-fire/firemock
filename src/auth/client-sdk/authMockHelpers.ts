@@ -1,4 +1,4 @@
-import { authAdminApi } from "../authAdminApi";
+import { authAdminApi } from "../state-mgmt/authAdminApi";
 import { User } from "@firebase/auth-types";
 import { validate } from "email-validator";
 
