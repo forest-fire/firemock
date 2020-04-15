@@ -15,6 +15,7 @@ export interface IAuthProviders {
 import { IMockAdminApi } from "../auth/state-mgmt/authAdminApi";
 import { Mock, IDictionary } from "../index";
 import { EmailAuthProvider } from "@firebase/auth-types";
+import { UserRecord } from "../auth/admin-sdk";
 
 export type UserCredential = import("@firebase/auth-types").UserCredential;
 export type User = import("@firebase/auth-types").User;
@@ -66,6 +67,8 @@ export interface IMockAuth extends FirebaseAuth, IMockAdminApi {}
  * The configuration of the **Auth** mocking service
  */
 export interface IMockAuthConfig {
+  providers: IAuthProvider[];
+  users?: IMockUser[];
   /**
    * create a set of users who are deemed valid for email/password
    * login; this will be used for email logins as well as email links.
@@ -82,4 +85,48 @@ export interface IMockAuthConfig {
   allowEmailLinks?: boolean;
   /** allow logins via a code sent via SMS */
   allowPhoneLogins?: boolean;
+}
+
+export const enum AuthProvider {
+  emailPassword = "emailPassword",
+  phone = "phone",
+  google = "google",
+  playGames = "playGames",
+  gameCenter = "gameCenter",
+  facebook = "facebook",
+  twitter = "twitter",
+  github = "github",
+  yahoo = "yahoo",
+  microsoft = "microsoft",
+  apple = "apple",
+  anonymous = "anonymous"
+}
+
+export type IAuthProvider = keyof typeof AuthProvider;
+
+export interface IMockUser extends UserRecord {
+  /** optionally set a fixed UID for this user */
+  uid: string;
+  /** optionally give the user a set of claims */
+  claims?: IDictionary;
+  /**
+   * Optionally state token Ids which should be returned when calling
+   * the `getTokenId()` method. This is useful if you have an associated
+   * set of "valid (or invalid) tokens" in your testing environment.
+   */
+  tokenIds?: string[];
+
+  displayName?: string;
+  disabled: boolean;
+
+  phoneNumber?: string | null;
+  photoURL?: string | null;
+
+  email?: string;
+  password: string;
+  /**
+   * indicates whether the user has _verified_ their email ownership by clicking
+   * on the verification link
+   */
+  emailVerified: boolean;
 }
