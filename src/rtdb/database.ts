@@ -1,16 +1,22 @@
 // tslint:disable:no-implicit-dependencies
 import { IDictionary, pathJoin } from "common-types";
-import { IListener } from "./query";
+import { IListener } from "../rtdb/query";
 import set from "lodash.set";
 import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
 import copy from "fast-copy";
-import { join, getParent, getKey, stripLeadingDot, removeDots } from "./util";
-import { SnapShot, IMockWatcherGroupEvent, Query, Reference } from "./index";
+import {
+  join,
+  getParent,
+  getKey,
+  stripLeadingDot,
+  removeDots
+} from "../shared/util";
+import { SnapShot, IMockWatcherGroupEvent, Query, Reference } from "../index";
 import { DataSnapshot, EventType } from "@firebase/database-types";
-import { auth as mockedAuth } from "./auth";
-import { IFirebaseEventHandler } from "./@types/db-types";
+import { auth as mockedAuth } from "../auth";
+import { IFirebaseEventHandler } from "../@types/db-types";
 import deepmerge from "deepmerge";
 import { SerializedQuery } from "serialized-query";
 import { hashToArray } from "typed-conversions";

@@ -2,7 +2,7 @@ import { IDictionary } from "common-types";
 import { IRelationship } from "./index";
 import Queue from "./queue";
 import SchemaHelper from "./schema-helper";
-import pluralize, { addException } from "./pluralize";
+import pluralize, { addException } from "./shared/pluralize";
 
 export interface ISchema {
   id: string;
@@ -47,7 +47,9 @@ export default class Schema<T = any> {
         const schema: ISchema = this._schemas.find(this.schemaId);
         return [
           schema.prefix,
-          schema.modelName ? pluralize(schema.modelName) : pluralize(this.schemaId)
+          schema.modelName
+            ? pluralize(schema.modelName)
+            : pluralize(this.schemaId)
         ].join("/");
       }
     });
@@ -69,7 +71,8 @@ export default class Schema<T = any> {
   /** prefixes a static path to the beginning of the  */
   public pathPrefix(prefix: string) {
     prefix = prefix.replace(/\./g, "/"); // slash reference preferred over dot
-    prefix = prefix.slice(-1) === "/" ? prefix.slice(0, prefix.length - 1) : prefix;
+    prefix =
+      prefix.slice(-1) === "/" ? prefix.slice(0, prefix.length - 1) : prefix;
 
     this._schemas.update(this.schemaId, { prefix });
 

@@ -15,7 +15,7 @@ import {
   removeDB,
   multiPathUpdateDB
 } from "./database";
-import { parts, join, slashNotation, networkDelay } from "./util";
+import { parts, join, slashNotation, networkDelay } from "../shared/util";
 
 function isMultiPath(data: IDictionary) {
   Object.keys(data).map((d: any) => {

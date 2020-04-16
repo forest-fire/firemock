@@ -4,14 +4,12 @@ import {
   EventType,
   Reference as IReference
 } from "@firebase/database-types";
-import { db, addListener, getDb } from "./database";
-import get from "lodash.get";
+import { addListener, getDb } from "./database";
 import SnapShot from "./snapshot";
-import * as convert from "typed-conversions";
 import Reference from "./reference";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { join, leafNode, DelayType, networkDelay } from "./util";
-import { runQuery } from "./shared/runQuery";
+import { join, leafNode, DelayType, networkDelay } from "../shared/util";
+import { runQuery } from "../shared/runQuery";
 import { IDictionary } from "common-types";
 
 export type EventHandler =

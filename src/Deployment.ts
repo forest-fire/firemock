@@ -4,10 +4,10 @@ import set from "lodash.set";
 import get from "lodash.get";
 import first from "lodash.first";
 import { IRelationship, ISchema, IQueue } from "./index";
-import { getRandomInt, dotNotation } from "./util";
+import { getRandomInt, dotNotation } from "./shared/util";
 import Queue from "./queue";
-import pluralize from "./pluralize";
-import { db } from "./database";
+import pluralize from "./shared/pluralize";
+import { db } from "./rtdb/database";
 
 export default class Deployment {
   private schemaId: string;
@@ -60,15 +60,11 @@ export default class Deployment {
 
     if (hasMany.length === 0) {
       console.log(
-        `Attempt to quantify "hasMany" relationships with schema "${
-          this.schemaId
-        }" is not possible; no such relationships exist`
+        `Attempt to quantify "hasMany" relationships with schema "${this.schemaId}" is not possible; no such relationships exist`
       );
     } else if (targetted.length === 0) {
       console.log(
-        `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${
-          this.schemaId
-        }" model`
+        `The "${targetSchema}" schema does not have a "hasMany" relationship with the "${this.schemaId}" model`
       );
     } else {
       const queue = this._queue.find(this.queueId);
@@ -144,7 +140,9 @@ export default class Deployment {
   }
 
   private insertRelationshipLinks(queue: IQueue) {
-    const relationships = this._relationships.filter(r => r.source === queue.schema);
+    const relationships = this._relationships.filter(
+      r => r.source === queue.schema
+    );
     const belongsTo = relationships.filter(r => r.type === "belongsTo");
     const hasMany = relationships.filter(r => r.type === "hasMany");
 
@@ -188,7 +186,8 @@ export default class Deployment {
     });
 
     hasMany.forEach(r => {
-      const fulfill = Object.keys(queue.hasMany || {}).indexOf(r.sourceProperty) !== -1;
+      const fulfill =
+        Object.keys(queue.hasMany || {}).indexOf(r.sourceProperty) !== -1;
       const howMany = fulfill ? queue.hasMany[r.sourceProperty] : 0;
 
       const source = this._schemas.find(r.source);
@@ -223,11 +222,19 @@ export default class Deployment {
       const property = r.sourceProperty;
 
       const path = source.path();
-      const sourceRecords: IDictionary = get(db, dotNotation(source.path()), {});
+      const sourceRecords: IDictionary = get(
+        db,
+        dotNotation(source.path()),
+        {}
+      );
 
       Object.keys(sourceRecords).forEach(key => {
         for (let i = 1; i <= howMany; i++) {
-          set(db, `${dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
+          set(
+            db,
+            `${dotNotation(source.path())}.${key}.${property}.${getID()}`,
+            true
+          );
         }
       });
     });

@@ -5,9 +5,7 @@ import { Mock } from "../src";
 import {
   authProviders,
   setCurrentUser,
-  setDefaultAnonymousUid,
-  allUsers,
-  getAnonymousUid
+  setDefaultAnonymousUid
 } from "../src/auth/state-mgmt";
 
 const expect = chai.expect;

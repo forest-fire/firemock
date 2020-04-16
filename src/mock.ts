@@ -6,8 +6,8 @@ import {
   updateDatabase,
   silenceEvents,
   restoreEvents
-} from "./database";
-import { DelayType, setNetworkDelay } from "./util";
+} from "./rtdb/database";
+import { DelayType, setNetworkDelay } from "./shared/util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
 import { clearAuthUsers, initializeAuth } from "./auth/state-mgmt";

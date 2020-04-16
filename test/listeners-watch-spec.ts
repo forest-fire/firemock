@@ -13,7 +13,7 @@ import {
   clearDatabase,
   listenerCount,
   reset
-} from "../src/database";
+} from "../src/rtdb/database";
 import { wait } from "common-types";
 import { SerializedQuery } from "serialized-query";
 

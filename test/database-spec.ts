@@ -19,8 +19,8 @@ import {
   findValueListeners,
   reset,
   getDb
-} from "../src/database";
-import { GenericEventHandler, HandleValueEvent } from "../src/query";
+} from "../src/rtdb/database";
+import { GenericEventHandler, HandleValueEvent } from "../src/rtdb/query";
 import "mocha";
 import { wait, IDictionary } from "common-types";
 

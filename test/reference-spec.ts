@@ -5,8 +5,14 @@ import * as helpers from "./testing/helpers";
 import { Mock, SchemaCallback } from "../src";
 import SchemaHelper from "../src/schema-helper";
 import { difference } from "lodash";
-import { reset } from "../src/database";
-import { firstProp, lastProp, firstKey, lastKey, Delays } from "../src/util";
+import { reset } from "../src/rtdb/database";
+import {
+  firstProp,
+  lastProp,
+  firstKey,
+  lastKey,
+  Delays
+} from "../src/shared/util";
 import * as convert from "typed-conversions";
 
 import "mocha";
