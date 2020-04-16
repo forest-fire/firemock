@@ -64,7 +64,7 @@ export default class SnapShot<T = any> implements DataSnapshot {
   }
 
   public exists(): boolean {
-    return this._value !== null;
+    return this._value !== null && this._value !== undefined;
   }
 
   public forEach(actionCb: Action) {
