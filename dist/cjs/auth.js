@@ -1,8 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const util_1 = require("./util");
-const authAdminApi_1 = require("./auth/authAdminApi");
-const authMock_1 = require("./auth/authMock");
+const implemented_1 = require("./auth/client-sdk/implemented");
 let hasConnectedToAuthService = false;
 exports.auth = async () => {
     if (hasConnectedToAuthService) {
@@ -13,5 +12,5 @@ exports.auth = async () => {
     return exports.authApi;
 };
 // tslint:disable-next-line:no-object-literal-type-assertion
-exports.authApi = Object.assign(Object.assign({}, authMock_1.authMockApi), authAdminApi_1.authAdminApi);
+exports.authApi = Object.assign({}, implemented_1.implemented);
 //# sourceMappingURL=auth.js.map

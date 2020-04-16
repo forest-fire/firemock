@@ -1,0 +1,1 @@
+{"version":3,"file":"updateProfile.js","sourceRoot":"","sources":["../../../../../src/auth/client-sdk/UserObject/updateProfile.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,UAAU,EAAE,WAAW,EAAE,MAAM,kBAAkB,CAAC;AAE3D;;;;;;;;;;;;;GAaG;AACH,MAAM,CAAC,KAAK,UAAU,aAAa,CAAC,OAGnC;IACC,UAAU,CAAC,WAAW,EAAE,CAAC,GAAG,EAAE,OAAO,CAAC,CAAC;AACzC,CAAC"}

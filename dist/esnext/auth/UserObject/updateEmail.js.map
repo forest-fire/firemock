@@ -1,1 +1,0 @@
-{"version":3,"file":"updateEmail.js","sourceRoot":"","sources":["../../../../src/auth/UserObject/updateEmail.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,MAAM,4BAA4B,CAAC;AAE3D;;;;;;;;;;;;;;;GAeG;AACH,MAAM,CAAC,KAAK,UAAU,WAAW,CAC/B,QAAgB,EAChB,UAAoB;IAEpB,IAAI,UAAU,EAAE;QACd,MAAM,IAAI,aAAa,CACrB,2IAA2I,EAC3I,4BAA4B,CAC7B,CAAC;KACH;AACH,CAAC"}

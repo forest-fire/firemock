@@ -14,7 +14,7 @@ export {
 } from "./database";
 export { IDictionary } from "common-types";
 export { MockHelper } from "./MockHelper";
-export * from "./auth/index";
+export * from "./auth/client-sdk/index";
 export * from "./@types/index";
 export { getMockHelper } from "./getMockHelper";
 

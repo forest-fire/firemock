@@ -12,7 +12,7 @@ module.exports = {
     "@vuepress/medium-zoom": true,
     autometa: {
       site: {
-        name: "Abstracted Admin"
+        name: "Firemock"
       },
       canonical_base: "https://abstracted-admin.com",
       author: {
@@ -21,8 +21,9 @@ module.exports = {
       }
     }
   },
-  title: "Abstracted Firebase",
-  description: "A simple wrapper for Firebase SDK's (with a view toward mocking)",
+  title: "Firemock",
+  description:
+    "A simple wrapper for Firebase SDK's (with a view toward mocking)",
   head: [
     ["meta", { name: "apple-mobile-web-app-capable", content: "yes" }],
     ["meta", { name: "application-name", content: "FireModel" }],
@@ -53,11 +54,26 @@ module.exports = {
         sizes: "48x48"
       }
     ],
-    ["link", { rel: "icon", href: "/icon/icon-rounded-32.png", sizes: "32x32" }],
-    ["link", { rel: "icon", href: "/icon/icon-rounded-48.png", sizes: "48x48" }],
-    ["link", { rel: "icon", href: "/icon/icon-rounded-192.png", sizes: "192x192" }],
-    ["link", { rel: "icon", href: "/icon/icon-rounded-225.png", sizes: "225x225" }],
-    ["link", { rel: "icon", href: "/icon/icon-rounded-512.png", sizes: "512x512" }],
+    [
+      "link",
+      { rel: "icon", href: "/icon/icon-rounded-32.png", sizes: "32x32" }
+    ],
+    [
+      "link",
+      { rel: "icon", href: "/icon/icon-rounded-48.png", sizes: "48x48" }
+    ],
+    [
+      "link",
+      { rel: "icon", href: "/icon/icon-rounded-192.png", sizes: "192x192" }
+    ],
+    [
+      "link",
+      { rel: "icon", href: "/icon/icon-rounded-225.png", sizes: "225x225" }
+    ],
+    [
+      "link",
+      { rel: "icon", href: "/icon/icon-rounded-512.png", sizes: "512x512" }
+    ],
     ["link", { rel: "manifest", href: "manifest.json" }],
     [
       "link",
@@ -124,8 +140,14 @@ module.exports = {
       }
     ],
 
-    ["link", { rel: "apple-touch-icon", href: "touch-icon-iphone", sizes: "120x120" }],
-    ["link", { rel: "apple-touch-icon", sizes: "152x152", href: "touch-icon-ipad" }],
+    [
+      "link",
+      { rel: "apple-touch-icon", href: "touch-icon-iphone", sizes: "120x120" }
+    ],
+    [
+      "link",
+      { rel: "apple-touch-icon", sizes: "152x152", href: "touch-icon-ipad" }
+    ],
     [
       "link",
       {
