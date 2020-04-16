@@ -1,7 +1,6 @@
 import { networkDelay } from "./util";
 import { IMockAuth } from "./@types/auth-types";
-import { authAdminApi } from "./auth/state-mgmt/authAdminApi";
-import { authMockApi } from "./auth/client-sdk/authMock";
+import { implemented } from "./auth/client-sdk/implemented";
 
 let hasConnectedToAuthService: boolean = false;
 
@@ -18,6 +17,5 @@ export const auth = async (): Promise<typeof authApi> => {
 
 // tslint:disable-next-line:no-object-literal-type-assertion
 export const authApi = {
-  ...authMockApi,
-  ...authAdminApi
+  ...implemented
 } as IMockAuth;

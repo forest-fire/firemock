@@ -1,2 +1,2 @@
-import { Auth } from "./index";
+import { Auth } from ".";
 export declare const implemented: Partial<Auth>;

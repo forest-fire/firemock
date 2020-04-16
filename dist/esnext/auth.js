@@ -1,6 +1,5 @@
 import { networkDelay } from "./util";
-import { authAdminApi } from "./auth/authAdminApi";
-import { authMockApi } from "./auth/authMock";
+import { implemented } from "./auth/client-sdk/implemented";
 let hasConnectedToAuthService = false;
 export const auth = async () => {
     if (hasConnectedToAuthService) {
@@ -11,5 +10,5 @@ export const auth = async () => {
     return authApi;
 };
 // tslint:disable-next-line:no-object-literal-type-assertion
-export const authApi = Object.assign(Object.assign({}, authMockApi), authAdminApi);
+export const authApi = Object.assign({}, implemented);
 //# sourceMappingURL=auth.js.map

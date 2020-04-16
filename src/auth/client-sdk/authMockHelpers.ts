@@ -1,7 +1,11 @@
-import { authAdminApi } from "../state-mgmt/authAdminApi";
 import { User } from "@firebase/auth-types";
 import { validate } from "email-validator";
-import { allUsers, authProviders } from "../state-mgmt";
+import {
+  allUsers,
+  authProviders,
+  getRandomMockUid,
+  getAuthObservers
+} from "../state-mgmt";
 
 export function emailExistsAsUserInAuth(email: string) {
   const emails = allUsers().map(i => i.email);
@@ -27,14 +31,7 @@ export function emailVerified(email: string) {
 export function userUid(email: string) {
   const config = allUsers().find(i => i.email === email);
 
-  return config ? config.uid || createUid() : createUid();
-}
-
-export function createUid() {
-  // example: 0CMjMW6vWQePd3zVmap78mHCxst1
-  return Math.random()
-    .toString(36)
-    .substr(2, 28);
+  return config ? config.uid || getRandomMockUid() : getRandomMockUid();
 }
 
 export function emailValidationAllowed() {
@@ -42,9 +39,9 @@ export function emailValidationAllowed() {
 }
 
 export function loggedIn(user: User) {
-  authAdminApi.getAuthObservers().map(o => o(user));
+  getAuthObservers().map(o => o(user));
 }
 
 export function loggedOut() {
-  authAdminApi.getAuthObservers().map(o => o(null));
+  getAuthObservers().map(o => o(null));
 }

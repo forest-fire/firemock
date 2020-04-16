@@ -1,9 +1,7 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
-__export(require("../state-mgmt/authAdminApi"));
-__export(require("./completeUserCredential"));
-__export(require("./notImplemented"));
+const notImplemented_1 = require("./notImplemented");
+const implemented_1 = require("./implemented");
+// tslint:disable-next-line:no-object-literal-type-assertion
+exports.authMockApi = Object.assign(Object.assign({}, notImplemented_1.notImplemented), implemented_1.implemented);
 //# sourceMappingURL=index.js.map

@@ -1,9 +1,8 @@
-import { authAdminApi } from "../../../state-mgmt/authAdminApi";
 import { atRandom } from "../../../../shared/atRandom";
-import { allUsers } from "../../../state-mgmt";
+import { allUsers, currentUser } from "../../../state-mgmt";
 
 export async function getIdToken() {
-  const user = authAdminApi.getCurrentUser();
+  const user = currentUser();
   const userConfig = allUsers().find(i => i.email === user.email);
 
   if (!user) {

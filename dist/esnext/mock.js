@@ -3,9 +3,9 @@ import { db, clearDatabase, updateDatabase, silenceEvents, restoreEvents } from 
 import { setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import { authAdminApi, clearAuthUsers } from "./auth/authAdminApi";
+import { clearAuthUsers, initializeAuth } from "./auth/state-mgmt";
 import { FireMockError } from "./errors/FireMockError";
-import authProviders from "./auth/AuthProviders";
+import authProviders from "./auth/client-sdk/AuthProviders";
 export let faker;
 /* tslint:disable:max-classes-per-file */
 export class Mock {
@@ -17,10 +17,8 @@ export class Mock {
      * DB to be setup via mocking.
      */
     dataOrMock, authConfig = {
-        allowAnonymous: true,
-        allowEmailLogins: false,
-        allowEmailLinks: false,
-        allowPhoneLogins: false
+        providers: ["anonymous"],
+        users: []
     }) {
         this._schemas = new Queue("schemas").clear();
         this._relationships = new Queue("relationships").clear();
@@ -34,7 +32,7 @@ export class Mock {
         if (dataOrMock && typeof dataOrMock === "function") {
             this._mockInitializer = dataOrMock(this);
         }
-        authAdminApi.configureAuth(authConfig);
+        initializeAuth(authConfig);
     }
     /**
      * returns a Mock object while also ensuring that the
@@ -48,20 +46,12 @@ export class Mock {
      * DB to be setup via mocking.
      */
     ) {
-        const defaultAuthConfig = {
-            allowAnonymous: true,
-            allowEmailLogins: false,
-            allowEmailLinks: false,
-            allowPhoneLogins: false,
-            validEmailUsers: []
-        };
         const defaultDbConfig = {};
         const obj = new Mock(options.db
             ? typeof options.db === "function"
                 ? {}
                 : options.db || defaultDbConfig
-            : defaultDbConfig, options.auth
-            ? Object.assign(Object.assign({}, defaultAuthConfig), options.auth) : defaultAuthConfig);
+            : defaultDbConfig, options.auth);
         if (typeof options.db === "function") {
             obj.updateDB(await options.db(obj));
         }

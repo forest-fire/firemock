@@ -5,11 +5,31 @@ import {
   UpdateRequest,
   ListUsersResult
 } from "..";
+import { addUser } from "../../state-mgmt";
 
 export const users: Partial<Auth> = {
   // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
   async createUser(properties: CreateRequest): Promise<UserRecord> {
-    return;
+    addUser({
+      password: Math.random()
+        .toString(36)
+        .substr(2, 10),
+      multiFactor: null as any,
+      ...properties
+    });
+    return {
+      ...(properties as Required<CreateRequest>),
+      metadata: {
+        lastSignInTime: null,
+        creationTime: String(new Date()),
+        toJSON() {
+          return {};
+        }
+      },
+      multiFactor: null as any,
+      toJSON: () => properties,
+      providerData: null as any
+    };
   },
   /** Updates an existing user. */
   async updateUser(

@@ -3,16 +3,12 @@
  * parts are un-implementated currently) as well as extending
  * to add an "administrative" API for mocking
  */
-export interface IMockAuth
-  extends FirebaseAuth,
-    IMockAdminApi,
-    IAuthProviders {}
+export interface IMockAuth extends FirebaseAuth, IAuthProviders {}
 
 export interface IAuthProviders {
   EmailAuthProvider: EmailAuthProvider;
 }
 
-import { IMockAdminApi } from "../auth/state-mgmt/authAdminApi";
 import { Mock, IDictionary } from "../index";
 import { EmailAuthProvider } from "@firebase/auth-types";
 import { UserRecord } from "../auth/admin-sdk";
@@ -20,11 +16,14 @@ import { UserRecord } from "../auth/admin-sdk";
 export type UserCredential = import("@firebase/auth-types").UserCredential;
 export type User = import("@firebase/auth-types").User;
 export type AuthSettings = import("@firebase/auth-types").AuthSettings;
-
 export type AuthCredential = import("@firebase/auth-types").AuthCredential;
+export type AuthProvider = import("@firebase/auth-types").AuthProvider;
 export type AdditionalUserInfo = import("@firebase/auth-types").AdditionalUserInfo;
 export type FirebaseAuth = import("@firebase/auth-types").FirebaseAuth;
 export type FirebaseApp = import("@firebase/app-types").FirebaseApp;
+export type IdTokenResult = import("@firebase/auth-types").IdTokenResult;
+export type ApplicationVerifier = import("@firebase/auth-types").ApplicationVerifier;
+export type ActionCodeSettings = import("@firebase/auth-types").ActionCodeSettings;
 
 /**
  * Create a user in the Auth system which can be logged in via the
@@ -61,33 +60,17 @@ export interface IPartialUserCredential {
  * parts are un-implementated currently) as well as extending
  * to add an "administrative" API for mocking
  */
-export interface IMockAuth extends FirebaseAuth, IMockAdminApi {}
+export interface IMockAuth extends FirebaseAuth {}
 
 /**
  * The configuration of the **Auth** mocking service
  */
 export interface IMockAuthConfig {
-  providers: IAuthProvider[];
-  users?: IMockUser[];
-  /**
-   * create a set of users who are deemed valid for email/password
-   * login; this will be used for email logins as well as email links.
-   *
-   * **Note:** if you set this without setting `allowEmailLogins` to true
-   * it will throw a `firemock/invalid-configuration` error.
-   */
-  validEmailUsers?: IEmailUser[];
-  /** allow anonymous logins */
-  allowAnonymous?: boolean;
-  /** allow email/password logins */
-  allowEmailLogins?: boolean;
-  /** allow logins via links sent to email */
-  allowEmailLinks?: boolean;
-  /** allow logins via a code sent via SMS */
-  allowPhoneLogins?: boolean;
+  providers: IAuthProviderName[];
+  users?: ISimplifiedMockUser[];
 }
 
-export const enum AuthProvider {
+export const enum AuthProviderName {
   emailPassword = "emailPassword",
   phone = "phone",
   google = "google",
@@ -102,11 +85,12 @@ export const enum AuthProvider {
   anonymous = "anonymous"
 }
 
-export type IAuthProvider = keyof typeof AuthProvider;
+export type IAuthProviderName = keyof typeof AuthProviderName;
 
 export interface IMockUser extends UserRecord {
   /** optionally set a fixed UID for this user */
   uid: string;
+  isAnonymous?: boolean;
   /** optionally give the user a set of claims */
   claims?: IDictionary;
   /**
@@ -123,10 +107,24 @@ export interface IMockUser extends UserRecord {
   photoURL?: string | null;
 
   email?: string;
-  password: string;
+  password?: string;
   /**
    * indicates whether the user has _verified_ their email ownership by clicking
    * on the verification link
    */
   emailVerified: boolean;
 }
+
+/**
+ * A basic configuration for a user that allows default values to fill in some of
+ * the non-essential properties which Firebase requires
+ */
+export type ISimplifiedMockUser = Omit<
+  IMockUser,
+  "emailVerified" | "disabled" | "uid" | "toJSON" | "providerData" | "metadata"
+> & {
+  emailVerified?: boolean;
+  disabled?: boolean;
+  uid?: string;
+  isAnonymous?: boolean;
+};

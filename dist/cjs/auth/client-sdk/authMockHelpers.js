@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const authAdminApi_1 = require("../state-mgmt/authAdminApi");
 const email_validator_1 = require("email-validator");
 const state_mgmt_1 = require("../state-mgmt");
 function emailExistsAsUserInAuth(email) {
@@ -24,26 +23,19 @@ function emailVerified(email) {
 exports.emailVerified = emailVerified;
 function userUid(email) {
     const config = state_mgmt_1.allUsers().find(i => i.email === email);
-    return config ? config.uid || createUid() : createUid();
+    return config ? config.uid || state_mgmt_1.getRandomMockUid() : state_mgmt_1.getRandomMockUid();
 }
 exports.userUid = userUid;
-function createUid() {
-    // example: 0CMjMW6vWQePd3zVmap78mHCxst1
-    return Math.random()
-        .toString(36)
-        .substr(2, 28);
-}
-exports.createUid = createUid;
 function emailValidationAllowed() {
     return state_mgmt_1.authProviders().includes("emailPassword");
 }
 exports.emailValidationAllowed = emailValidationAllowed;
 function loggedIn(user) {
-    authAdminApi_1.authAdminApi.getAuthObservers().map(o => o(user));
+    state_mgmt_1.getAuthObservers().map(o => o(user));
 }
 exports.loggedIn = loggedIn;
 function loggedOut() {
-    authAdminApi_1.authAdminApi.getAuthObservers().map(o => o(null));
+    state_mgmt_1.getAuthObservers().map(o => o(null));
 }
 exports.loggedOut = loggedOut;
 //# sourceMappingURL=authMockHelpers.js.map

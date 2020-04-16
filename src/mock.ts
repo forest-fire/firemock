@@ -10,11 +10,7 @@ import {
 import { DelayType, setNetworkDelay } from "./util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "./auth";
-import {
-  authAdminApi,
-  clearAuthUsers,
-  initializeAuth
-} from "./auth/state-mgmt";
+import { clearAuthUsers, initializeAuth } from "./auth/state-mgmt";
 import { FireMockError } from "./errors/FireMockError";
 import {
   IRelationship,

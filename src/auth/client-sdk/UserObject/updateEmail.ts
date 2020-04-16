@@ -1,4 +1,6 @@
 import { FireMockError } from "../../../errors/FireMockError";
+import { updateUser, currentUser } from "../../state-mgmt";
+import { networkDelay } from "../../../util";
 
 /**
  * **updateEmail**
@@ -26,4 +28,6 @@ export async function updateEmail(
       "auth/requires-recent-login"
     );
   }
+  await networkDelay();
+  updateUser(currentUser().uid, { email: newEmail });
 }
