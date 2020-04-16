@@ -8,6 +8,7 @@ import { pk } from "common-types";
 import { FireMockError } from "../../errors/FireMockError";
 import { UserCredential, User } from "@firebase/auth-types";
 import { clientApiUser } from "../client-sdk/UserObject";
+import { UpdateRequest } from "../admin-sdk";
 
 /**
  * The recognized users in the mock Auth system
@@ -168,14 +169,19 @@ export function convertToFirebaseUser(user: IMockUser): User {
   } as User;
 }
 
-export function updateUser(uid: string, update: Partial<IMockUser>) {
+export function updateUser(
+  uid: string,
+  update: Partial<IMockUser> | UpdateRequest
+) {
   const existing = _users.find(u => u.uid === uid);
   if (!existing) {
     throw new FireMockError(
       `Attempt to update the user with UID of "${uid}" failed because this user is not defined in the mock Auth instance!`
     );
   }
-  _users = _users.map(u => (u.uid === uid ? { ...u, ...update } : u));
+  _users = _users.map(u =>
+    u.uid === uid ? ({ ...u, ...update } as IMockUser) : u
+  );
 }
 
 export function allUsers() {

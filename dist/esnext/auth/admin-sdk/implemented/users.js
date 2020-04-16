@@ -1,4 +1,5 @@
-import { addUser } from "../../state-mgmt";
+import { addUser, updateUser, getUserById, removeUser, getUserByEmail, allUsers } from "../../state-mgmt";
+import { networkDelay } from "../../../util";
 export const users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {
@@ -11,23 +12,27 @@ export const users = {
                 toJSON() {
                     return {};
                 }
-            }, multiFactor: null, toJSON: () => properties, providerData: null });
+            }, multiFactor: null, toJSON: () => null, providerData: null });
     },
     /** Updates an existing user. */
     async updateUser(uid, properties) {
-        return;
+        updateUser(uid, properties);
+        return getUserById(uid);
     },
     async deleteUser(uid) {
-        return;
+        await networkDelay();
+        removeUser(uid);
     },
     async getUserByEmail(email) {
-        return;
+        await networkDelay();
+        return getUserByEmail(email);
     },
     async getUserByPhoneNumber(phoneNumber) {
         return;
     },
     async listUsers(maxResults, pageToken) {
-        return;
+        await networkDelay();
+        return { users: allUsers() };
     }
 };
 //# sourceMappingURL=users.js.map

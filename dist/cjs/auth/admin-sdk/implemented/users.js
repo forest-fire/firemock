@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_mgmt_1 = require("../../state-mgmt");
+const util_1 = require("../../../util");
 exports.users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {
@@ -13,23 +14,27 @@ exports.users = {
                 toJSON() {
                     return {};
                 }
-            }, multiFactor: null, toJSON: () => properties, providerData: null });
+            }, multiFactor: null, toJSON: () => null, providerData: null });
     },
     /** Updates an existing user. */
     async updateUser(uid, properties) {
-        return;
+        state_mgmt_1.updateUser(uid, properties);
+        return state_mgmt_1.getUserById(uid);
     },
     async deleteUser(uid) {
-        return;
+        await util_1.networkDelay();
+        state_mgmt_1.removeUser(uid);
     },
     async getUserByEmail(email) {
-        return;
+        await util_1.networkDelay();
+        return state_mgmt_1.getUserByEmail(email);
     },
     async getUserByPhoneNumber(phoneNumber) {
         return;
     },
     async listUsers(maxResults, pageToken) {
-        return;
+        await util_1.networkDelay();
+        return { users: state_mgmt_1.allUsers() };
     }
 };
 //# sourceMappingURL=users.js.map
