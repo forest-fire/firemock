@@ -5,7 +5,15 @@ import {
   UpdateRequest,
   ListUsersResult
 } from "..";
-import { addUser } from "../../state-mgmt";
+import {
+  addUser,
+  updateUser,
+  getUserById,
+  removeUser,
+  getUserByEmail,
+  allUsers
+} from "../../state-mgmt";
+import { networkDelay } from "../../../util";
 
 export const users: Partial<Auth> = {
   // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
@@ -27,7 +35,7 @@ export const users: Partial<Auth> = {
         }
       },
       multiFactor: null as any,
-      toJSON: () => properties,
+      toJSON: () => null as any,
       providerData: null as any
     };
   },
@@ -36,13 +44,16 @@ export const users: Partial<Auth> = {
     uid: string,
     properties: UpdateRequest
   ): Promise<UserRecord> {
-    return;
+    updateUser(uid, properties);
+    return getUserById(uid);
   },
   async deleteUser(uid: string): Promise<void> {
-    return;
+    await networkDelay();
+    removeUser(uid);
   },
   async getUserByEmail(email: string): Promise<UserRecord> {
-    return;
+    await networkDelay();
+    return getUserByEmail(email);
   },
   async getUserByPhoneNumber(phoneNumber: string): Promise<UserRecord> {
     return;
@@ -51,6 +62,7 @@ export const users: Partial<Auth> = {
     maxResults?: undefined | number,
     pageToken?: undefined | string
   ): Promise<ListUsersResult> {
-    return;
+    await networkDelay();
+    return { users: allUsers() };
   }
 };

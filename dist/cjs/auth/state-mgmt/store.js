@@ -153,7 +153,7 @@ function updateUser(uid, update) {
     if (!existing) {
         throw new FireMockError_1.FireMockError(`Attempt to update the user with UID of "${uid}" failed because this user is not defined in the mock Auth instance!`);
     }
-    _users = _users.map(u => (u.uid === uid ? Object.assign(Object.assign({}, u), update) : u));
+    _users = _users.map(u => u.uid === uid ? Object.assign(Object.assign({}, u), update) : u);
 }
 exports.updateUser = updateUser;
 function allUsers() {

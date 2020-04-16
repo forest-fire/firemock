@@ -1,5 +1,6 @@
 import { IMockUser, IMockAuthConfig, ISimplifiedMockUser } from "../../@types";
 import { UserCredential, User } from "@firebase/auth-types";
+import { UpdateRequest } from "../admin-sdk";
 export declare type IAuthObserver = (user: User | null) => any;
 export declare function getAuthObservers(): IAuthObserver[];
 export declare function addAuthObserver(ob: IAuthObserver): void;
@@ -40,7 +41,7 @@ export declare function getUserByEmail(email: string): IMockUser;
  * @param user a mock user defined by `IMockUser`
  */
 export declare function convertToFirebaseUser(user: IMockUser): User;
-export declare function updateUser(uid: string, update: Partial<IMockUser>): void;
+export declare function updateUser(uid: string, update: Partial<IMockUser> | UpdateRequest): void;
 export declare function allUsers(): IMockUser[];
 export declare function removeUser(uid: string): void;
 export declare function authProviders(): ("emailPassword" | "phone" | "google" | "playGames" | "gameCenter" | "facebook" | "twitter" | "github" | "yahoo" | "microsoft" | "apple" | "anonymous")[];
