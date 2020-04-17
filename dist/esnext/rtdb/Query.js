@@ -128,7 +128,7 @@ export class Query {
         const data = getDb(this._query.path);
         const results = runQuery(this._query, data);
         // return new SnapShot(leafNode(this._query.path), results);
-        return this.getSnapshotConstructor(leafNode(this._query.path), results);
+        return this.getSnapshot(leafNode(this._query.path), results);
     }
 }
 //# sourceMappingURL=Query.js.map

@@ -18,7 +18,7 @@ import {
   SnapShot,
   addListener,
   Query
-} from "./index";
+} from "../rtdb";
 import {
   parts,
   join,
@@ -171,10 +171,7 @@ export class Reference<T = any> extends Query<T> implements RtdbReference {
       : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
   }
 
-  protected getSnapshotConstructor<T extends RtdbDataSnapshot>(
-    key: string,
-    value: any
-  ) {
+  protected getSnapshot<T extends RtdbDataSnapshot>(key: string, value: any) {
     return new SnapShot<T>(key, value);
   }
 

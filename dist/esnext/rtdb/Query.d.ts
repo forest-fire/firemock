@@ -67,7 +67,7 @@ export declare abstract class Query<T = any> implements RtdbQuery {
      * typing provided by Google
      */
     protected getRoot(): RtdbReference;
-    protected abstract getSnapshotConstructor(key: string, value: any): RtdbDataSnapshot;
+    protected abstract getSnapshot(key: string, value: any): RtdbDataSnapshot;
     protected abstract addListener(pathOrQuery: string | SerializedQuery<any>, eventType: RtdbEventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<RtdbDataSnapshot>;
     /**
      * Reduce the dataset using _filters_ (after sorts) but do not apply sort

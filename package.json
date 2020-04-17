@@ -30,7 +30,8 @@
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
     "deploy": "ts-node ./scripts/deploy.ts ",
-    "info": "yarn do info"
+    "info": "yarn do info",
+    "circular": "yarn run madge --circular --extensions ts ./src",
   },
   "dependencies": {
     "@firebase/app": "^0.6.0",
@@ -73,6 +74,7 @@
     "chai": "^4.2.0",
     "chalk": "^3.0.0",
     "do-devops": "^0.3.5",
+    "madge": "^3.8.0",
     "mocha": "^7.0.1",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.2",

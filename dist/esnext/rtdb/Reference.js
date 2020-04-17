@@ -1,5 +1,5 @@
 import get from "lodash.get";
-import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB, SnapShot, addListener, Query } from "./index";
+import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB, SnapShot, addListener, Query } from "../rtdb";
 import { parts, join, slashNotation, networkDelay } from "../shared/util";
 import { SerializedQuery } from "serialized-query";
 function isMultiPath(data) {
@@ -103,7 +103,7 @@ export class Reference extends Query {
             ? slashNotation(join("FireMock::Reference@", this.path, this.key))
             : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
     }
-    getSnapshotConstructor(key, value) {
+    getSnapshot(key, value) {
         return new SnapShot(key, value);
     }
     addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context) {

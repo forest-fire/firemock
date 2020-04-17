@@ -1,6 +1,6 @@
 import { IDictionary } from "common-types";
 import { RtdbReference, RtdbDataSnapshot, RtdbThenableReference, RtdbEventType, IFirebaseEventHandler } from "../@types/rtdb-types";
-import { SnapShot, Query } from "./index";
+import { SnapShot, Query } from "../rtdb";
 import { DelayType } from "../shared/util";
 import { SerializedQuery } from "serialized-query";
 export declare class Reference<T = any> extends Query<T> implements RtdbReference {
@@ -24,6 +24,6 @@ export declare class Reference<T = any> extends Query<T> implements RtdbReferenc
     }>;
     onDisconnect(): any;
     toString(): string;
-    protected getSnapshotConstructor<T extends RtdbDataSnapshot>(key: string, value: any): SnapShot<T>;
+    protected getSnapshot<T extends RtdbDataSnapshot>(key: string, value: any): SnapShot<T>;
     protected addListener(pathOrQuery: string | SerializedQuery<any>, eventType: RtdbEventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<RtdbDataSnapshot>;
 }

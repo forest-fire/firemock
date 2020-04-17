@@ -6,7 +6,7 @@ import {
   QueryValue,
   IFirebaseEventHandler
 } from "../@types/rtdb-types";
-import { getDb } from "./store";
+import { getDb } from "../rtdb";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { leafNode, DelayType, networkDelay } from "../shared/util";
 import { runQuery } from "../shared/runQuery";
@@ -173,10 +173,7 @@ export abstract class Query<T = any> implements RtdbQuery {
     return null;
   }
 
-  protected abstract getSnapshotConstructor(
-    key: string,
-    value: any
-  ): RtdbDataSnapshot;
+  protected abstract getSnapshot(key: string, value: any): RtdbDataSnapshot;
 
   protected abstract addListener(
     pathOrQuery: string | SerializedQuery<any>,
@@ -195,6 +192,6 @@ export abstract class Query<T = any> implements RtdbQuery {
     const results = runQuery(this._query, data);
 
     // return new SnapShot(leafNode(this._query.path), results);
-    return this.getSnapshotConstructor(leafNode(this._query.path), results);
+    return this.getSnapshot(leafNode(this._query.path), results);
   }
 }
