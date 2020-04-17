@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_mgmt_1 = require("../../state-mgmt");
-const util_1 = require("../../../util");
+const util_1 = require("../../../shared/util");
 exports.users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {
@@ -34,7 +34,7 @@ exports.users = {
     },
     async listUsers(maxResults, pageToken) {
         await util_1.networkDelay();
-        return { users: state_mgmt_1.allUsers() };
+        return { users: maxResults ? state_mgmt_1.allUsers().slice(0, maxResults) : state_mgmt_1.allUsers() };
     }
 };
 //# sourceMappingURL=users.js.map

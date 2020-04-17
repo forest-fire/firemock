@@ -1,4 +1,4 @@
-import { networkDelay } from "./util";
+import { networkDelay } from "./shared/util";
 import { implemented } from "./auth/client-sdk/implemented";
 let hasConnectedToAuthService = false;
 export const auth = async () => {

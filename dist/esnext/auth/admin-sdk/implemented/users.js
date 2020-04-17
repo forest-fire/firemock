@@ -1,5 +1,5 @@
 import { addUser, updateUser, getUserById, removeUser, getUserByEmail, allUsers } from "../../state-mgmt";
-import { networkDelay } from "../../../util";
+import { networkDelay } from "../../../shared/util";
 export const users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {
@@ -32,7 +32,7 @@ export const users = {
     },
     async listUsers(maxResults, pageToken) {
         await networkDelay();
-        return { users: allUsers() };
+        return { users: maxResults ? allUsers().slice(0, maxResults) : allUsers() };
     }
 };
 //# sourceMappingURL=users.js.map

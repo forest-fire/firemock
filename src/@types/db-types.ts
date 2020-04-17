@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import SchemaHelper from "../schema-helper";
+import { SchemaHelper } from "../mocking/schema-helper";
 import { DataSnapshot } from "@firebase/database-types";
 
 export interface ISchema {

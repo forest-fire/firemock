@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("./util");
+const util_1 = require("./shared/util");
 const implemented_1 = require("./auth/client-sdk/implemented");
 let hasConnectedToAuthService = false;
 exports.auth = async () => {

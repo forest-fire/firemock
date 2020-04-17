@@ -20,7 +20,7 @@ import {
   reset,
   getDb
 } from "../src/rtdb/database";
-import { GenericEventHandler, HandleValueEvent } from "../src/rtdb/query";
+import { GenericEventHandler, HandleValueEvent } from "../src/rtdb/Query";
 import "mocha";
 import { wait, IDictionary } from "common-types";
 

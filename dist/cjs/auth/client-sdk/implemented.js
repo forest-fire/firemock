@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("../../util");
+const util_1 = require("../../shared/util");
 const completeUserCredential_1 = require("./completeUserCredential");
 const FireMockError_1 = require("../../errors/FireMockError");
 const authMockHelpers_1 = require("./authMockHelpers");

@@ -1,9 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
-import { IDictionary } from "common-types";
 import * as chai from "chai";
-import  {Mock, SchemaCallback } from "../src";
-import * as helpers from "./testing/helpers";
+import { Mock, SchemaCallback } from "../src";
 const expect = chai.expect;
 
 const animalMock: SchemaCallback = h => () => ({
@@ -13,7 +11,9 @@ const animalMock: SchemaCallback = h => () => ({
 });
 
 describe("Setting null to db path →", () => {
-  it("when set() to null path should be removed", async () => {
+  it.only("when set() to null path should be removed", async () => {
+    console.log("Mock is", Mock);
+
     const m = await Mock.prepare();
     m.addSchema("animal", animalMock);
     m.queueSchema("animal", 1, { id: "1234" });

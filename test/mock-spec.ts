@@ -2,8 +2,8 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Mock, SchemaCallback } from "../src";
-import SchemaHelper from "../src/schema-helper";
+import { SchemaCallback } from "../src";
+import { Mock, SchemaHelper } from "../src/mocking";
 import first from "lodash.first";
 import { firstProp, lastProp } from "../src/shared/util";
 

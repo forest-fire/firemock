@@ -2,7 +2,7 @@
 import "mocha";
 import { IDictionary } from "common-types";
 import * as chai from "chai";
-import SnapShot from "../src/rtdb/snapshot";
+import { SnapShot } from "../src/rtdb";
 const expect = chai.expect;
 
 describe("SnapShot:", () => {

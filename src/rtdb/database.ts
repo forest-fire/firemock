@@ -1,6 +1,6 @@
 // tslint:disable:no-implicit-dependencies
 import { IDictionary, pathJoin } from "common-types";
-import { IListener } from "../rtdb/query";
+import { IListener } from "./Query";
 import set from "lodash.set";
 import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
