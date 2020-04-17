@@ -1,6 +1,5 @@
-import { Queue } from "./Queue";
-import { SchemaHelper } from "./schema-helper";
-import pluralize, { addException } from "../shared/pluralize";
+import { Queue, SchemaHelper } from "./index";
+import { pluralize, addException } from "../shared";
 export class Schema {
     constructor(schemaId) {
         this.schemaId = schemaId;

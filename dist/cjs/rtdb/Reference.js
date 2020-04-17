@@ -3,10 +3,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Query_1 = require("./Query");
 const lodash_get_1 = __importDefault(require("lodash.get"));
-const database_1 = require("./database");
+const index_1 = require("./index");
 const util_1 = require("../shared/util");
+const serialized_query_1 = require("serialized-query");
 function isMultiPath(data) {
     Object.keys(data).map((d) => {
         if (!d) {
@@ -17,7 +17,21 @@ function isMultiPath(data) {
     const indexesLookLikeAPath = Object.keys(data).every(i => i.indexOf("/") !== -1);
     return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
-class Reference extends Query_1.Query {
+class Reference extends index_1.Query {
+    static createQuery(query, delay = 5) {
+        if (typeof query === "string") {
+            query = new serialized_query_1.SerializedQuery(query);
+        }
+        const obj = new Reference(query.path, delay);
+        obj._query = query;
+        return obj;
+    }
+    static create(path) {
+        return new Reference(path);
+    }
+    constructor(path, _delay = 5) {
+        super(path, _delay);
+    }
     get key() {
         return this.path.split(".").pop();
     }
@@ -25,36 +39,35 @@ class Reference extends Query_1.Query {
         const r = util_1.parts(this.path)
             .slice(-1)
             .join(".");
-        return new Reference(r, lodash_get_1.default(database_1.db, r));
+        return new Reference(r, lodash_get_1.default(index_1.db, r));
     }
     child(path) {
         const r = util_1.parts(this.path)
             .concat([path])
             .join(".");
-        return new Reference(r, lodash_get_1.default(database_1.db, r));
+        return new Reference(r, lodash_get_1.default(index_1.db, r));
     }
     get root() {
-        return new Reference("/", database_1.db);
+        return new Reference("/", index_1.db);
     }
     push(value, onComplete) {
-        const id = database_1.pushDB(this.path, value);
+        const id = index_1.pushDB(this.path, value);
         this.path = util_1.join(this.path, id);
         if (onComplete) {
             onComplete(null);
         }
-        // TODO: try and get this typed appropriately
         const ref = util_1.networkDelay(this);
         return ref;
     }
     remove(onComplete) {
-        database_1.removeDB(this.path);
+        index_1.removeDB(this.path);
         if (onComplete) {
             onComplete(null);
         }
         return util_1.networkDelay();
     }
     set(value, onComplete) {
-        database_1.setDB(this.path, value);
+        index_1.setDB(this.path, value);
         if (onComplete) {
             onComplete(null);
         }
@@ -62,10 +75,10 @@ class Reference extends Query_1.Query {
     }
     update(values, onComplete) {
         if (isMultiPath(values)) {
-            database_1.multiPathUpdateDB(values);
+            index_1.multiPathUpdateDB(values);
         }
         else {
-            database_1.updateDB(this.path, values);
+            index_1.updateDB(this.path, values);
         }
         if (onComplete) {
             onComplete(null);
@@ -94,6 +107,12 @@ class Reference extends Query_1.Query {
         return this.path
             ? util_1.slashNotation(util_1.join("FireMock::Reference@", this.path, this.key))
             : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
+    }
+    getSnapshotConstructor(key, value) {
+        return new index_1.SnapShot(key, value);
+    }
+    addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context) {
+        return index_1.addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context);
     }
 }
 exports.Reference = Reference;

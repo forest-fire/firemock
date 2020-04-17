@@ -1,76 +1,33 @@
 import {
-  DataSnapshot,
-  Query as IQuery,
-  EventType,
-  Reference as IReference
-} from "@firebase/database-types";
-import { addListener, getDb } from "./database";
-import { SnapShot } from "./Snapshot";
-import { Reference } from "./Reference";
+  RtdbQuery,
+  RtdbReference,
+  RtdbDataSnapshot,
+  RtdbEventType,
+  QueryValue,
+  IFirebaseEventHandler
+} from "../@types/rtdb-types";
+import { getDb } from "./store";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { join, leafNode, DelayType, networkDelay } from "../shared/util";
+import { leafNode, DelayType, networkDelay } from "../shared/util";
 import { runQuery } from "../shared/runQuery";
 import { IDictionary } from "common-types";
 
-export type EventHandler =
-  | HandleValueEvent
-  | HandleNewEvent
-  | HandleRemoveEvent;
-export type GenericEventHandler = (snap: SnapShot, key?: string) => void;
-export type HandleValueEvent = (dataSnapShot: SnapShot) => void;
-export type HandleNewEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
-export type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
-export type HandleMoveEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
-export type HandleChangeEvent = (
-  childSnapshot: SnapShot,
-  prevChildKey: string
-) => void;
-
-export type QueryValue = number | string | boolean | null;
-
-export interface IListener {
-  /** random string */
-  id: string;
-  /** the _query_ the listener is based off of */
-  query: SerializedQuery;
-
-  eventType: EventType;
-  callback: (a: DataSnapshot | null, b?: string) => any;
-  cancelCallbackOrContext?: object | null;
-  context?: object | null;
-}
-
-export type IQueryFilter<T> = (resultset: T[]) => T[];
-
 /** tslint:ignore:member-ordering */
-export class Query<T = any> implements IQuery {
-  /**
-   * A static initializer which returns a **Firemock** `Query`
-   * that has been configured with a `SerializedQuery`.
-   *
-   * @param query the _SerializedQuery_ to configure with
-   */
-  public static create(query: SerializedQuery) {
-    query.setPath(join(query.path)); // ensures dot notation
-    const obj = new Query(query.path);
-    obj._query = query;
-    return obj;
-  }
-
+export abstract class Query<T = any> implements RtdbQuery {
+  public path: string;
   protected _query: SerializedQuery;
+  protected _delay: DelayType;
 
-  constructor(public path: string, protected _delay: DelayType = 5) {
-    this._query = SerializedQuery.path(path);
+  constructor(path: string | SerializedQuery, delay: DelayType = 5) {
+    this.path = (typeof path === "string"
+      ? path
+      : SerializedQuery.path) as string;
+    this._delay = delay;
+    this._query = typeof path === "string" ? SerializedQuery.path(path) : path;
   }
 
-  public get ref(): Reference<T> {
-    return new Reference<T>(this.path, this._delay);
+  public get ref(): RtdbReference {
+    return (this as unknown) as RtdbReference;
   }
 
   public limitToLast(num: number): Query<T> {
@@ -112,12 +69,12 @@ export class Query<T = any> implements IQuery {
    * Setup an event listener for a given eventType
    */
   public on(
-    eventType: EventType,
-    callback: (a: DataSnapshot, b?: null | string) => any,
+    eventType: RtdbEventType,
+    callback: (a: RtdbDataSnapshot, b?: null | string) => any,
     cancelCallbackOrContext?: (err?: Error) => void | null,
     context?: object | null
-  ): (a: DataSnapshot, b?: null | string) => Promise<null> {
-    addListener(
+  ): (a: RtdbDataSnapshot, b?: null | string) => Promise<null> {
+    this.addListener(
       this._query,
       eventType,
       callback,
@@ -128,8 +85,8 @@ export class Query<T = any> implements IQuery {
     return null;
   }
 
-  public once(eventType: "value"): Promise<DataSnapshot> {
-    return networkDelay<DataSnapshot>(this.getQuerySnapShot());
+  public once(eventType: "value"): Promise<RtdbDataSnapshot> {
+    return networkDelay<RtdbDataSnapshot>(this.getQuerySnapShot());
   }
 
   public off() {
@@ -205,25 +162,39 @@ export class Query<T = any> implements IQuery {
    * This is an undocumented API endpoint that is within the
    * typing provided by Google
    */
-  protected getParent(): IReference | null {
+  protected getParent(): RtdbReference | null {
     return null;
   }
   /**
    * This is an undocumented API endpoint that is within the
    * typing provided by Google
    */
-  protected getRoot(): IReference {
+  protected getRoot(): RtdbReference {
     return null;
   }
+
+  protected abstract getSnapshotConstructor(
+    key: string,
+    value: any
+  ): RtdbDataSnapshot;
+
+  protected abstract addListener(
+    pathOrQuery: string | SerializedQuery<any>,
+    eventType: RtdbEventType,
+    callback: IFirebaseEventHandler,
+    cancelCallbackOrContext?: (err?: Error) => void,
+    context?: IDictionary
+  ): Promise<RtdbDataSnapshot>;
 
   /**
    * Reduce the dataset using _filters_ (after sorts) but do not apply sort
    * order to new SnapShot (so natural order is preserved)
    */
-  private getQuerySnapShot(): SnapShot<T> {
+  private getQuerySnapShot() {
     const data = getDb(this._query.path);
     const results = runQuery(this._query, data);
 
-    return new SnapShot(leafNode(this._query.path), results);
+    // return new SnapShot(leafNode(this._query.path), results);
+    return this.getSnapshotConstructor(leafNode(this._query.path), results);
   }
 }

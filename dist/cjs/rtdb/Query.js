@@ -1,32 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const database_1 = require("./database");
-const Snapshot_1 = require("./Snapshot");
-const Reference_1 = require("./Reference");
+const store_1 = require("./store");
 const serialized_query_1 = require("serialized-query");
 const util_1 = require("../shared/util");
 const runQuery_1 = require("../shared/runQuery");
 /** tslint:ignore:member-ordering */
 class Query {
-    constructor(path, _delay = 5) {
-        this.path = path;
-        this._delay = _delay;
-        this._query = serialized_query_1.SerializedQuery.path(path);
-    }
-    /**
-     * A static initializer which returns a **Firemock** `Query`
-     * that has been configured with a `SerializedQuery`.
-     *
-     * @param query the _SerializedQuery_ to configure with
-     */
-    static create(query) {
-        query.setPath(util_1.join(query.path)); // ensures dot notation
-        const obj = new Query(query.path);
-        obj._query = query;
-        return obj;
+    constructor(path, delay = 5) {
+        this.path = (typeof path === "string"
+            ? path
+            : serialized_query_1.SerializedQuery.path);
+        this._delay = delay;
+        this._query = typeof path === "string" ? serialized_query_1.SerializedQuery.path(path) : path;
     }
     get ref() {
-        return new Reference_1.Reference(this.path, this._delay);
+        return this;
     }
     limitToLast(num) {
         this._query.limitToLast(num);
@@ -56,7 +44,7 @@ class Query {
      * Setup an event listener for a given eventType
      */
     on(eventType, callback, cancelCallbackOrContext, context) {
-        database_1.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
+        this.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
@@ -139,9 +127,10 @@ class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     getQuerySnapShot() {
-        const data = database_1.getDb(this._query.path);
+        const data = store_1.getDb(this._query.path);
         const results = runQuery_1.runQuery(this._query, data);
-        return new Snapshot_1.SnapShot(util_1.leafNode(this._query.path), results);
+        // return new SnapShot(leafNode(this._query.path), results);
+        return this.getSnapshotConstructor(util_1.leafNode(this._query.path), results);
     }
 }
 exports.Query = Query;

@@ -1,30 +1,18 @@
-import { addListener, getDb } from "./database";
-import { SnapShot } from "./Snapshot";
-import { Reference } from "./Reference";
+import { getDb } from "./store";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { join, leafNode, networkDelay } from "../shared/util";
+import { leafNode, networkDelay } from "../shared/util";
 import { runQuery } from "../shared/runQuery";
 /** tslint:ignore:member-ordering */
 export class Query {
-    constructor(path, _delay = 5) {
-        this.path = path;
-        this._delay = _delay;
-        this._query = SerializedQuery.path(path);
-    }
-    /**
-     * A static initializer which returns a **Firemock** `Query`
-     * that has been configured with a `SerializedQuery`.
-     *
-     * @param query the _SerializedQuery_ to configure with
-     */
-    static create(query) {
-        query.setPath(join(query.path)); // ensures dot notation
-        const obj = new Query(query.path);
-        obj._query = query;
-        return obj;
+    constructor(path, delay = 5) {
+        this.path = (typeof path === "string"
+            ? path
+            : SerializedQuery.path);
+        this._delay = delay;
+        this._query = typeof path === "string" ? SerializedQuery.path(path) : path;
     }
     get ref() {
-        return new Reference(this.path, this._delay);
+        return this;
     }
     limitToLast(num) {
         this._query.limitToLast(num);
@@ -54,7 +42,7 @@ export class Query {
      * Setup an event listener for a given eventType
      */
     on(eventType, callback, cancelCallbackOrContext, context) {
-        addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
+        this.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
     once(eventType) {
@@ -139,7 +127,8 @@ export class Query {
     getQuerySnapShot() {
         const data = getDb(this._query.path);
         const results = runQuery(this._query, data);
-        return new SnapShot(leafNode(this._query.path), results);
+        // return new SnapShot(leafNode(this._query.path), results);
+        return this.getSnapshotConstructor(leafNode(this._query.path), results);
     }
 }
 //# sourceMappingURL=Query.js.map

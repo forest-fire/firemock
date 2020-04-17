@@ -3,11 +3,10 @@ import * as fbKey from "firebase-key";
 import set from "lodash.set";
 import get from "lodash.get";
 import first from "lodash.first";
-import { IRelationship, ISchema, IQueue } from "../index";
-import { getRandomInt, dotNotation } from "../shared/util";
-import { Queue } from "./Queue";
-import pluralize from "../shared/pluralize";
-import { db } from "../rtdb/database";
+import { IRelationship, ISchema, IQueue } from "../@types";
+import { getRandomInt, dotNotation, pluralize } from "../shared";
+import { Queue } from "./index";
+import { db } from "../rtdb";
 
 export class Deployment {
   private schemaId: string;

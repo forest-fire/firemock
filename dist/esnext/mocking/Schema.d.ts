@@ -1,4 +1,4 @@
-import { SchemaCallback } from "../index";
+import { SchemaCallback } from "../@types";
 /**
  * The property that exists on the source scheme as a FK reference
  * to the external schema/entity.

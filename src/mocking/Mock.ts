@@ -1,13 +1,13 @@
 import { IDictionary } from "common-types";
 import { Queue, Schema, Deployment } from "./index";
-import { Reference } from "../rtdb";
 import {
+  Reference,
   db,
   clearDatabase,
   updateDatabase,
-  silenceEvents,
-  restoreEvents
-} from "../rtdb/database";
+  restoreEvents,
+  silenceEvents
+} from "../rtdb";
 import { DelayType, setNetworkDelay } from "../shared/util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "../auth";

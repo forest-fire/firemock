@@ -1,6 +1,5 @@
 import { Queue, Schema, Deployment } from "./index";
-import { Reference } from "../rtdb";
-import { db, clearDatabase, updateDatabase, silenceEvents, restoreEvents } from "../rtdb/database";
+import { Reference, db, clearDatabase, updateDatabase, restoreEvents, silenceEvents } from "../rtdb";
 import { setNetworkDelay } from "../shared/util";
 import { MockHelper } from "./MockHelper";
 import { auth as fireAuth } from "../auth";

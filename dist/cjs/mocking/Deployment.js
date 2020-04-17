@@ -14,15 +14,14 @@ const fbKey = __importStar(require("firebase-key"));
 const lodash_set_1 = __importDefault(require("lodash.set"));
 const lodash_get_1 = __importDefault(require("lodash.get"));
 const lodash_first_1 = __importDefault(require("lodash.first"));
-const util_1 = require("../shared/util");
-const Queue_1 = require("./Queue");
-const pluralize_1 = __importDefault(require("../shared/pluralize"));
-const database_1 = require("../rtdb/database");
+const shared_1 = require("../shared");
+const index_1 = require("./index");
+const rtdb_1 = require("../rtdb");
 class Deployment {
     constructor() {
-        this._queue = new Queue_1.Queue("queue");
-        this._schemas = new Queue_1.Queue("schemas");
-        this._relationships = new Queue_1.Queue("relationships");
+        this._queue = new index_1.Queue("queue");
+        this._schemas = new index_1.Queue("schemas");
+        this._relationships = new index_1.Queue("relationships");
     }
     /**
      * Queue a schema for deployment to the mock DB
@@ -69,7 +68,7 @@ class Deployment {
         else {
             const queue = this._queue.find(this.queueId);
             this._queue.update(this.queueId, {
-                hasMany: Object.assign(Object.assign({}, queue.hasMany), { [pluralize_1.default(targetSchema)]: quantity })
+                hasMany: Object.assign(Object.assign({}, queue.hasMany), { [shared_1.pluralize(targetSchema)]: quantity })
             });
         }
         return this;
@@ -108,7 +107,7 @@ class Deployment {
         const mock = schema.fn();
         const path = schema.path();
         const key = overrides.id || fbKey.key();
-        lodash_set_1.default(database_1.db, util_1.dotNotation(path) + `.${key}`, typeof mock === "object"
+        lodash_set_1.default(rtdb_1.db, shared_1.dotNotation(path) + `.${key}`, typeof mock === "object"
             ? Object.assign(Object.assign({}, mock), overrides) : overrides && typeof overrides !== "object"
             ? overrides
             : mock);
@@ -127,11 +126,11 @@ class Deployment {
             let getID;
             if (fulfill) {
                 const mockAvailable = this._schemas.find(r.target) ? true : false;
-                const available = Object.keys(database_1.db[pluralize_1.default(r.target)] || {});
+                const available = Object.keys(rtdb_1.db[shared_1.pluralize(r.target)] || {});
                 const generatedAvailable = available.length > 0;
-                const numChoices = (database_1.db[r.target] || []).length;
+                const numChoices = (rtdb_1.db[r.target] || []).length;
                 const choice = () => generatedAvailable
-                    ? available[util_1.getRandomInt(0, available.length - 1)]
+                    ? available[shared_1.getRandomInt(0, available.length - 1)]
                     : this.insertMockIntoDB(r.target, {});
                 getID = () => mockAvailable
                     ? generatedAvailable
@@ -144,9 +143,9 @@ class Deployment {
             }
             const property = r.sourceProperty;
             const path = source.path();
-            const recordList = lodash_get_1.default(database_1.db, util_1.dotNotation(source.path()), {});
+            const recordList = lodash_get_1.default(rtdb_1.db, shared_1.dotNotation(source.path()), {});
             Object.keys(recordList).forEach(key => {
-                lodash_set_1.default(database_1.db, `${util_1.dotNotation(source.path())}.${key}.${property}`, getID());
+                lodash_set_1.default(rtdb_1.db, `${shared_1.dotNotation(source.path())}.${key}.${property}`, getID());
             });
         });
         hasMany.forEach(r => {
@@ -157,13 +156,13 @@ class Deployment {
             let getID;
             if (fulfill) {
                 const mockAvailable = this._schemas.find(r.target) ? true : false;
-                const available = Object.keys(database_1.db[pluralize_1.default(r.target)] || {});
+                const available = Object.keys(rtdb_1.db[shared_1.pluralize(r.target)] || {});
                 const used = [];
                 const generatedAvailable = available.length > 0;
-                const numChoices = (database_1.db[pluralize_1.default(r.target)] || []).length;
+                const numChoices = (rtdb_1.db[shared_1.pluralize(r.target)] || []).length;
                 const choice = (pool) => {
                     if (pool.length > 0) {
-                        const chosen = pool[util_1.getRandomInt(0, pool.length - 1)];
+                        const chosen = pool[shared_1.getRandomInt(0, pool.length - 1)];
                         used.push(chosen);
                         return chosen;
                     }
@@ -178,10 +177,10 @@ class Deployment {
             }
             const property = r.sourceProperty;
             const path = source.path();
-            const sourceRecords = lodash_get_1.default(database_1.db, util_1.dotNotation(source.path()), {});
+            const sourceRecords = lodash_get_1.default(rtdb_1.db, shared_1.dotNotation(source.path()), {});
             Object.keys(sourceRecords).forEach(key => {
                 for (let i = 1; i <= howMany; i++) {
-                    lodash_set_1.default(database_1.db, `${util_1.dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
+                    lodash_set_1.default(rtdb_1.db, `${shared_1.dotNotation(source.path())}.${key}.${property}.${getID()}`, true);
                 }
             });
         });

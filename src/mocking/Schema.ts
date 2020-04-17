@@ -1,8 +1,6 @@
-import { IDictionary } from "common-types";
-import { IRelationship, ISchema, SchemaCallback } from "../index";
-import { Queue } from "./Queue";
-import { SchemaHelper } from "./schema-helper";
-import pluralize, { addException } from "../shared/pluralize";
+import { IRelationship, ISchema, SchemaCallback } from "../@types";
+import { Queue, SchemaHelper } from "./index";
+import { pluralize, addException } from "../shared";
 
 /**
  * The property that exists on the source scheme as a FK reference

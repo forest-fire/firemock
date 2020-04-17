@@ -1,11 +1,12 @@
 import { IDictionary } from "common-types";
-import { Query } from "./Query";
 import get from "lodash.get";
 import {
-  Reference as IReference,
-  ThenableReference as IThenableReference,
-  DataSnapshot
-} from "@firebase/database-types";
+  RtdbReference,
+  RtdbDataSnapshot,
+  RtdbThenableReference,
+  RtdbEventType,
+  IFirebaseEventHandler
+} from "../@types/rtdb-types";
 
 import {
   db,
@@ -13,9 +14,19 @@ import {
   updateDB,
   pushDB,
   removeDB,
-  multiPathUpdateDB
-} from "./database";
-import { parts, join, slashNotation, networkDelay } from "../shared/util";
+  multiPathUpdateDB,
+  SnapShot,
+  addListener,
+  Query
+} from "./index";
+import {
+  parts,
+  join,
+  slashNotation,
+  networkDelay,
+  DelayType
+} from "../shared/util";
+import { SerializedQuery } from "serialized-query";
 
 function isMultiPath(data: IDictionary) {
   Object.keys(data).map((d: any) => {
@@ -29,12 +40,32 @@ function isMultiPath(data: IDictionary) {
   );
   return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
-export class Reference<T = any> extends Query<T> implements IReference {
+
+export class Reference<T = any> extends Query<T> implements RtdbReference {
+  public static createQuery(
+    query: string | SerializedQuery,
+    delay: DelayType = 5
+  ) {
+    if (typeof query === "string") {
+      query = new SerializedQuery(query);
+    }
+    const obj = new Reference(query.path, delay);
+    obj._query = query;
+    return obj;
+  }
+  public static create(path: string) {
+    return new Reference(path);
+  }
+
+  constructor(path: string, _delay: DelayType = 5) {
+    super(path, _delay);
+  }
+
   public get key(): string | null {
     return this.path.split(".").pop();
   }
 
-  public get parent(): IReference | null {
+  public get parent(): RtdbReference | null {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
@@ -55,14 +86,13 @@ export class Reference<T = any> extends Query<T> implements IReference {
   public push(
     value?: any,
     onComplete?: (a: Error | null) => any
-  ): IThenableReference {
+  ): RtdbThenableReference {
     const id = pushDB(this.path, value);
     this.path = join(this.path, id);
     if (onComplete) {
       onComplete(null);
     }
 
-    // TODO: try and get this typed appropriately
     const ref = networkDelay<Reference<T>>(this);
     return ref as any;
   }
@@ -115,7 +145,11 @@ export class Reference<T = any> extends Query<T> implements IReference {
 
   public transaction(
     transactionUpdate: (a: Partial<T>) => Partial<T>,
-    onComplete?: (a: Error | null, b: boolean, c: DataSnapshot | null) => any,
+    onComplete?: (
+      a: Error | null,
+      b: boolean,
+      c: RtdbDataSnapshot | null
+    ) => any,
     applyLocally?: boolean
   ) {
     return Promise.resolve({
@@ -135,5 +169,28 @@ export class Reference<T = any> extends Query<T> implements IReference {
     return this.path
       ? slashNotation(join("FireMock::Reference@", this.path, this.key))
       : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
+  }
+
+  protected getSnapshotConstructor<T extends RtdbDataSnapshot>(
+    key: string,
+    value: any
+  ) {
+    return new SnapShot<T>(key, value);
+  }
+
+  protected addListener(
+    pathOrQuery: string | SerializedQuery<any>,
+    eventType: RtdbEventType,
+    callback: IFirebaseEventHandler,
+    cancelCallbackOrContext?: (err?: Error) => void,
+    context?: IDictionary
+  ): Promise<RtdbDataSnapshot> {
+    return addListener(
+      pathOrQuery,
+      eventType,
+      callback,
+      cancelCallbackOrContext,
+      context
+    );
   }
 }

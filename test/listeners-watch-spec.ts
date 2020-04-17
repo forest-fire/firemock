@@ -2,7 +2,7 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Query, IDictionary, SchemaHelper, Mock, Reference } from "../src";
+import { SchemaHelper, Mock, Reference } from "../src";
 import { DataSnapshot } from "@firebase/database-types";
 import {
   updateDB,
@@ -13,8 +13,8 @@ import {
   clearDatabase,
   listenerCount,
   reset
-} from "../src/rtdb/database";
-import { wait } from "common-types";
+} from "../src/rtdb";
+import { wait, IDictionary } from "common-types";
 import { SerializedQuery } from "serialized-query";
 
 const expect = chai.expect;
@@ -66,7 +66,7 @@ describe("Listener events ->", () => {
 
   it('listening on "on_child" events', async () => {
     reset();
-    const queryRef = new Query("userProfile", 10);
+    const queryRef = Reference.createQuery("userProfile", 10);
     let events: IDictionary[] = [];
     const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
       events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
@@ -128,7 +128,7 @@ describe("Listener events ->", () => {
 
   it("removing a record that exists sends child_removed event", async () => {
     reset();
-    const queryRef = new Query("userProfile", 10);
+    const queryRef = Reference.createQuery("userProfile", 10);
     let events: IDictionary[] = [];
     const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
       events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
@@ -155,7 +155,7 @@ describe("Listener events ->", () => {
 
   it("removing a record that was not there; results in no events", async () => {
     reset();
-    const queryRef = new Query("userProfile", 10);
+    const queryRef = Reference.createQuery("userProfile", 10);
     const events: IDictionary[] = [];
     const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
       events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
@@ -170,7 +170,7 @@ describe("Listener events ->", () => {
 
   it("updating DB in a watcher path does not return child_added, does return child_changed", async () => {
     clearDatabase();
-    const queryRef = new Query("userProfile", 10);
+    const queryRef = Reference.createQuery("userProfile", 10);
     let events: IDictionary[] = [];
     const cb = (eventType: string) => (snap: DataSnapshot, prevKey?: any) => {
       events.push({ eventType, val: snap.val(), key: snap.key, prevKey, snap });
@@ -216,8 +216,8 @@ describe("Listener events ->", () => {
     expect(m.db.employees[firstEmployee]).to.be.an("object");
     expect(m.db.companies[firstCompany]).to.be.an("object");
 
-    const qEmployee = new Query("employees", 10);
-    const qCompany = new Query("companies", 10);
+    const qEmployee = Reference.createQuery("employees", 10);
+    const qCompany = Reference.createQuery("companies", 10);
 
     const events: Array<{
       eventType: string;

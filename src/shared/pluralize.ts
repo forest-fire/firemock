@@ -1,14 +1,14 @@
-import { IDictionary } from 'common-types';
+import { IDictionary } from "common-types";
 
 const exceptions: IDictionary<string> = {
-  child: 'children',
-  man: 'men',
-  woman: 'women',
-  tooth: 'teeth',
-  foot: 'feet',
-  mouse: 'mice',
-  person: 'people',
-  company: 'companies'
+  child: "children",
+  man: "men",
+  woman: "women",
+  tooth: "teeth",
+  foot: "feet",
+  mouse: "mice",
+  person: "people",
+  company: "companies"
 };
 
 /**
@@ -16,16 +16,16 @@ const exceptions: IDictionary<string> = {
  */
 const singularExceptions = () => {
   return Object.keys(pluralize).reduce(
-    (agg: IDictionary, k: string) => agg[exceptions[k]] = k,
+    (agg: IDictionary, k: string) => (agg[exceptions[k]] = k),
     new Object()
   );
 };
 
-export default function pluralize(singular: string) {
+export function pluralize(singular: string) {
   const rules = [
-    { find: /(.*)(ch|sh|ax|ss)$/, replace: '$1$2es' },
-    { find: /(.*)(fe|f)$/, replace: '$1ves' },
-    { find: /(.*)us$/, replace: '$1i' }
+    { find: /(.*)(ch|sh|ax|ss)$/, replace: "$1$2es" },
+    { find: /(.*)(fe|f)$/, replace: "$1ves" },
+    { find: /(.*)us$/, replace: "$1i" }
   ];
   for (const r of rules) {
     if (r.find.test(singular)) {
@@ -34,7 +34,7 @@ export default function pluralize(singular: string) {
   }
 
   return exceptions[singular] ? exceptions[singular] : `${singular}s`;
-};
+}
 
 export const addException = (singular: string, plural: string) => {
   exceptions[singular] = plural;
@@ -43,4 +43,3 @@ export const addException = (singular: string, plural: string) => {
 export const singularize = (plural: string) => {
   //
 };
-

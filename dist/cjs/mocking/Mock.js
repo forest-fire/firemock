@@ -12,7 +12,6 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("./index");
 const rtdb_1 = require("../rtdb");
-const database_1 = require("../rtdb/database");
 const util_1 = require("../shared/util");
 const MockHelper_1 = require("./MockHelper");
 const auth_1 = require("../auth");
@@ -36,7 +35,7 @@ class Mock {
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
         index_1.Queue.clearAll();
-        database_1.clearDatabase();
+        rtdb_1.clearDatabase();
         state_mgmt_1.clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
@@ -76,7 +75,7 @@ class Mock {
         return obj;
     }
     get db() {
-        return database_1.db;
+        return rtdb_1.db;
     }
     get deploy() {
         return new index_1.Deployment();
@@ -90,9 +89,9 @@ class Mock {
     /** optionally clear the DB before applying the update */
     clearFirst) {
         if (clearFirst) {
-            database_1.clearDatabase();
+            rtdb_1.clearDatabase();
         }
-        database_1.updateDatabase(stateUpdate);
+        rtdb_1.updateDatabase(stateUpdate);
     }
     /**
      * silences the database from sending events;
@@ -100,14 +99,14 @@ class Mock {
      * as part of the Mocking process to reduce noise
      */
     silenceEvents() {
-        database_1.silenceEvents();
+        rtdb_1.silenceEvents();
     }
     /**
      * returns the database to its default state of sending
      * events out.
      */
     restoreEvents() {
-        database_1.restoreEvents();
+        rtdb_1.restoreEvents();
     }
     async auth() {
         return auth_1.auth();

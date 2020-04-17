@@ -1,42 +1,14 @@
-import { DataSnapshot, Query as IQuery, EventType, Reference as IReference } from "@firebase/database-types";
-import { SnapShot } from "./Snapshot";
-import { Reference } from "./Reference";
+import { RtdbQuery, RtdbReference, RtdbDataSnapshot, RtdbEventType, QueryValue, IFirebaseEventHandler } from "../@types/rtdb-types";
 import { SerializedQuery } from "serialized-query";
 import { DelayType } from "../shared/util";
 import { IDictionary } from "common-types";
-export declare type EventHandler = HandleValueEvent | HandleNewEvent | HandleRemoveEvent;
-export declare type GenericEventHandler = (snap: SnapShot, key?: string) => void;
-export declare type HandleValueEvent = (dataSnapShot: SnapShot) => void;
-export declare type HandleNewEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
-export declare type HandleRemoveEvent = (oldChildSnapshot: SnapShot) => void;
-export declare type HandleMoveEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
-export declare type HandleChangeEvent = (childSnapshot: SnapShot, prevChildKey: string) => void;
-export declare type QueryValue = number | string | boolean | null;
-export interface IListener {
-    /** random string */
-    id: string;
-    /** the _query_ the listener is based off of */
-    query: SerializedQuery;
-    eventType: EventType;
-    callback: (a: DataSnapshot | null, b?: string) => any;
-    cancelCallbackOrContext?: object | null;
-    context?: object | null;
-}
-export declare type IQueryFilter<T> = (resultset: T[]) => T[];
 /** tslint:ignore:member-ordering */
-export declare class Query<T = any> implements IQuery {
+export declare abstract class Query<T = any> implements RtdbQuery {
     path: string;
-    protected _delay: DelayType;
-    /**
-     * A static initializer which returns a **Firemock** `Query`
-     * that has been configured with a `SerializedQuery`.
-     *
-     * @param query the _SerializedQuery_ to configure with
-     */
-    static create(query: SerializedQuery): Query<any>;
     protected _query: SerializedQuery;
-    constructor(path: string, _delay?: DelayType);
-    get ref(): Reference<T>;
+    protected _delay: DelayType;
+    constructor(path: string | SerializedQuery, delay?: DelayType);
+    get ref(): RtdbReference;
     limitToLast(num: number): Query<T>;
     limitToFirst(num: number): Query<T>;
     equalTo(value: QueryValue, key?: Extract<keyof T, string>): Query<T>;
@@ -46,8 +18,8 @@ export declare class Query<T = any> implements IQuery {
     /**
      * Setup an event listener for a given eventType
      */
-    on(eventType: EventType, callback: (a: DataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: DataSnapshot, b?: null | string) => Promise<null>;
-    once(eventType: "value"): Promise<DataSnapshot>;
+    on(eventType: RtdbEventType, callback: (a: RtdbDataSnapshot, b?: null | string) => any, cancelCallbackOrContext?: (err?: Error) => void | null, context?: object | null): (a: RtdbDataSnapshot, b?: null | string) => Promise<null>;
+    once(eventType: "value"): Promise<RtdbDataSnapshot>;
     off(): void;
     /**
      * Returns a boolean flag based on whether the two queries --
@@ -89,12 +61,14 @@ export declare class Query<T = any> implements IQuery {
      * This is an undocumented API endpoint that is within the
      * typing provided by Google
      */
-    protected getParent(): IReference | null;
+    protected getParent(): RtdbReference | null;
     /**
      * This is an undocumented API endpoint that is within the
      * typing provided by Google
      */
-    protected getRoot(): IReference;
+    protected getRoot(): RtdbReference;
+    protected abstract getSnapshotConstructor(key: string, value: any): RtdbDataSnapshot;
+    protected abstract addListener(pathOrQuery: string | SerializedQuery<any>, eventType: RtdbEventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<RtdbDataSnapshot>;
     /**
      * Reduce the dataset using _filters_ (after sorts) but do not apply sort
      * order to new SnapShot (so natural order is preserved)

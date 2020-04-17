@@ -2,27 +2,33 @@
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
 import set from "lodash.set";
-import { Mock, SchemaCallback, IFirebaseEventHandler } from "../src";
+import {
+  Mock,
+  SchemaCallback,
+  IFirebaseEventHandler,
+  GenericEventHandler,
+  HandleValueEvent
+} from "../src";
 import {
   db,
   clearDatabase,
-  addListener,
-  listenerCount,
-  removeListener,
-  removeAllListeners,
-  listenerPaths,
   pushDB,
   setDB,
   removeDB,
   updateDB,
+  reset
+} from "../src/rtdb/store";
+import {
+  addListener,
+  listenerCount,
+  removeAllListeners,
+  removeListener,
+  listenerPaths,
   findChildListeners,
-  findValueListeners,
-  reset,
-  getDb
-} from "../src/rtdb/database";
-import { GenericEventHandler, HandleValueEvent } from "../src/rtdb/Query";
+  findValueListeners
+} from "../src/rtdb/listeners";
 import "mocha";
-import { wait, IDictionary } from "common-types";
+import { wait } from "common-types";
 
 const expect = chai.expect;
 

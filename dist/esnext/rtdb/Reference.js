@@ -1,7 +1,7 @@
-import { Query } from "./Query";
 import get from "lodash.get";
-import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB } from "./database";
+import { db, setDB, updateDB, pushDB, removeDB, multiPathUpdateDB, SnapShot, addListener, Query } from "./index";
 import { parts, join, slashNotation, networkDelay } from "../shared/util";
+import { SerializedQuery } from "serialized-query";
 function isMultiPath(data) {
     Object.keys(data).map((d) => {
         if (!d) {
@@ -13,6 +13,20 @@ function isMultiPath(data) {
     return indexesAreStrings && indexesLookLikeAPath ? true : false;
 }
 export class Reference extends Query {
+    static createQuery(query, delay = 5) {
+        if (typeof query === "string") {
+            query = new SerializedQuery(query);
+        }
+        const obj = new Reference(query.path, delay);
+        obj._query = query;
+        return obj;
+    }
+    static create(path) {
+        return new Reference(path);
+    }
+    constructor(path, _delay = 5) {
+        super(path, _delay);
+    }
     get key() {
         return this.path.split(".").pop();
     }
@@ -37,7 +51,6 @@ export class Reference extends Query {
         if (onComplete) {
             onComplete(null);
         }
-        // TODO: try and get this typed appropriately
         const ref = networkDelay(this);
         return ref;
     }
@@ -89,6 +102,12 @@ export class Reference extends Query {
         return this.path
             ? slashNotation(join("FireMock::Reference@", this.path, this.key))
             : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
+    }
+    getSnapshotConstructor(key, value) {
+        return new SnapShot(key, value);
+    }
+    addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context) {
+        return addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context);
     }
 }
 //# sourceMappingURL=Reference.js.map

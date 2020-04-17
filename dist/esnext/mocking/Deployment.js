@@ -2,10 +2,9 @@ import * as fbKey from "firebase-key";
 import set from "lodash.set";
 import get from "lodash.get";
 import first from "lodash.first";
-import { getRandomInt, dotNotation } from "../shared/util";
-import { Queue } from "./Queue";
-import pluralize from "../shared/pluralize";
-import { db } from "../rtdb/database";
+import { getRandomInt, dotNotation, pluralize } from "../shared";
+import { Queue } from "./index";
+import { db } from "../rtdb";
 export class Deployment {
     constructor() {
         this._queue = new Queue("queue");

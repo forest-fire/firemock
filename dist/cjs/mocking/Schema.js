@@ -1,20 +1,12 @@
 "use strict";
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const Queue_1 = require("./Queue");
-const schema_helper_1 = require("./schema-helper");
-const pluralize_1 = __importStar(require("../shared/pluralize"));
+const index_1 = require("./index");
+const shared_1 = require("../shared");
 class Schema {
     constructor(schemaId) {
         this.schemaId = schemaId;
-        this._schemas = new Queue_1.Queue("schemas");
-        this._relationships = new Queue_1.Queue("relationships");
+        this._schemas = new index_1.Queue("schemas");
+        this._relationships = new index_1.Queue("relationships");
         this._prefix = "";
     }
     /**
@@ -23,14 +15,14 @@ class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new schema_helper_1.SchemaHelper({})),
+            fn: cb(new index_1.SchemaHelper({})),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [
                     schema.prefix,
                     schema.modelName
-                        ? pluralize_1.default(schema.modelName)
-                        : pluralize_1.default(this.schemaId)
+                        ? shared_1.pluralize(schema.modelName)
+                        : shared_1.pluralize(this.schemaId)
                 ].join("/");
             }
         });
@@ -63,7 +55,7 @@ class Schema {
         const model = this._schemas.find(this.schemaId).modelName
             ? this._schemas.find(this.schemaId).modelName
             : this.schemaId;
-        pluralize_1.addException(model, plural);
+        shared_1.addException(model, plural);
         return this;
     }
     /**
@@ -86,7 +78,7 @@ class Schema {
             type: "hasMany",
             source: this.schemaId,
             target,
-            sourceProperty: sourceProperty ? sourceProperty : pluralize_1.default(target)
+            sourceProperty: sourceProperty ? sourceProperty : shared_1.pluralize(target)
         });
         return this;
     }

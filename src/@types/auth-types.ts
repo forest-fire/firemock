@@ -9,9 +9,10 @@ export interface IAuthProviders {
   EmailAuthProvider: EmailAuthProvider;
 }
 
-import { Mock, IDictionary } from "../index";
+import { Mock } from "../index";
 import { EmailAuthProvider } from "@firebase/auth-types";
 import { UserRecord } from "../auth/admin-sdk";
+import { IDictionary } from "common-types";
 
 export type UserCredential = import("@firebase/auth-types").UserCredential;
 export type User = import("@firebase/auth-types").User;
