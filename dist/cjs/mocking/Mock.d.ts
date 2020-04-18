@@ -20,7 +20,7 @@ export declare class Mock {
      * DB to be setup via mocking.
      */
     ): Promise<Mock>;
-    get db(): IDictionary<any>;
+    get db(): any;
     get deploy(): Deployment;
     private _schemas;
     private _relationships;
@@ -65,7 +65,7 @@ export declare class Mock {
      * it's required. Calling this _async_ method will ensure that
      * before you're mocking with faker available.
      */
-    importFakerLibrary(): Promise<void>;
+    importFakerLibrary(): Promise<Faker.FakerStatic>;
     /**
      * **getMockHelper**
      *
@@ -74,7 +74,7 @@ export declare class Mock {
      * you can also set some additional `context` where desirable.
      */
     getMockHelper(context?: IDictionary): MockHelper;
-    addSchema<S = any>(schema: string, mock?: SchemaCallback): Schema<S>;
+    addSchema<S = any>(schema: string, mock?: SchemaCallback<S>): Schema<S>;
     /** Set the network delay for queries with "once" */
     setDelay(d: DelayType): void;
     queueSchema<T = any>(schemaId: string, quantity?: number, overrides?: IDictionary): Deployment;

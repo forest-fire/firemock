@@ -1,13 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const mocking_1 = require("../mocking");
+const index_1 = require("../mocking/index");
 const shared_1 = require("../shared");
+const Mock_1 = require("./Mock");
 class Schema {
-    constructor(schemaId) {
+    constructor(schemaId, mockFn) {
         this.schemaId = schemaId;
-        this._schemas = new mocking_1.Queue("schemas");
-        this._relationships = new mocking_1.Queue("relationships");
-        this._prefix = "";
+        this._schemas = new index_1.Queue("schemas");
+        this._relationships = new index_1.Queue("relationships");
+        if (mockFn) {
+            this.mock(mockFn);
+        }
     }
     /**
      * Add a mocking function to be used to generate the schema in mock DB
@@ -15,7 +18,7 @@ class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new mocking_1.SchemaHelper({})),
+            fn: cb(new index_1.SchemaHelper({}, Mock_1.faker)),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [

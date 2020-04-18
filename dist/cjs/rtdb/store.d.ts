@@ -1,6 +1,5 @@
 import { IDictionary } from "common-types";
 import { IMockWatcherGroupEvent } from "../@types/rtdb-types";
-export declare let db: IDictionary;
 /**
  * silences the database from sending events;
  * this is not typically done but can be done
@@ -13,10 +12,15 @@ export declare function silenceEvents(): void;
  */
 export declare function restoreEvents(): void;
 export declare function shouldSendEvents(): boolean;
+/** clears the DB without losing reference to DB object */
 export declare function clearDatabase(): void;
-export declare function updateDatabase(state: any): void;
+/**
+ * updates the state of the database based on a
+ * non-descructive update.
+ */
+export declare function updateDatabase(updatedState: IDictionary): void;
 export declare function auth(): Promise<import("..").IMockAuth>;
-export declare function getDb<T = any>(path: string): any;
+export declare function getDb<T = any>(path?: string): any;
 /**
  * **setDB**
  *

@@ -10,7 +10,6 @@ import {
   HandleValueEvent
 } from "../src";
 import {
-  db,
   clearDatabase,
   pushDB,
   setDB,
@@ -452,7 +451,7 @@ describe("Database", () => {
 
     it('"child_added" ignores removed child', async () => {
       reset();
-      set(db, "people.abcd", {
+      setDB("people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
@@ -469,17 +468,17 @@ describe("Database", () => {
 
     it('"child_removed" responds to removed child', async () => {
       reset();
-      set(db, "people.abcd", {
+      setDB("people.abcd", {
         name: "Chris Chisty",
         age: 100
       });
       let ready = false;
       const callback: HandleValueEvent = snap => {
         if (ready) {
-          expect(db.people).to.be.an("object");
-          expect(Object.keys(db.people)).length(0);
+          expect(getDb().people).to.be.an("object");
+          expect(Object.keys(getDb().people)).length(0);
         } else {
-          expect(Object.keys(db.people)).length(1);
+          expect(Object.keys(getDb().people)).length(1);
         }
       };
       await addListener("/people", "child_removed", callback);

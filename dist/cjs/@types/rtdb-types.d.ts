@@ -47,7 +47,7 @@ export interface IQueue {
     belongsTo?: IDictionary<boolean>;
 }
 /** A Schema's mock callback generator must conform to this type signature */
-export declare type SchemaCallback<T = any> = (helper: ISchemaHelper) => () => T;
+export declare type SchemaCallback<T = any> = (helper: ISchemaHelper<T>) => () => T;
 /**
  * Captures a CRUD event
  */

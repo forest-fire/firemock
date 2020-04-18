@@ -9,7 +9,6 @@ import {
 } from "../@types/rtdb-types";
 
 import {
-  db,
   setDB,
   updateDB,
   pushDB,
@@ -27,6 +26,7 @@ import {
   DelayType
 } from "../shared/index";
 import { SerializedQuery } from "serialized-query";
+import { getDb } from "./store";
 
 function isMultiPath(data: IDictionary) {
   Object.keys(data).map((d: any) => {
@@ -69,18 +69,18 @@ export class Reference<T = any> extends Query<T> implements RtdbReference {
     const r = parts(this.path)
       .slice(-1)
       .join(".");
-    return new Reference(r, get(db, r));
+    return new Reference(r, getDb(r));
   }
 
   public child<C = any>(path: string): Reference {
     const r = parts(this.path)
       .concat([path])
       .join(".");
-    return new Reference<C>(r, get(db, r));
+    return new Reference<C>(r, getDb(r));
   }
 
   public get root(): Reference {
-    return new Reference("/", db);
+    return new Reference("/", getDb("/"));
   }
 
   public push(

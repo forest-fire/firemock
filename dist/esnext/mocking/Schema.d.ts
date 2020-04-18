@@ -8,8 +8,7 @@ export declare class Schema<T = any> {
     schemaId: string;
     private _schemas;
     private _relationships;
-    private _prefix;
-    constructor(schemaId: string);
+    constructor(schemaId: string, mockFn?: SchemaCallback);
     /**
      * Add a mocking function to be used to generate the schema in mock DB
      */

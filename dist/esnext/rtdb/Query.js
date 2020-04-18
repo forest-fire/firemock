@@ -1,7 +1,7 @@
-import { getDb } from "./store";
+import { getDb, SnapShot } from "../rtdb/index";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { leafNode, networkDelay } from "../shared/util";
-import { runQuery } from "../shared/runQuery";
+import { leafNode, networkDelay } from "../shared/index";
+import { runQuery } from "../shared/index";
 /** tslint:ignore:member-ordering */
 export class Query {
     constructor(path, delay = 5) {
@@ -45,11 +45,12 @@ export class Query {
         this.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
-    once(eventType) {
-        return networkDelay(this.getQuerySnapShot());
+    async once(eventType) {
+        await networkDelay();
+        return this.getQuerySnapShot();
     }
     off() {
-        console.log("off() not implemented yet");
+        console.log("off() not implemented yet on Firemock");
     }
     /**
      * Returns a boolean flag based on whether the two queries --
@@ -125,10 +126,11 @@ export class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     getQuerySnapShot() {
-        const data = getDb(this._query.path);
+        const path = this._query.path || this.path;
+        const data = getDb(path);
         const results = runQuery(this._query, data);
-        // return new SnapShot(leafNode(this._query.path), results);
-        return this.getSnapshot(leafNode(this._query.path), results);
+        return new SnapShot(leafNode(this._query.path), results);
+        // return this.getSnapshotConstructor(leafNode(this._query.path), results);
     }
 }
 //# sourceMappingURL=Query.js.map

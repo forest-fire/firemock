@@ -1,12 +1,9 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const lodash_get_1 = __importDefault(require("lodash.get"));
 const index_1 = require("../rtdb/index");
-const shared_1 = require("../shared");
+const index_2 = require("../shared/index");
 const serialized_query_1 = require("serialized-query");
+const store_1 = require("./store");
 function isMultiPath(data) {
     Object.keys(data).map((d) => {
         if (!d) {
@@ -36,27 +33,27 @@ class Reference extends index_1.Query {
         return this.path.split(".").pop();
     }
     get parent() {
-        const r = shared_1.parts(this.path)
+        const r = index_2.parts(this.path)
             .slice(-1)
             .join(".");
-        return new Reference(r, lodash_get_1.default(index_1.db, r));
+        return new Reference(r, store_1.getDb(r));
     }
     child(path) {
-        const r = shared_1.parts(this.path)
+        const r = index_2.parts(this.path)
             .concat([path])
             .join(".");
-        return new Reference(r, lodash_get_1.default(index_1.db, r));
+        return new Reference(r, store_1.getDb(r));
     }
     get root() {
-        return new Reference("/", index_1.db);
+        return new Reference("/", store_1.getDb("/"));
     }
     push(value, onComplete) {
         const id = index_1.pushDB(this.path, value);
-        this.path = shared_1.join(this.path, id);
+        this.path = index_2.join(this.path, id);
         if (onComplete) {
             onComplete(null);
         }
-        const ref = shared_1.networkDelay(this);
+        const ref = index_2.networkDelay(this);
         return ref;
     }
     remove(onComplete) {
@@ -64,14 +61,14 @@ class Reference extends index_1.Query {
         if (onComplete) {
             onComplete(null);
         }
-        return shared_1.networkDelay();
+        return index_2.networkDelay();
     }
     set(value, onComplete) {
         index_1.setDB(this.path, value);
         if (onComplete) {
             onComplete(null);
         }
-        return shared_1.networkDelay();
+        return index_2.networkDelay();
     }
     update(values, onComplete) {
         if (isMultiPath(values)) {
@@ -83,13 +80,13 @@ class Reference extends index_1.Query {
         if (onComplete) {
             onComplete(null);
         }
-        return shared_1.networkDelay();
+        return index_2.networkDelay();
     }
     setPriority(priority, onComplete) {
-        return shared_1.networkDelay();
+        return index_2.networkDelay();
     }
     setWithPriority(newVal, newPriority, onComplete) {
-        return shared_1.networkDelay();
+        return index_2.networkDelay();
     }
     transaction(transactionUpdate, onComplete, applyLocally) {
         return Promise.resolve({
@@ -105,7 +102,7 @@ class Reference extends index_1.Query {
     }
     toString() {
         return this.path
-            ? shared_1.slashNotation(shared_1.join("FireMock::Reference@", this.path, this.key))
+            ? index_2.slashNotation(index_2.join("FireMock::Reference@", this.path, this.key))
             : "FireMock::Reference@uninitialized (aka, no path) mock Reference object";
     }
     getSnapshot(key, value) {

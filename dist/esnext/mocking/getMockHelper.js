@@ -1,4 +1,4 @@
-import { MockHelper } from "./MockHelper";
+import { MockHelper } from "../mocking/index";
 /**
  * Returns a Mock Helper object which includes the faker library.
  *

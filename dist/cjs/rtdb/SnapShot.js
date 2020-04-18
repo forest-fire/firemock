@@ -6,14 +6,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_get_1 = __importDefault(require("lodash.get"));
 const index_1 = require("../rtdb/index");
 const typed_conversions_1 = require("typed-conversions");
-const shared_1 = require("../shared");
+const index_2 = require("../shared/index");
 class SnapShot {
     constructor(_key, _value) {
         this._key = _key;
         this._value = _value;
     }
     get key() {
-        return shared_1.getKey(shared_1.join(this._key));
+        return index_2.getKey(index_2.join(this._key));
     }
     get ref() {
         return new index_1.Reference(this._key);

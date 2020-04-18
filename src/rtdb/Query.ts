@@ -11,7 +11,6 @@ import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { leafNode, DelayType, networkDelay } from "../shared/index";
 import { runQuery } from "../shared/index";
 import { IDictionary } from "common-types";
-import { db } from "./store";
 
 /** tslint:ignore:member-ordering */
 export abstract class Query<T = any> implements RtdbQuery {

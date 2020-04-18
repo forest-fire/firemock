@@ -5,12 +5,15 @@ import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
 import copy from "fast-copy";
-import { join, getParent, getKey } from "../shared/util";
-import { auth as mockedAuth } from "../auth";
 import deepmerge from "deepmerge";
-import { getListeners, removeAllListeners, notify } from "./index";
-import { dotifyKeys, dotify } from "../shared/dotify";
-export let db = [];
+import { auth as mockedAuth } from "../auth";
+import { join, getParent, getKey, dotifyKeys, dotify } from "../shared/index";
+import { getListeners, removeAllListeners, notify } from "../rtdb/index";
+/**
+ * The in-memory dictionary/hash mantained by the mock RTDB to represent
+ * the state of the database
+ */
+let db = {};
 let _silenceEvents = false;
 /**
  * silences the database from sending events;
@@ -30,17 +33,23 @@ export function restoreEvents() {
 export function shouldSendEvents() {
     return !_silenceEvents;
 }
+/** clears the DB without losing reference to DB object */
 export function clearDatabase() {
-    db = {};
+    const keys = Object.keys(db);
+    keys.forEach(key => delete db[key]);
 }
-export function updateDatabase(state) {
-    db = deepmerge(db, state);
+/**
+ * updates the state of the database based on a
+ * non-descructive update.
+ */
+export function updateDatabase(updatedState) {
+    db = deepmerge(db, updatedState);
 }
 export async function auth() {
     return mockedAuth();
 }
 export function getDb(path) {
-    return get(db, dotify(path));
+    return path ? get(db, dotify(path)) : db;
 }
 /**
  * **setDB**

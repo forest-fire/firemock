@@ -1,7 +1,7 @@
 import get from "lodash.get";
-import { Reference } from "./index";
-import * as convert from "typed-conversions";
-import { getKey, join } from "../shared/util";
+import { Reference } from "../rtdb/index";
+import { arrayToHash } from "typed-conversions";
+import { getKey, join } from "../shared/index";
 export class SnapShot {
     constructor(_key, _value) {
         this._key = _key;
@@ -14,9 +14,7 @@ export class SnapShot {
         return new Reference(this._key);
     }
     val() {
-        return Array.isArray(this._value)
-            ? convert.arrayToHash(this._value)
-            : this._value;
+        return Array.isArray(this._value) ? arrayToHash(this._value) : this._value;
     }
     toJSON() {
         return JSON.stringify(this._value);

@@ -2,7 +2,6 @@ import { IDictionary } from "common-types";
 import { Queue, Schema, Deployment, MockHelper } from "../mocking/index";
 import {
   Reference,
-  db,
   clearDatabase,
   updateDatabase,
   restoreEvents,

@@ -1,6 +1,6 @@
 import { RtdbQuery, RtdbReference, RtdbDataSnapshot, RtdbEventType, QueryValue, IFirebaseEventHandler } from "../@types/rtdb-types";
 import { SerializedQuery } from "serialized-query";
-import { DelayType } from "../shared/util";
+import { DelayType } from "../shared/index";
 import { IDictionary } from "common-types";
 /** tslint:ignore:member-ordering */
 export declare abstract class Query<T = any> implements RtdbQuery {
@@ -67,7 +67,6 @@ export declare abstract class Query<T = any> implements RtdbQuery {
      * typing provided by Google
      */
     protected getRoot(): RtdbReference;
-    protected abstract getSnapshot(key: string, value: any): RtdbDataSnapshot;
     protected abstract addListener(pathOrQuery: string | SerializedQuery<any>, eventType: RtdbEventType, callback: IFirebaseEventHandler, cancelCallbackOrContext?: (err?: Error) => void, context?: IDictionary): Promise<RtdbDataSnapshot>;
     /**
      * Reduce the dataset using _filters_ (after sorts) but do not apply sort

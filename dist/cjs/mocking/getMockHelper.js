@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const MockHelper_1 = require("./MockHelper");
+const index_1 = require("../mocking/index");
 /**
  * Returns a Mock Helper object which includes the faker library.
  *
@@ -10,7 +10,7 @@ const MockHelper_1 = require("./MockHelper");
  */
 async function getMockHelper(db) {
     await db.mock.importFakerLibrary();
-    const obj = new MockHelper_1.MockHelper();
+    const obj = new index_1.MockHelper();
     return obj;
 }
 exports.getMockHelper = getMockHelper;

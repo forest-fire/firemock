@@ -26,6 +26,9 @@ export declare class Deployment {
      */
     fulfillBelongsTo(targetSchema: string): this;
     generate(): void;
+    /**
+     * Adds in a given record/mock into the mock database
+     */
     private insertMockIntoDB;
     private insertRelationshipLinks;
 }

@@ -4,10 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const serialized_query_1 = require("serialized-query");
-const shared_1 = require("../shared");
+const index_1 = require("../shared/index");
 const lodash_get_1 = __importDefault(require("lodash.get"));
 const typed_conversions_1 = require("typed-conversions");
-const index_1 = require("../rtdb/index");
+const index_2 = require("../rtdb/index");
 let _listeners = [];
 /**
  * **addListener**
@@ -23,10 +23,10 @@ let _listeners = [];
  */
 async function addListener(pathOrQuery, eventType, callback, cancelCallbackOrContext, context) {
     const query = (typeof pathOrQuery === "string"
-        ? new serialized_query_1.SerializedQuery(shared_1.join(pathOrQuery))
+        ? new serialized_query_1.SerializedQuery(index_1.join(pathOrQuery))
         : pathOrQuery);
     pathOrQuery = (typeof pathOrQuery === "string"
-        ? shared_1.join(pathOrQuery)
+        ? index_1.join(pathOrQuery)
         : query.path);
     _listeners.push({
         id: Math.random()
@@ -39,7 +39,7 @@ async function addListener(pathOrQuery, eventType, callback, cancelCallbackOrCon
         context
     });
     function ref(dbPath) {
-        return new index_1.Reference(dbPath);
+        return new index_2.Reference(dbPath);
     }
     const snapshot = await query
         .deserialize({ ref })
@@ -50,7 +50,7 @@ async function addListener(pathOrQuery, eventType, callback, cancelCallbackOrCon
     else {
         const list = typed_conversions_1.hashToArray(snapshot.val());
         if (eventType === "child_added") {
-            list.forEach((i) => callback(new index_1.SnapShot(shared_1.join(query.path, i.id), i)));
+            list.forEach((i) => callback(new index_2.SnapShot(index_1.join(query.path, i.id), i)));
         }
     }
     return snapshot;
@@ -188,46 +188,46 @@ function keyDidNotPreviouslyExist(e, dbSnapshot) {
  * send to zero or more listeners.
  */
 function notify(data, dbSnapshot) {
-    if (!index_1.shouldSendEvents()) {
+    if (!index_2.shouldSendEvents()) {
         return;
     }
-    const events = index_1.groupEventsByWatcher(data, dbSnapshot);
+    const events = index_2.groupEventsByWatcher(data, dbSnapshot);
     events.forEach(evt => {
         const isDeleteEvent = evt.value === null || evt.value === undefined;
         switch (evt.listenerEvent) {
             case "child_removed":
                 if (isDeleteEvent) {
-                    evt.callback(new index_1.SnapShot(evt.key, evt.priorValue));
+                    evt.callback(new index_2.SnapShot(evt.key, evt.priorValue));
                 }
                 return;
             case "child_added":
                 if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
-                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
+                    evt.callback(new index_2.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "child_changed":
                 if (!isDeleteEvent) {
-                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
+                    evt.callback(new index_2.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "child_moved":
                 if (!isDeleteEvent && keyDidNotPreviouslyExist(evt, dbSnapshot)) {
                     // TODO: if we implement sorting then add the previousKey value
-                    evt.callback(new index_1.SnapShot(evt.key, evt.value));
+                    evt.callback(new index_2.SnapShot(evt.key, evt.value));
                 }
                 return;
             case "value":
-                const snapKey = new index_1.SnapShot(evt.listenerPath, evt.value).key;
+                const snapKey = new index_2.SnapShot(evt.listenerPath, evt.value).key;
                 if (snapKey === evt.key) {
                     // root set
-                    evt.callback(new index_1.SnapShot(evt.listenerPath, evt.value === null || evt.value === undefined
+                    evt.callback(new index_2.SnapShot(evt.listenerPath, evt.value === null || evt.value === undefined
                         ? undefined
                         : { [evt.key]: evt.value }));
                 }
                 else {
                     // property set
-                    const value = evt.value === null ? index_1.getDb(evt.listenerPath) : evt.value;
-                    evt.callback(new index_1.SnapShot(evt.listenerPath, value));
+                    const value = evt.value === null ? index_2.getDb(evt.listenerPath) : evt.value;
+                    evt.callback(new index_2.SnapShot(evt.listenerPath, value));
                 }
         } // end switch
     });
@@ -235,7 +235,7 @@ function notify(data, dbSnapshot) {
 exports.notify = notify;
 function priorKey(path, id) {
     let previous;
-    const ids = index_1.getDb(path);
+    const ids = index_2.getDb(path);
     if (typeof ids === "object") {
         return null;
     }
@@ -259,20 +259,20 @@ function priorKey(path, id) {
  * @param eventTypes <optional> the specific child event (or events) to filter down to; if you have more than one then you should be aware that this property is destructured so the calling function should pass in an array of parameters rather than an array as the second parameter
  */
 function findChildListeners(changePath, ...eventTypes) {
-    changePath = shared_1.stripLeadingDot(changePath.replace(/\//g, "."));
+    changePath = index_1.stripLeadingDot(changePath.replace(/\//g, "."));
     eventTypes =
         eventTypes.length !== 0
             ? eventTypes
             : ["child_added", "child_changed", "child_moved", "child_removed"];
     const decendants = _listeners
         .filter(l => eventTypes.includes(l.eventType))
-        .filter(l => changePath.startsWith(shared_1.dotify(l.query.path)))
+        .filter(l => changePath.startsWith(index_1.dotify(l.query.path)))
         .reduce((acc, listener) => {
-        const id = shared_1.removeDots(changePath
+        const id = index_1.removeDots(changePath
             .replace(listener.query.path, "")
             .split(".")
             .filter(i => i)[0]);
-        const remainingPath = shared_1.stripLeadingDot(changePath.replace(shared_1.stripLeadingDot(listener.query.path), ""));
+        const remainingPath = index_1.stripLeadingDot(changePath.replace(index_1.stripLeadingDot(listener.query.path), ""));
         const changeIsAtRoot = id === remainingPath;
         acc.push(Object.assign(Object.assign({}, listener), { id, changeIsAtRoot }));
         return acc;
@@ -288,7 +288,7 @@ exports.findChildListeners = findChildListeners;
  * @param path path to root listening point
  */
 function findValueListeners(path) {
-    return _listeners.filter(l => shared_1.join(path).indexOf(shared_1.join(l.query.path)) !== -1 && l.eventType === "value");
+    return _listeners.filter(l => index_1.join(path).indexOf(index_1.join(l.query.path)) !== -1 && l.eventType === "value");
 }
 exports.findValueListeners = findValueListeners;
 //# sourceMappingURL=listeners.js.map

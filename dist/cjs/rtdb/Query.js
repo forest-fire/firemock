@@ -2,7 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("../rtdb/index");
 const serialized_query_1 = require("serialized-query");
-const shared_1 = require("../shared");
+const index_2 = require("../shared/index");
+const index_3 = require("../shared/index");
 /** tslint:ignore:member-ordering */
 class Query {
     constructor(path, delay = 5) {
@@ -46,11 +47,12 @@ class Query {
         this.addListener(this._query, eventType, callback, cancelCallbackOrContext, context);
         return null;
     }
-    once(eventType) {
-        return shared_1.networkDelay(this.getQuerySnapShot());
+    async once(eventType) {
+        await index_2.networkDelay();
+        return this.getQuerySnapShot();
     }
     off() {
-        console.log("off() not implemented yet");
+        console.log("off() not implemented yet on Firemock");
     }
     /**
      * Returns a boolean flag based on whether the two queries --
@@ -126,10 +128,11 @@ class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     getQuerySnapShot() {
-        const data = index_1.getDb(this._query.path);
-        // const results = runQuery(this._query, data);
-        // return this.getSnapshot(leafNode(this._query.path), results);
-        return {};
+        const path = this._query.path || this.path;
+        const data = index_1.getDb(path);
+        const results = index_3.runQuery(this._query, data);
+        return new index_1.SnapShot(index_2.leafNode(this._query.path), results);
+        // return this.getSnapshotConstructor(leafNode(this._query.path), results);
     }
 }
 exports.Query = Query;

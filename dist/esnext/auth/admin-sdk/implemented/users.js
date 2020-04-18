@@ -1,5 +1,5 @@
 import { addUser, updateUser, getUserById, removeUser, getUserByEmail, allUsers } from "../../state-mgmt";
-import { networkDelay } from "../../../shared/util";
+import { networkDelay } from "../../../shared";
 export const users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {

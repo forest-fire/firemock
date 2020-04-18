@@ -74,7 +74,7 @@ class Mock {
         return obj;
     }
     get db() {
-        return index_2.db;
+        return index_2.getDb();
     }
     get deploy() {
         return new index_1.Deployment();
@@ -128,6 +128,7 @@ class Mock {
         if (!exports.faker) {
             exports.faker = await Promise.resolve().then(() => __importStar(require(/* webpackChunkName: "faker-lib" */ "faker")));
         }
+        return exports.faker;
     }
     /**
      * **getMockHelper**
@@ -143,11 +144,7 @@ class Mock {
         return new index_1.MockHelper(context);
     }
     addSchema(schema, mock) {
-        const s = new index_1.Schema(schema);
-        if (mock) {
-            s.mock(mock);
-        }
-        return new index_1.Schema(schema);
+        return new index_1.Schema(schema, mock);
     }
     /** Set the network delay for queries with "once" */
     setDelay(d) {

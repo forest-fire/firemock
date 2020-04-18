@@ -1,5 +1,5 @@
 import { createError } from "common-types";
-import { faker } from "./Mock";
+import { faker } from "../mocking/index";
 export class MockHelper {
     constructor(context) {
         this.context = context;

@@ -1,11 +1,14 @@
-import { Queue, SchemaHelper } from "./index";
+import { Queue, SchemaHelper } from "../mocking/index";
 import { pluralize, addException } from "../shared";
+import { faker } from "./Mock";
 export class Schema {
-    constructor(schemaId) {
+    constructor(schemaId, mockFn) {
         this.schemaId = schemaId;
         this._schemas = new Queue("schemas");
         this._relationships = new Queue("relationships");
-        this._prefix = "";
+        if (mockFn) {
+            this.mock(mockFn);
+        }
     }
     /**
      * Add a mocking function to be used to generate the schema in mock DB
@@ -13,7 +16,7 @@ export class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new SchemaHelper({})),
+            fn: cb(new SchemaHelper({}, faker)),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [

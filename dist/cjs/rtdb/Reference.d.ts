@@ -1,7 +1,7 @@
 import { IDictionary } from "common-types";
 import { RtdbReference, RtdbDataSnapshot, RtdbThenableReference, RtdbEventType, IFirebaseEventHandler } from "../@types/rtdb-types";
 import { SnapShot, Query } from "../rtdb/index";
-import { DelayType } from "../shared";
+import { DelayType } from "../shared/index";
 import { SerializedQuery } from "serialized-query";
 export declare class Reference<T = any> extends Query<T> implements RtdbReference {
     static createQuery(query: string | SerializedQuery, delay?: DelayType): Reference<any>;

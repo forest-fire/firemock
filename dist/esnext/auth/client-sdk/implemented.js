@@ -1,4 +1,4 @@
-import { networkDelay } from "../../shared/util";
+import { networkDelay } from "../../shared";
 import { completeUserCredential } from "./completeUserCredential";
 import { FireMockError } from "../../errors/FireMockError";
 import { emailExistsAsUserInAuth, emailHasCorrectPassword, emailVerified, userUid, emailValidationAllowed, emailIsValidFormat } from "./authMockHelpers";
