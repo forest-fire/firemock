@@ -6,11 +6,12 @@ import {
   QueryValue,
   IFirebaseEventHandler
 } from "../@types/rtdb-types";
-import { getDb } from "../rtdb/index";
+import { getDb, SnapShot } from "../rtdb/index";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { leafNode, DelayType, networkDelay, runQuery } from "../shared/index";
+import { leafNode, DelayType, networkDelay } from "../shared/index";
+import { runQuery } from "../shared/index";
 import { IDictionary } from "common-types";
-import { DataSnapshot } from "@firebase/database-types";
+import { db } from "./store";
 
 /** tslint:ignore:member-ordering */
 export abstract class Query<T = any> implements RtdbQuery {
@@ -85,12 +86,13 @@ export abstract class Query<T = any> implements RtdbQuery {
     return null;
   }
 
-  public once(eventType: "value"): Promise<RtdbDataSnapshot> {
-    return networkDelay<RtdbDataSnapshot>(this.getQuerySnapShot());
+  public async once(eventType: "value"): Promise<RtdbDataSnapshot> {
+    await networkDelay();
+    return this.getQuerySnapShot();
   }
 
   public off() {
-    console.log("off() not implemented yet");
+    console.log("off() not implemented yet on Firemock");
   }
 
   /**
@@ -173,7 +175,10 @@ export abstract class Query<T = any> implements RtdbQuery {
     return null;
   }
 
-  protected abstract getSnapshot(key: string, value: any): RtdbDataSnapshot;
+  // protected abstract getSnapshotConstructor(
+  //   key: string,
+  //   value: any
+  // ): RtdbDataSnapshot;
 
   protected abstract addListener(
     pathOrQuery: string | SerializedQuery<any>,
@@ -188,9 +193,11 @@ export abstract class Query<T = any> implements RtdbQuery {
    * order to new SnapShot (so natural order is preserved)
    */
   private getQuerySnapShot() {
-    const data = getDb(this._query.path);
+    const path = this._query.path || this.path;
+    const data = getDb(path);
     const results = runQuery(this._query, data);
-    return this.getSnapshot(leafNode(this._query.path), results);
-    // return {} as DataSnapshot;
+
+    return new SnapShot(leafNode(this._query.path), results);
+    // return this.getSnapshotConstructor(leafNode(this._query.path), results);
   }
 }

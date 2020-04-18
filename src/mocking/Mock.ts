@@ -6,7 +6,8 @@ import {
   clearDatabase,
   updateDatabase,
   restoreEvents,
-  silenceEvents
+  silenceEvents,
+  getDb
 } from "../rtdb/index";
 import { DelayType, setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
@@ -65,7 +66,7 @@ export class Mock {
   }
 
   public get db() {
-    return db;
+    return getDb();
   }
 
   public get deploy() {

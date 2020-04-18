@@ -5,7 +5,7 @@ import * as helpers from "./testing/helpers";
 import { SchemaCallback } from "../src";
 import { Mock, SchemaHelper } from "../src/mocking";
 import { difference } from "lodash";
-import { reset } from "../src/rtdb";
+import { reset, getDb } from "../src/rtdb";
 import {
   firstProp,
   lastProp,
@@ -473,7 +473,6 @@ describe("Reference functions", () => {
       );
 
       const items = convert.hashToArray(snap.val()).map(i => i.value);
-      console.log(snap);
 
       expect(items).to.have.lengthOf(5);
 
@@ -503,11 +502,12 @@ describe("Reference functions", () => {
     });
     it('orderByChild() combines with limitToLast() for "server-side" selection', async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
+      // m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.queueSchema("person", 10, { age: 1 });
       m.generate();
+
       const results = await m
         .ref("/people")
         .orderByChild("age")

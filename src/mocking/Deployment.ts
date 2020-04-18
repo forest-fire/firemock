@@ -5,9 +5,9 @@ import get from "lodash.get";
 import first from "lodash.first";
 import { IRelationship, ISchema, IQueue } from "../@types";
 import { getRandomInt, dotNotation, pluralize } from "../shared";
-import { db } from "../rtdb/index";
 import { Queue } from "../mocking/index";
 import { faker } from "./Mock";
+import { setDB, getDb } from "../rtdb";
 
 export class Deployment {
   private schemaId: string;
@@ -104,11 +104,9 @@ export class Deployment {
   }
 
   public generate() {
-    console.log(this._queue);
-
+    // iterate over each schema that has been queued
+    // for generation
     this._queue.map((q: IQueue) => {
-      console.log(q);
-
       for (let i = q.quantity; i > 0; i--) {
         this.insertMockIntoDB(q.schema, q.overrides);
       }
@@ -123,21 +121,24 @@ export class Deployment {
     this._queue.clear();
   }
 
+  /**
+   * Adds in a given record/mock into the mock database
+   */
   private insertMockIntoDB(schemaId: string, overrides: IDictionary) {
     const schema: ISchema = this._schemas.find(schemaId);
     const mock = schema.fn();
     const path = schema.path();
     const key = overrides.id || fbKey.key();
-
-    set(
-      db,
-      dotNotation(path) + `.${key}`,
+    const dbPath = dotNotation(path) + `.${key}`;
+    const payload =
       typeof mock === "object"
         ? { ...mock, ...overrides }
         : overrides && typeof overrides !== "object"
         ? overrides
-        : mock
-    );
+        : mock;
+
+    // set(db, dbPath, payload);
+    setDB(dbPath, payload);
 
     return key;
   }
@@ -148,6 +149,7 @@ export class Deployment {
     );
     const belongsTo = relationships.filter(r => r.type === "belongsTo");
     const hasMany = relationships.filter(r => r.type === "hasMany");
+    const db = getDb();
 
     belongsTo.forEach(r => {
       const fulfill =

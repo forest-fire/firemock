@@ -12,7 +12,11 @@ import { IMockWatcherGroupEvent } from "../@types/rtdb-types";
 import { join, getParent, getKey, dotifyKeys, dotify } from "../shared/index";
 import { getListeners, removeAllListeners, notify } from "../rtdb/index";
 
-export let db: IDictionary = [];
+/**
+ * The in-memory dictionary/hash mantained by the mock RTDB to represent
+ * the state of the database
+ */
+let db: IDictionary = {};
 
 let _silenceEvents: boolean = false;
 
@@ -37,21 +41,26 @@ export function shouldSendEvents() {
   return !_silenceEvents;
 }
 
+/** clears the DB without losing reference to DB object */
 export function clearDatabase() {
-  db = {};
+  const keys = Object.keys(db);
+  keys.forEach(key => delete db[key]);
 }
 
-export function updateDatabase(state: any) {
-  db = deepmerge(db, state);
+/**
+ * updates the state of the database based on a
+ * non-descructive update.
+ */
+export function updateDatabase(updatedState: IDictionary) {
+  db = deepmerge(db, updatedState);
 }
 
 export async function auth() {
   return mockedAuth();
 }
 
-export function getDb<T = any>(path: string) {
-  // return get(db, path);
-  return get(db, dotify(path));
+export function getDb<T = any>(path?: string) {
+  return path ? get(db, dotify(path)) : db;
 }
 
 /**
@@ -78,6 +87,7 @@ export function setDB(path: string, value: any, silent: boolean = false) {
     const parentValue: any = get(db, getParent(dotPath));
     if (typeof parentValue === "object") {
       delete parentValue[getKey(dotPath)];
+
       set(db, getParent(dotPath), parentValue);
     } else {
       set(db, dotPath, undefined);
