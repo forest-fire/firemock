@@ -10,11 +10,10 @@ const lodash_get_1 = __importDefault(require("lodash.get"));
 const firebase_key_1 = require("firebase-key");
 const fast_equals_1 = require("fast-equals");
 const fast_copy_1 = __importDefault(require("fast-copy"));
-const util_1 = require("../shared/util");
+const shared_1 = require("../shared");
 const auth_1 = require("../auth");
 const deepmerge_1 = __importDefault(require("deepmerge"));
-const index_1 = require("./index");
-const dotify_1 = require("../shared/dotify");
+const index_1 = require("../rtdb/index");
 exports.db = [];
 let _silenceEvents = false;
 /**
@@ -51,7 +50,7 @@ async function auth() {
 }
 exports.auth = auth;
 function getDb(path) {
-    return lodash_get_1.default(exports.db, dotify_1.dotify(path));
+    return lodash_get_1.default(exports.db, shared_1.dotify(path));
 }
 exports.getDb = getDb;
 /**
@@ -60,7 +59,7 @@ exports.getDb = getDb;
  * sets the database at a given path
  */
 function setDB(path, value, silent = false) {
-    const dotPath = util_1.join(path);
+    const dotPath = shared_1.join(path);
     const oldRef = lodash_get_1.default(exports.db, dotPath);
     const oldValue = typeof oldRef === "object" ? Object.assign(Object.assign({}, oldRef), {}) : oldRef;
     const isReference = ["object", "array"].includes(typeof value);
@@ -71,10 +70,10 @@ function setDB(path, value, silent = false) {
         return;
     }
     if (value === null) {
-        const parentValue = lodash_get_1.default(exports.db, util_1.getParent(dotPath));
+        const parentValue = lodash_get_1.default(exports.db, shared_1.getParent(dotPath));
         if (typeof parentValue === "object") {
-            delete parentValue[util_1.getKey(dotPath)];
-            lodash_set_1.default(exports.db, util_1.getParent(dotPath), parentValue);
+            delete parentValue[shared_1.getKey(dotPath)];
+            lodash_set_1.default(exports.db, shared_1.getParent(dotPath), parentValue);
         }
         else {
             lodash_set_1.default(exports.db, dotPath, undefined);
@@ -94,7 +93,7 @@ exports.setDB = setDB;
  * single-path, non-destructive update to database
  */
 function updateDB(path, value) {
-    const dotPath = util_1.join(path);
+    const dotPath = shared_1.join(path);
     const oldValue = lodash_get_1.default(exports.db, dotPath);
     let changed = true;
     if (typeof value === "object" &&
@@ -144,9 +143,9 @@ const slashify = (path) => {
  * on the database.
  */
 function groupEventsByWatcher(data, dbSnapshot) {
-    data = dotify_1.dotifyKeys(data);
-    const getFromSnapshot = (path) => lodash_get_1.default(dbSnapshot, dotify_1.dotify(path));
-    const eventPaths = Object.keys(data).map(i => dotify_1.dotify(i));
+    data = shared_1.dotifyKeys(data);
+    const getFromSnapshot = (path) => lodash_get_1.default(dbSnapshot, shared_1.dotify(path));
+    const eventPaths = Object.keys(data).map(i => shared_1.dotify(i));
     const response = [];
     const relativePath = (full, partial) => {
         return full.replace(partial, "");
@@ -154,20 +153,20 @@ function groupEventsByWatcher(data, dbSnapshot) {
     const justKey = (obj) => (obj ? Object.keys(obj)[0] : null);
     const justValue = (obj) => justKey(obj) ? obj[justKey(obj)] : null;
     index_1.getListeners().forEach(listener => {
-        const eventPathsUnderListener = eventPaths.filter(path => path.includes(dotify_1.dotify(listener.query.path)));
+        const eventPathsUnderListener = eventPaths.filter(path => path.includes(shared_1.dotify(listener.query.path)));
         if (eventPathsUnderListener.length === 0) {
             // if there are no listeners then there's nothing to do
             return;
         }
         const paths = [];
-        const listenerPath = dotify_1.dotify(listener.query.path);
+        const listenerPath = shared_1.dotify(listener.query.path);
         const changeObject = eventPathsUnderListener.reduce((changes, path) => {
             paths.push(path);
-            if (dotify_1.dotify(listener.query.path) === path) {
+            if (shared_1.dotify(listener.query.path) === path) {
                 changes = data[path];
             }
             else {
-                lodash_set_1.default(changes, dotify_1.dotify(relativePath(path, listenerPath)), data[path]);
+                lodash_set_1.default(changes, shared_1.dotify(relativePath(path, listenerPath)), data[path]);
             }
             return changes;
         }, {});
@@ -175,7 +174,7 @@ function groupEventsByWatcher(data, dbSnapshot) {
             ? changeObject
                 ? justKey(changeObject)
                 : listener.query.path.split(".").pop()
-            : dotify_1.dotify(common_types_1.pathJoin(slashify(listener.query.path), justKey(changeObject)));
+            : shared_1.dotify(common_types_1.pathJoin(slashify(listener.query.path), justKey(changeObject)));
         const newResponse = {
             listenerId: listener.id,
             listenerPath,
@@ -213,7 +212,7 @@ exports.removeDB = removeDB;
  */
 function pushDB(path, value) {
     const pushId = firebase_key_1.key();
-    const fullPath = util_1.join(path, pushId);
+    const fullPath = shared_1.join(path, pushId);
     const valuePlusId = typeof value === "object" ? Object.assign(Object.assign({}, value), { id: pushId }) : value;
     setDB(fullPath, valuePlusId);
     return pushId;

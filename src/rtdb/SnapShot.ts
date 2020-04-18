@@ -1,8 +1,8 @@
 import { IDictionary, SortingFunction } from "common-types";
 import get from "lodash.get";
-import { Reference } from "./index";
-import * as convert from "typed-conversions";
-import { getKey, join } from "../shared/util";
+import { Reference } from "../rtdb/index";
+import { arrayToHash } from "typed-conversions";
+import { getKey, join } from "../shared/index";
 import { RtdbDataSnapshot } from "../@types/rtdb-types";
 
 /**
@@ -25,9 +25,7 @@ export class SnapShot<T = any> implements RtdbDataSnapshot {
   }
 
   public val(): T | IDictionary<T> {
-    return Array.isArray(this._value)
-      ? convert.arrayToHash(this._value)
-      : this._value;
+    return Array.isArray(this._value) ? arrayToHash(this._value) : this._value;
   }
 
   public toJSON() {

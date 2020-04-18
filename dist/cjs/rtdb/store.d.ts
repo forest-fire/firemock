@@ -1,6 +1,5 @@
 import { IDictionary } from "common-types";
-import { IMockWatcherGroupEvent } from "../index";
-export declare type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
+import { IMockWatcherGroupEvent } from "../@types/rtdb-types";
 export declare let db: IDictionary;
 /**
  * silences the database from sending events;

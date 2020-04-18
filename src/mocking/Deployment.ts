@@ -5,8 +5,9 @@ import get from "lodash.get";
 import first from "lodash.first";
 import { IRelationship, ISchema, IQueue } from "../@types";
 import { getRandomInt, dotNotation, pluralize } from "../shared";
-import { Queue } from "./index";
-import { db } from "../rtdb";
+import { db } from "../rtdb/index";
+import { Queue } from "../mocking/index";
+import { faker } from "./Mock";
 
 export class Deployment {
   private schemaId: string;
@@ -103,7 +104,11 @@ export class Deployment {
   }
 
   public generate() {
+    console.log(this._queue);
+
     this._queue.map((q: IQueue) => {
+      console.log(q);
+
       for (let i = q.quantity; i > 0; i--) {
         this.insertMockIntoDB(q.schema, q.overrides);
       }
@@ -120,7 +125,6 @@ export class Deployment {
 
   private insertMockIntoDB(schemaId: string, overrides: IDictionary) {
     const schema: ISchema = this._schemas.find(schemaId);
-
     const mock = schema.fn();
     const path = schema.path();
     const key = overrides.id || fbKey.key();

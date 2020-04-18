@@ -1,11 +1,12 @@
 import { IDictionary } from "common-types";
-import { SchemaHelper } from "../mocking/schema-helper";
 import { SerializedQuery } from "serialized-query";
+import { ISchemaHelper } from "./mocking-types";
 export declare type RtdbQuery = import("@firebase/database-types").Query;
 export declare type RtdbReference = import("@firebase/database-types").Reference;
 export declare type RtdbDataSnapshot = import("@firebase/database-types").DataSnapshot;
 export declare type RtdbThenableReference = import("@firebase/database-types").ThenableReference;
 export declare type RtdbEventType = import("@firebase/database-types").EventType;
+export declare type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
 export interface ISchema {
     id: string;
     /** path to the database which is the root for given schema list */
@@ -46,7 +47,7 @@ export interface IQueue {
     belongsTo?: IDictionary<boolean>;
 }
 /** A Schema's mock callback generator must conform to this type signature */
-export declare type SchemaCallback<T = any> = (helper: SchemaHelper) => () => T;
+export declare type SchemaCallback<T = any> = (helper: ISchemaHelper) => () => T;
 /**
  * Captures a CRUD event
  */

@@ -2,33 +2,24 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const lodash_get_1 = __importDefault(require("lodash.get"));
-const index_1 = require("./index");
-const convert = __importStar(require("typed-conversions"));
-const util_1 = require("../shared/util");
+const index_1 = require("../rtdb/index");
+const typed_conversions_1 = require("typed-conversions");
+const shared_1 = require("../shared");
 class SnapShot {
     constructor(_key, _value) {
         this._key = _key;
         this._value = _value;
     }
     get key() {
-        return util_1.getKey(util_1.join(this._key));
+        return shared_1.getKey(shared_1.join(this._key));
     }
     get ref() {
         return new index_1.Reference(this._key);
     }
     val() {
-        return Array.isArray(this._value)
-            ? convert.arrayToHash(this._value)
-            : this._value;
+        return Array.isArray(this._value) ? typed_conversions_1.arrayToHash(this._value) : this._value;
     }
     toJSON() {
         return JSON.stringify(this._value);

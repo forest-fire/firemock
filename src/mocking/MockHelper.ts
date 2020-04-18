@@ -1,5 +1,5 @@
 import { IDictionary, createError } from "common-types";
-import { faker } from "./Mock";
+import { faker } from "../mocking/index";
 
 export class MockHelper {
   constructor(public context?: IDictionary) {}

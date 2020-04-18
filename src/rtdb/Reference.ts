@@ -18,14 +18,14 @@ import {
   SnapShot,
   addListener,
   Query
-} from "../rtdb";
+} from "../rtdb/index";
 import {
   parts,
   join,
   slashNotation,
   networkDelay,
   DelayType
-} from "../shared/util";
+} from "../shared/index";
 import { SerializedQuery } from "serialized-query";
 
 function isMultiPath(data: IDictionary) {

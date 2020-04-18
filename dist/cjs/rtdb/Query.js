@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const store_1 = require("./store");
+const index_1 = require("../rtdb/index");
 const serialized_query_1 = require("serialized-query");
-const util_1 = require("../shared/util");
-const runQuery_1 = require("../shared/runQuery");
+const shared_1 = require("../shared");
 /** tslint:ignore:member-ordering */
 class Query {
     constructor(path, delay = 5) {
@@ -48,7 +47,7 @@ class Query {
         return null;
     }
     once(eventType) {
-        return util_1.networkDelay(this.getQuerySnapShot());
+        return shared_1.networkDelay(this.getQuerySnapShot());
     }
     off() {
         console.log("off() not implemented yet");
@@ -127,10 +126,10 @@ class Query {
      * order to new SnapShot (so natural order is preserved)
      */
     getQuerySnapShot() {
-        const data = store_1.getDb(this._query.path);
-        const results = runQuery_1.runQuery(this._query, data);
-        // return new SnapShot(leafNode(this._query.path), results);
-        return this.getSnapshot(util_1.leafNode(this._query.path), results);
+        const data = index_1.getDb(this._query.path);
+        // const results = runQuery(this._query, data);
+        // return this.getSnapshot(leafNode(this._query.path), results);
+        return {};
     }
 }
 exports.Query = Query;

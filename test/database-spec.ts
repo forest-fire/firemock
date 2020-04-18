@@ -296,7 +296,6 @@ describe("Database", () => {
       const callback: HandleValueEvent = snap => {
         if (status === "has-listener") {
           const list = snap.val();
-
           const first = list[firstKey];
           expect(first.age).to.equal(firstRecord.age + 1);
         }
@@ -307,6 +306,7 @@ describe("Database", () => {
 
       status = "has-listener";
       const people = await m.ref("/people").once("value");
+
       firstKey = helpers.firstKey(people.val());
       firstRecord = helpers.firstRecord(people.val());
 

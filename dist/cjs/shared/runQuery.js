@@ -9,10 +9,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const serialized_query_1 = require("serialized-query");
 const typed_conversions_1 = require("typed-conversions");
+const query_types_1 = require("../@types/query-types");
 const sortFns = __importStar(require("./sortFns"));
 const queryFilters = __importStar(require("./queryFilters"));
 const limitFilters = __importStar(require("./limitFilters"));
-const query_types_1 = require("../@types/query-types");
 const orderByKey = (list) => {
     const keys = Object.keys(list).sort();
     let hash = {};

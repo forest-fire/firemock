@@ -1,5 +1,5 @@
 import { IDictionary } from "common-types";
-import { Queue, Schema, Deployment } from "./index";
+import { Queue, Schema, Deployment, MockHelper } from "../mocking/index";
 import {
   Reference,
   db,
@@ -7,9 +7,8 @@ import {
   updateDatabase,
   restoreEvents,
   silenceEvents
-} from "../rtdb";
-import { DelayType, setNetworkDelay } from "../shared/util";
-import { MockHelper } from "./MockHelper";
+} from "../rtdb/index";
+import { DelayType, setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
 import { clearAuthUsers, initializeAuth } from "../auth/state-mgmt";
 import { FireMockError } from "../errors/FireMockError";
@@ -22,10 +21,11 @@ import {
   IMockAuthConfig,
   AsyncMockData,
   IMockSetup
-} from "../@types/index";
+} from "../@types";
 import authProviders from "../auth/client-sdk/AuthProviders";
 import { FirebaseNamespace } from "@firebase/app-types";
-export let faker: Faker.FakerStatic;
+import { FakerStatic } from "../@types/mocking-types";
+export let faker: FakerStatic;
 
 /* tslint:disable:max-classes-per-file */
 export class Mock {
@@ -160,6 +160,7 @@ export class Mock {
     if (!faker) {
       faker = await import(/* webpackChunkName: "faker-lib" */ "faker");
     }
+    return faker;
   }
 
   /**
@@ -179,12 +180,8 @@ export class Mock {
     return new MockHelper(context);
   }
 
-  public addSchema<S = any>(schema: string, mock?: SchemaCallback) {
-    const s = new Schema<S>(schema);
-    if (mock) {
-      s.mock(mock);
-    }
-    return new Schema<S>(schema);
+  public addSchema<S = any>(schema: string, mock?: SchemaCallback<S>) {
+    return new Schema<S>(schema, mock);
   }
 
   /** Set the network delay for queries with "once" */
@@ -209,6 +206,7 @@ export class Mock {
         "firemock/faker-not-ready"
       );
     }
+
     return new Deployment().generate();
   }
 

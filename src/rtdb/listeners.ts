@@ -7,12 +7,16 @@ import {
   IMockWatcherGroupEvent
 } from "../@types/rtdb-types";
 import { IDictionary } from "common-types";
-import { join, stripLeadingDot, removeDots } from "../shared/util";
+import { join, stripLeadingDot, removeDots, dotify } from "../shared/index";
 import get from "lodash.get";
-import { getDb, shouldSendEvents, groupEventsByWatcher } from "./store";
 import { hashToArray } from "typed-conversions";
-import { Reference, SnapShot } from "./index";
-import { dotify } from "../shared/dotify";
+import {
+  getDb,
+  SnapShot,
+  Reference,
+  shouldSendEvents,
+  groupEventsByWatcher
+} from "../rtdb/index";
 
 let _listeners: IListener[] = [];
 

@@ -1,6 +1,7 @@
 import { IRelationship, ISchema, SchemaCallback } from "../@types";
-import { Queue, SchemaHelper } from "./index";
+import { Queue, SchemaHelper } from "../mocking/index";
 import { pluralize, addException } from "../shared";
+import { faker } from "./Mock";
 
 /**
  * The property that exists on the source scheme as a FK reference
@@ -11,9 +12,12 @@ export type SourceProperty = string;
 export class Schema<T = any> {
   private _schemas = new Queue<ISchema>("schemas");
   private _relationships = new Queue<IRelationship>("relationships");
-  private _prefix: string = "";
 
-  constructor(public schemaId: string) {}
+  constructor(public schemaId: string, mockFn?: SchemaCallback) {
+    if (mockFn) {
+      this.mock(mockFn);
+    }
+  }
 
   /**
    * Add a mocking function to be used to generate the schema in mock DB
@@ -21,7 +25,7 @@ export class Schema<T = any> {
   public mock(cb: SchemaCallback) {
     this._schemas.enqueue({
       id: this.schemaId,
-      fn: cb(new SchemaHelper({})), // TODO: pass in support for DB lookups
+      fn: cb(new SchemaHelper({}, faker)), // TODO: pass in support for DB lookups
       path: () => {
         const schema: ISchema = this._schemas.find(this.schemaId);
         return [

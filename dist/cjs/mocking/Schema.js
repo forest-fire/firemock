@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("./index");
+const mocking_1 = require("../mocking");
 const shared_1 = require("../shared");
 class Schema {
     constructor(schemaId) {
         this.schemaId = schemaId;
-        this._schemas = new index_1.Queue("schemas");
-        this._relationships = new index_1.Queue("relationships");
+        this._schemas = new mocking_1.Queue("schemas");
+        this._relationships = new mocking_1.Queue("relationships");
         this._prefix = "";
     }
     /**
@@ -15,7 +15,7 @@ class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new index_1.SchemaHelper({})),
+            fn: cb(new mocking_1.SchemaHelper({})),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [

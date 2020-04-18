@@ -4,7 +4,7 @@ import {
   UserRecord,
   UpdateRequest,
   ListUsersResult
-} from "..";
+} from "../../../@types/auth-types";
 import {
   addUser,
   updateUser,
@@ -13,7 +13,7 @@ import {
   getUserByEmail,
   allUsers
 } from "../../state-mgmt";
-import { networkDelay } from "../../../shared/util";
+import { networkDelay } from "../../../shared";
 
 export const users: Partial<Auth> = {
   // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user

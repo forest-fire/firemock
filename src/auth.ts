@@ -1,4 +1,4 @@
-import { networkDelay } from "./shared/util";
+import { networkDelay } from "./shared";
 import { IMockAuth } from "./@types/auth-types";
 import { implemented } from "./auth/client-sdk/implemented";
 

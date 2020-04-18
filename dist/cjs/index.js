@@ -4,7 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./@types"));
-__export(require("./rtdb"));
-__export(require("./mocking"));
+__export(require("./rtdb/index"));
+__export(require("./mocking/index"));
 __export(require("./auth/client-sdk"));
 //# sourceMappingURL=index.js.map

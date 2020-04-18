@@ -1,6 +1,6 @@
 import { RtdbQuery, RtdbReference, RtdbDataSnapshot, RtdbEventType, QueryValue, IFirebaseEventHandler } from "../@types/rtdb-types";
 import { SerializedQuery } from "serialized-query";
-import { DelayType } from "../shared/util";
+import { DelayType } from "../shared";
 import { IDictionary } from "common-types";
 /** tslint:ignore:member-ordering */
 export declare abstract class Query<T = any> implements RtdbQuery {

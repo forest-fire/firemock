@@ -5,14 +5,13 @@ import get from "lodash.get";
 import { key as fbKey } from "firebase-key";
 import { deepEqual } from "fast-equals";
 import copy from "fast-copy";
-import { join, getParent, getKey } from "../shared/util";
-import { IMockWatcherGroupEvent } from "../index";
-import { auth as mockedAuth } from "../auth";
 import deepmerge from "deepmerge";
-import { getListeners, removeAllListeners, notify } from "./index";
-import { dotifyKeys, dotify } from "../shared/dotify";
 
-export type FirebaseDatabase = import("@firebase/database-types").FirebaseDatabase;
+import { auth as mockedAuth } from "../auth";
+import { IMockWatcherGroupEvent } from "../@types/rtdb-types";
+import { join, getParent, getKey, dotifyKeys, dotify } from "../shared/index";
+import { getListeners, removeAllListeners, notify } from "../rtdb/index";
+
 export let db: IDictionary = [];
 
 let _silenceEvents: boolean = false;
@@ -51,6 +50,7 @@ export async function auth() {
 }
 
 export function getDb<T = any>(path: string) {
+  // return get(db, path);
   return get(db, dotify(path));
 }
 

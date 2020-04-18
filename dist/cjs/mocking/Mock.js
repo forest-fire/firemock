@@ -10,10 +10,9 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const index_1 = require("./index");
-const rtdb_1 = require("../rtdb");
-const util_1 = require("../shared/util");
-const MockHelper_1 = require("./MockHelper");
+const index_1 = require("../mocking/index");
+const index_2 = require("../rtdb/index");
+const shared_1 = require("../shared");
 const auth_1 = require("../auth");
 const state_mgmt_1 = require("../auth/state-mgmt");
 const FireMockError_1 = require("../errors/FireMockError");
@@ -35,7 +34,7 @@ class Mock {
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
         index_1.Queue.clearAll();
-        rtdb_1.clearDatabase();
+        index_2.clearDatabase();
         state_mgmt_1.clearAuthUsers();
         if (dataOrMock && typeof dataOrMock === "object") {
             this.updateDB(dataOrMock);
@@ -75,7 +74,7 @@ class Mock {
         return obj;
     }
     get db() {
-        return rtdb_1.db;
+        return index_2.db;
     }
     get deploy() {
         return new index_1.Deployment();
@@ -89,9 +88,9 @@ class Mock {
     /** optionally clear the DB before applying the update */
     clearFirst) {
         if (clearFirst) {
-            rtdb_1.clearDatabase();
+            index_2.clearDatabase();
         }
-        rtdb_1.updateDatabase(stateUpdate);
+        index_2.updateDatabase(stateUpdate);
     }
     /**
      * silences the database from sending events;
@@ -99,14 +98,14 @@ class Mock {
      * as part of the Mocking process to reduce noise
      */
     silenceEvents() {
-        rtdb_1.silenceEvents();
+        index_2.silenceEvents();
     }
     /**
      * returns the database to its default state of sending
      * events out.
      */
     restoreEvents() {
-        rtdb_1.restoreEvents();
+        index_2.restoreEvents();
     }
     async auth() {
         return auth_1.auth();
@@ -141,7 +140,7 @@ class Mock {
         if (!exports.faker && !exports.faker.address) {
             throw new FireMockError_1.FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
         }
-        return new MockHelper_1.MockHelper(context);
+        return new index_1.MockHelper(context);
     }
     addSchema(schema, mock) {
         const s = new index_1.Schema(schema);
@@ -152,7 +151,7 @@ class Mock {
     }
     /** Set the network delay for queries with "once" */
     setDelay(d) {
-        util_1.setNetworkDelay(d);
+        shared_1.setNetworkDelay(d);
     }
     queueSchema(schemaId, quantity = 1, overrides = {}) {
         const d = new index_1.Deployment();
@@ -166,7 +165,7 @@ class Mock {
         return new index_1.Deployment().generate();
     }
     ref(dbPath) {
-        return new rtdb_1.Reference(dbPath);
+        return new index_2.Reference(dbPath);
     }
 }
 exports.Mock = Mock;

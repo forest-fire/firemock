@@ -6,11 +6,11 @@ import {
   QueryValue,
   IFirebaseEventHandler
 } from "../@types/rtdb-types";
-import { getDb } from "../rtdb";
+import { getDb } from "../rtdb/index";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
-import { leafNode, DelayType, networkDelay } from "../shared/util";
-import { runQuery } from "../shared/runQuery";
+import { leafNode, DelayType, networkDelay, runQuery } from "../shared/index";
 import { IDictionary } from "common-types";
+import { DataSnapshot } from "@firebase/database-types";
 
 /** tslint:ignore:member-ordering */
 export abstract class Query<T = any> implements RtdbQuery {
@@ -190,8 +190,7 @@ export abstract class Query<T = any> implements RtdbQuery {
   private getQuerySnapShot() {
     const data = getDb(this._query.path);
     const results = runQuery(this._query, data);
-
-    // return new SnapShot(leafNode(this._query.path), results);
     return this.getSnapshot(leafNode(this._query.path), results);
+    // return {} as DataSnapshot;
   }
 }

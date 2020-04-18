@@ -1,5 +1,5 @@
 import { IDictionary, SortingFunction } from "common-types";
-import { Reference } from "./index";
+import { Reference } from "../rtdb/index";
 import { RtdbDataSnapshot } from "../@types/rtdb-types";
 /**
  * Each record in the forEach iteration will be passed

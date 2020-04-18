@@ -1,13 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("./shared/util");
+const shared_1 = require("./shared");
 const implemented_1 = require("./auth/client-sdk/implemented");
 let hasConnectedToAuthService = false;
 exports.auth = async () => {
     if (hasConnectedToAuthService) {
         return exports.authApi;
     }
-    await util_1.networkDelay();
+    await shared_1.networkDelay();
     hasConnectedToAuthService = true;
     return exports.authApi;
 };

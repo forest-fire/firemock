@@ -1,12 +1,12 @@
 /// <reference types="faker" />
 import { IDictionary } from "common-types";
-import { Schema, Deployment } from "./index";
-import { Reference } from "../rtdb";
-import { DelayType } from "../shared/util";
-import { MockHelper } from "./MockHelper";
-import { SchemaCallback, IMockConfigOptions, IMockAuthConfig, IMockSetup } from "../@types/index";
+import { Schema, Deployment, MockHelper } from "../mocking/index";
+import { Reference } from "../rtdb/index";
+import { DelayType } from "../shared";
+import { SchemaCallback, IMockConfigOptions, IMockAuthConfig, IMockSetup } from "../@types";
 import { FirebaseNamespace } from "@firebase/app-types";
-export declare let faker: Faker.FakerStatic;
+import { FakerStatic } from "../@types/mocking-types";
+export declare let faker: FakerStatic;
 export declare class Mock {
     /**
      * returns a Mock object while also ensuring that the
