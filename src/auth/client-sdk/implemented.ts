@@ -5,7 +5,7 @@ import {
   User,
   IPartialUserCredential
 } from "../../@types/auth-types";
-import { networkDelay } from "../../util";
+import { networkDelay } from "../../shared";
 import { completeUserCredential } from "./completeUserCredential";
 import { Omit } from "common-types";
 import { notImplemented } from "./notImplemented";

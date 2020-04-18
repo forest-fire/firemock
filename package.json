@@ -1,6 +1,6 @@
 {
   "name": "firemock",
-  "version": "0.38.1",
+  "version": "0.38.2",
   "description": "firemock",
   "license": "MIT",
   "repository": "git@github.com:forest-fire/firemock.git",
@@ -30,7 +30,8 @@
     "watch:test": "ts-node ./scripts/watch.ts test",
     "watch:all": "ts-node ./scripts/watch.ts all",
     "deploy": "ts-node ./scripts/deploy.ts ",
-    "info": "yarn do info"
+    "info": "yarn do info",
+    "circular": "yarn run madge --circular --extensions ts ./src"
   },
   "dependencies": {
     "@firebase/app": "^0.6.0",
@@ -65,23 +66,24 @@
     "@types/node": "^8.0.0",
     "@types/rimraf": "^2.0.3",
     "@types/stack-trace": "^0.0.29",
-    "@vuepress/plugin-back-to-top": "^1.4.0",
-    "@vuepress/plugin-last-updated": "^1.4.0",
-    "@vuepress/plugin-medium-zoom": "^1.4.0",
-    "@vuepress/plugin-pwa": "^1.4.0",
+    "@vuepress/plugin-back-to-top": "^1.4.1",
+    "@vuepress/plugin-last-updated": "^1.4.1",
+    "@vuepress/plugin-medium-zoom": "^1.4.1",
+    "@vuepress/plugin-pwa": "^1.4.1",
     "async-shelljs": "^0.1.4",
     "chai": "^4.2.0",
-    "chalk": "^3.0.0",
+    "chalk": "^4.0.0",
     "do-devops": "^0.3.5",
-    "mocha": "^7.0.1",
-    "prettier": "^1.19.1",
+    "madge": "^3.8.0",
+    "mocha": "^7.1.1",
+    "prettier": "^2.0.4",
     "rimraf": "^3.0.2",
     "test-console": "^1.1.0",
-    "ts-node": "^8.6.2",
-    "tslint": "^6.1.0",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.3",
-    "vuepress": "^1.4.0"
+    "vuepress": "^1.4.1"
   },
   "engines": {
     "node": ">=8.0.0"

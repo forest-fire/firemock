@@ -2,10 +2,10 @@
 import "mocha";
 import * as chai from "chai";
 import * as helpers from "./testing/helpers";
-import { Mock, SchemaCallback } from "../src";
-import SchemaHelper from "../src/schema-helper";
+import { SchemaCallback } from "../src";
+import { Mock, SchemaHelper } from "../src/mocking";
 import first from "lodash.first";
-import { firstProp, lastProp } from "../src/util";
+import { firstProp, lastProp } from "../src/shared/util";
 
 const expect = chai.expect;
 
@@ -159,7 +159,9 @@ describe("Mock class()", () => {
 
     it("Mocking function that returns a scalar works as intended", async () => {
       const m = await Mock.prepare();
-      m.addSchema("number", h => () => h.faker.random.number({ min: 0, max: 1000 }));
+      m.addSchema("number", h => () =>
+        h.faker.random.number({ min: 0, max: 1000 })
+      );
       m.addSchema("string", h => () => h.faker.random.words(3));
       m.queueSchema("number", 10);
       m.queueSchema("string", 10);
@@ -277,7 +279,9 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
+        10
+      );
       expect(m.db.employees).to.not.be.an("object");
     });
     it("Adding hasMany with quantifyHasMany() produces real references when FK reference is a defined schema", async () => {
@@ -299,7 +303,9 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
+        10
+      );
       expect(m.db.employees).to.not.equal(undefined);
     });
 
@@ -349,7 +355,9 @@ describe("Mock class()", () => {
         .generate();
 
       expect(firstProp(m.db.companies).employees).is.an("object");
-      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(10);
+      expect(Object.keys(firstProp(m.db.companies).employees).length).is.equal(
+        10
+      );
       expect(m.db.employees).to.not.equal(undefined);
       expect(Object.keys(m.db.employees).length).to.equal(10);
     });

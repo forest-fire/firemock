@@ -1,4 +1,4 @@
-import { Auth, DecodedIdToken } from "../index";
+import { DecodedIdToken, Auth } from "../../../@types/auth-types";
 
 export const tokens: Partial<Auth> = {
   /**

@@ -1,9 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
-import { IDictionary } from "common-types";
 import * as chai from "chai";
-import  {Mock, SchemaCallback } from "../src";
-import * as helpers from "./testing/helpers";
+import { Mock, SchemaCallback } from "../src";
 const expect = chai.expect;
 
 const animalMock: SchemaCallback = h => () => ({

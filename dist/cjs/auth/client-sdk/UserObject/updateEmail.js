@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const FireMockError_1 = require("../../../errors/FireMockError");
 const state_mgmt_1 = require("../../state-mgmt");
-const util_1 = require("../../../util");
+const util_1 = require("../../../shared/util");
 /**
  * **updateEmail**
  *

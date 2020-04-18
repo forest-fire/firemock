@@ -9,9 +9,9 @@ export interface IAuthProviders {
   EmailAuthProvider: EmailAuthProvider;
 }
 
-import { Mock, IDictionary } from "../index";
+export type MockKlass = import("../mocking/Mock").Mock;
 import { EmailAuthProvider } from "@firebase/auth-types";
-import { UserRecord } from "../auth/admin-sdk";
+import { IDictionary } from "common-types";
 
 export type UserCredential = import("@firebase/auth-types").UserCredential;
 export type User = import("@firebase/auth-types").User;
@@ -24,6 +24,12 @@ export type FirebaseApp = import("@firebase/app-types").FirebaseApp;
 export type IdTokenResult = import("@firebase/auth-types").IdTokenResult;
 export type ApplicationVerifier = import("@firebase/auth-types").ApplicationVerifier;
 export type ActionCodeSettings = import("@firebase/auth-types").ActionCodeSettings;
+export type Auth = import("firebase-admin").auth.Auth;
+export type CreateRequest = import("firebase-admin").auth.CreateRequest;
+export type UserRecord = import("firebase-admin").auth.UserRecord;
+export type UpdateRequest = import("firebase-admin").auth.UpdateRequest;
+export type DecodedIdToken = import("firebase-admin").auth.DecodedIdToken;
+export type ListUsersResult = import("firebase-admin").auth.ListUsersResult;
 
 /**
  * Create a user in the Auth system which can be logged in via the
@@ -46,7 +52,7 @@ export interface IEmailUser {
   tokenIds?: string[];
 }
 
-export type IMockSetup = (mock: Mock) => () => Promise<void>;
+export type IMockSetup = (mock: MockKlass) => () => Promise<void>;
 
 export interface IPartialUserCredential {
   additionalUserInfo?: Partial<AdditionalUserInfo>;

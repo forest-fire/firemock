@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const util_1 = require("../../util");
+const shared_1 = require("../../shared");
 const completeUserCredential_1 = require("./completeUserCredential");
 const FireMockError_1 = require("../../errors/FireMockError");
 const authMockHelpers_1 = require("./authMockHelpers");
@@ -22,7 +22,7 @@ exports.implemented = {
         console.warn(`currently firemock accepts calls to setPersistence() but it doesn't support it.`);
     },
     signInAnonymously: async () => {
-        await util_1.networkDelay();
+        await shared_1.networkDelay();
         if (state_mgmt_1.authProviders().includes("anonymous")) {
             const user = Object.assign(Object.assign({}, UserObject_1.clientApiUser), { isAnonymous: true, uid: state_mgmt_1.getAnonymousUid() });
             const credential = {
@@ -44,7 +44,7 @@ exports.implemented = {
         }
     },
     async signInWithEmailAndPassword(email, password) {
-        await util_1.networkDelay();
+        await shared_1.networkDelay();
         if (!authMockHelpers_1.emailValidationAllowed()) {
             throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }
@@ -81,7 +81,7 @@ exports.implemented = {
      * Add a new user with the Email/Password provider
      */
     async createUserWithEmailAndPassword(email, password) {
-        await util_1.networkDelay();
+        await shared_1.networkDelay();
         if (!authMockHelpers_1.emailValidationAllowed()) {
             throw new FireMockError_1.FireMockError("email authentication not allowed", "auth/operation-not-allowed");
         }

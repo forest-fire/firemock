@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const state_mgmt_1 = require("../../state-mgmt");
-const util_1 = require("../../../util");
+const shared_1 = require("../../../shared");
 exports.users = {
     // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
     async createUser(properties) {
@@ -22,19 +22,19 @@ exports.users = {
         return state_mgmt_1.getUserById(uid);
     },
     async deleteUser(uid) {
-        await util_1.networkDelay();
+        await shared_1.networkDelay();
         state_mgmt_1.removeUser(uid);
     },
     async getUserByEmail(email) {
-        await util_1.networkDelay();
+        await shared_1.networkDelay();
         return state_mgmt_1.getUserByEmail(email);
     },
     async getUserByPhoneNumber(phoneNumber) {
         return;
     },
     async listUsers(maxResults, pageToken) {
-        await util_1.networkDelay();
-        return { users: state_mgmt_1.allUsers() };
+        await shared_1.networkDelay();
+        return { users: maxResults ? state_mgmt_1.allUsers().slice(0, maxResults) : state_mgmt_1.allUsers() };
     }
 };
 //# sourceMappingURL=users.js.map

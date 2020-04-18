@@ -1,10 +1,11 @@
 import { SerializedQuery, QueryOrderType } from "serialized-query";
 import { hashToArray, arrayToHash } from "typed-conversions";
+import { IDictionary } from "common-types";
+import { SortOrder } from "../@types/query-types";
+
 import * as sortFns from "./sortFns";
 import * as queryFilters from "./queryFilters";
 import * as limitFilters from "./limitFilters";
-import { IDictionary } from "common-types";
-import { SortOrder } from "../@types/query-types";
 
 const orderByKey = (list: IDictionary) => {
   const keys = Object.keys(list).sort();

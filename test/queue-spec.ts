@@ -1,7 +1,7 @@
 // tslint:disable:no-implicit-dependencies
 import "mocha";
 import * as chai from "chai";
-import Queue from "../src/queue";
+import { Queue } from "../src/mocking";
 
 const expect = chai.expect;
 
@@ -183,13 +183,11 @@ describe("Queue Class", () => {
   });
 
   it("replace() replaces an existing item in the queue", () => {
-    const q = new Queue("replace")
-      .clear()
-      .fromArray([
-        { id: "foo", value: 5 },
-        { id: "bar", value: 10 },
-        { id: "baz", value: 20 }
-      ]);
+    const q = new Queue("replace").clear().fromArray([
+      { id: "foo", value: 5 },
+      { id: "bar", value: 10 },
+      { id: "baz", value: 20 }
+    ]);
     q.replace("foo", { value: 16, foo: "bar" });
 
     expect(q.find("foo").value).is.equal(16);
@@ -197,13 +195,11 @@ describe("Queue Class", () => {
   });
 
   it("update() updates an existing item in the queue", () => {
-    const q = new Queue("replace")
-      .clear()
-      .fromArray([
-        { id: "foo", value: 5 },
-        { id: "bar", value: 10 },
-        { id: "baz", value: 20 }
-      ]);
+    const q = new Queue("replace").clear().fromArray([
+      { id: "foo", value: 5 },
+      { id: "bar", value: 10 },
+      { id: "baz", value: 20 }
+    ]);
     q.update("foo", { foo: "bar" });
 
     expect(q.find("foo").value).is.equal(5);
@@ -211,9 +207,10 @@ describe("Queue Class", () => {
   });
 
   it("update() on a non-existing item results in the new item being added", () => {
-    const q = new Queue("replace")
-      .clear()
-      .fromArray([{ id: "foo", value: 5 }, { id: "baz", value: 20 }]);
+    const q = new Queue("replace").clear().fromArray([
+      { id: "foo", value: 5 },
+      { id: "baz", value: 20 }
+    ]);
     q.update("bar", { value: 50 });
 
     expect(q.find("bar").value).is.equal(50);

@@ -1,6 +1,5 @@
-import { IMockUser, IMockAuthConfig, ISimplifiedMockUser } from "../../@types";
+import { IMockUser, IMockAuthConfig, ISimplifiedMockUser, UpdateRequest } from "../../@types";
 import { UserCredential, User } from "@firebase/auth-types";
-import { UpdateRequest } from "../admin-sdk";
 export declare type IAuthObserver = (user: User | null) => any;
 export declare function getAuthObservers(): IAuthObserver[];
 export declare function addAuthObserver(ob: IAuthObserver): void;

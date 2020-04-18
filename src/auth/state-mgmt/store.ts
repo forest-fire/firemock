@@ -2,13 +2,13 @@ import {
   IMockUser,
   IMockAuthConfig,
   IAuthProviderName,
-  ISimplifiedMockUser
+  ISimplifiedMockUser,
+  UpdateRequest
 } from "../../@types";
 import { pk } from "common-types";
 import { FireMockError } from "../../errors/FireMockError";
 import { UserCredential, User } from "@firebase/auth-types";
 import { clientApiUser } from "../client-sdk/UserObject";
-import { UpdateRequest } from "../admin-sdk";
 
 /**
  * The recognized users in the mock Auth system

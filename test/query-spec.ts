@@ -1,6 +1,6 @@
 // tslint:disable:no-implicit-dependencies
 import * as chai from "chai";
-import { Mock } from "../src/mock";
+import { Mock } from "../src/mocking";
 import { SerializedQuery } from "serialized-query";
 
 const expect = chai.expect;

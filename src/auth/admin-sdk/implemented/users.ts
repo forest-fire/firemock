@@ -4,7 +4,7 @@ import {
   UserRecord,
   UpdateRequest,
   ListUsersResult
-} from "..";
+} from "../../../@types/auth-types";
 import {
   addUser,
   updateUser,
@@ -13,7 +13,7 @@ import {
   getUserByEmail,
   allUsers
 } from "../../state-mgmt";
-import { networkDelay } from "../../../util";
+import { networkDelay } from "../../../shared";
 
 export const users: Partial<Auth> = {
   // https://firebase.google.com/docs/auth/admin/manage-users#create_a_user
@@ -63,6 +63,6 @@ export const users: Partial<Auth> = {
     pageToken?: undefined | string
   ): Promise<ListUsersResult> {
     await networkDelay();
-    return { users: allUsers() };
+    return { users: maxResults ? allUsers().slice(0, maxResults) : allUsers() };
   }
 };

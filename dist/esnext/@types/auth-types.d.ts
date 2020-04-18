@@ -8,9 +8,9 @@ export interface IMockAuth extends FirebaseAuth, IAuthProviders {
 export interface IAuthProviders {
     EmailAuthProvider: EmailAuthProvider;
 }
-import { Mock, IDictionary } from "../index";
+export declare type MockKlass = import("../mocking/Mock").Mock;
 import { EmailAuthProvider } from "@firebase/auth-types";
-import { UserRecord } from "../auth/admin-sdk";
+import { IDictionary } from "common-types";
 export declare type UserCredential = import("@firebase/auth-types").UserCredential;
 export declare type User = import("@firebase/auth-types").User;
 export declare type AuthSettings = import("@firebase/auth-types").AuthSettings;
@@ -22,6 +22,12 @@ export declare type FirebaseApp = import("@firebase/app-types").FirebaseApp;
 export declare type IdTokenResult = import("@firebase/auth-types").IdTokenResult;
 export declare type ApplicationVerifier = import("@firebase/auth-types").ApplicationVerifier;
 export declare type ActionCodeSettings = import("@firebase/auth-types").ActionCodeSettings;
+export declare type Auth = import("firebase-admin").auth.Auth;
+export declare type CreateRequest = import("firebase-admin").auth.CreateRequest;
+export declare type UserRecord = import("firebase-admin").auth.UserRecord;
+export declare type UpdateRequest = import("firebase-admin").auth.UpdateRequest;
+export declare type DecodedIdToken = import("firebase-admin").auth.DecodedIdToken;
+export declare type ListUsersResult = import("firebase-admin").auth.ListUsersResult;
 /**
  * Create a user in the Auth system which can be logged in via the
  * email/password authentication style
@@ -42,7 +48,7 @@ export interface IEmailUser {
      */
     tokenIds?: string[];
 }
-export declare type IMockSetup = (mock: Mock) => () => Promise<void>;
+export declare type IMockSetup = (mock: MockKlass) => () => Promise<void>;
 export interface IPartialUserCredential {
     additionalUserInfo?: Partial<AdditionalUserInfo>;
     credential?: Partial<AuthCredential> | null;

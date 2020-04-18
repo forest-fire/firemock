@@ -1,9 +1,9 @@
 import { QueryOrderType } from "serialized-query";
 import { hashToArray, arrayToHash } from "typed-conversions";
+import { SortOrder } from "../@types/query-types";
 import * as sortFns from "./sortFns";
 import * as queryFilters from "./queryFilters";
 import * as limitFilters from "./limitFilters";
-import { SortOrder } from "../@types/query-types";
 const orderByKey = (list) => {
     const keys = Object.keys(list).sort();
     let hash = {};

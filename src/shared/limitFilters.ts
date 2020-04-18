@@ -1,4 +1,3 @@
-import { IDictionary } from "common-types";
 import { SerializedQuery } from "serialized-query";
 
 /** an filter function for queries with a `limitToFirst` value */
