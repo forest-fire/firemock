@@ -373,7 +373,6 @@ describe("Reference functions", () => {
 
     it("orderByChild() -- where child is a string -- sorts correctly", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
@@ -398,7 +397,6 @@ describe("Reference functions", () => {
 
     it("orderByChild() -- where child is a boolean -- sorts correctly", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.generate();
@@ -448,7 +446,6 @@ describe("Reference functions", () => {
 
     it("orderByValue() sorts on server correctly", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       m.addSchema("number", h => () =>
         h.faker.random.number({ min: 0, max: 10 })
       );
@@ -484,7 +481,6 @@ describe("Reference functions", () => {
 
     it('orderByChild() combines with limitToFirst() for "server-side" selection', async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       m.addSchema("person", personMock);
       m.queueSchema("person", 10);
       m.queueSchema("person", 10, { age: 99 });
@@ -540,7 +536,6 @@ describe("Reference functions", () => {
 
     it("push() can push scalar", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       await m.ref("/data").push(444);
       const data = (await m.ref("/data").once("value")).val();
       expect(helpers.firstRecord(data)).to.equal(444);
@@ -548,7 +543,6 @@ describe("Reference functions", () => {
 
     it("push() will call callback after pushing to DB", async () => {
       const m = await Mock.prepare();
-      await m.getMockHelper();
       let count = 0;
       const callback = () => count++;
       await m.ref("/data").push(444, callback);

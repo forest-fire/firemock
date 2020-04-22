@@ -163,22 +163,22 @@ export class Mock {
     return faker;
   }
 
-  /**
-   * **getMockHelper**
-   *
-   * returns a MockHelper class which should always contain
-   * access to the faker library off the `faker` property exposed;
-   * you can also set some additional `context` where desirable.
-   */
-  public getMockHelper(context?: IDictionary) {
-    if (!faker && !faker.address) {
-      throw new FireMockError(
-        `The Faker library must be loaded before a MockHelper can be returned`,
-        "firemock/faker-not-ready"
-      );
-    }
-    return new MockHelper(context);
-  }
+  // /**
+  //  * **getMockHelper**
+  //  *
+  //  * returns a MockHelper class which should always contain
+  //  * access to the faker library off the `faker` property exposed;
+  //  * you can also set some additional `context` where desirable.
+  //  */
+  // public getMockHelper(context?: IDictionary) {
+  //   if (!faker && !faker.address) {
+  //     throw new FireMockError(
+  //       `The Faker library must be loaded before a MockHelper can be returned`,
+  //       "firemock/faker-not-ready"
+  //     );
+  //   }
+  //   return new MockHelper(context);
+  // }
 
   public addSchema<S = any>(schema: string, mock?: SchemaCallback<S>) {
     return new Schema<S>(schema, mock);

@@ -1,6 +1,6 @@
 /// <reference types="faker" />
 import { IDictionary } from "common-types";
-import { Schema, Deployment, MockHelper } from "../mocking/index";
+import { Schema, Deployment } from "../mocking/index";
 import { Reference } from "../rtdb/index";
 import { DelayType } from "../shared";
 import { SchemaCallback, IMockConfigOptions, IMockAuthConfig, IMockSetup } from "../@types";
@@ -66,14 +66,6 @@ export declare class Mock {
      * before you're mocking with faker available.
      */
     importFakerLibrary(): Promise<Faker.FakerStatic>;
-    /**
-     * **getMockHelper**
-     *
-     * returns a MockHelper class which should always contain
-     * access to the faker library off the `faker` property exposed;
-     * you can also set some additional `context` where desirable.
-     */
-    getMockHelper(context?: IDictionary): MockHelper;
     addSchema<S = any>(schema: string, mock?: SchemaCallback<S>): Schema<S>;
     /** Set the network delay for queries with "once" */
     setDelay(d: DelayType): void;

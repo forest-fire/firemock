@@ -1,4 +1,4 @@
-import { Queue, Schema, Deployment, MockHelper } from "../mocking/index";
+import { Queue, Schema, Deployment } from "../mocking/index";
 import { Reference, clearDatabase, updateDatabase, restoreEvents, silenceEvents, getDb } from "../rtdb/index";
 import { setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
@@ -119,19 +119,22 @@ export class Mock {
         }
         return faker;
     }
-    /**
-     * **getMockHelper**
-     *
-     * returns a MockHelper class which should always contain
-     * access to the faker library off the `faker` property exposed;
-     * you can also set some additional `context` where desirable.
-     */
-    getMockHelper(context) {
-        if (!faker && !faker.address) {
-            throw new FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
-        }
-        return new MockHelper(context);
-    }
+    // /**
+    //  * **getMockHelper**
+    //  *
+    //  * returns a MockHelper class which should always contain
+    //  * access to the faker library off the `faker` property exposed;
+    //  * you can also set some additional `context` where desirable.
+    //  */
+    // public getMockHelper(context?: IDictionary) {
+    //   if (!faker && !faker.address) {
+    //     throw new FireMockError(
+    //       `The Faker library must be loaded before a MockHelper can be returned`,
+    //       "firemock/faker-not-ready"
+    //     );
+    //   }
+    //   return new MockHelper(context);
+    // }
     addSchema(schema, mock) {
         return new Schema(schema, mock);
     }
