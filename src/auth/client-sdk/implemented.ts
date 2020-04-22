@@ -108,8 +108,9 @@ export const implemented: Omit<FirebaseAuth, keyof typeof notImplemented> = {
       user: {
         email: found.email,
         isAnonymous: false,
-        emailVerified: emailVerified(email),
-        uid: userUid(email)
+        emailVerified: found.emailVerified,
+        uid: userUid(email),
+        displayName: found.displayName
       },
       credential: {
         signInMethod: "signInWithEmailAndPassword",

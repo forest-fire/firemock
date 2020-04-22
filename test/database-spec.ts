@@ -290,13 +290,13 @@ describe("Database", () => {
       m.queueSchema("person", 10);
       m.generate();
       let status = "no-listener";
-      let firstRecord;
-      let firstKey;
+      let firstRecord: any;
+      let firstKey: any;
 
       const callback: HandleValueEvent = snap => {
         if (status === "has-listener") {
-          const list = snap.val();
-          const first = list[firstKey];
+          const list: any = snap.val();
+          const first: any = list[firstKey];
           expect(first.age).to.equal(firstRecord.age + 1);
         }
       };

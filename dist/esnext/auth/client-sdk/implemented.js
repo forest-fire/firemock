@@ -1,7 +1,7 @@
 import { networkDelay } from "../../shared";
 import { completeUserCredential } from "./completeUserCredential";
 import { FireMockError } from "../../errors/FireMockError";
-import { emailExistsAsUserInAuth, emailHasCorrectPassword, emailVerified, userUid, emailValidationAllowed, emailIsValidFormat } from "./authMockHelpers";
+import { emailExistsAsUserInAuth, emailHasCorrectPassword, userUid, emailValidationAllowed, emailIsValidFormat } from "./authMockHelpers";
 import { addUser, allUsers, authProviders, setCurrentUser, clearCurrentUser, addAuthObserver, getAnonymousUid } from "../state-mgmt";
 import { clientApiUser } from "./UserObject";
 export const implemented = {
@@ -60,8 +60,9 @@ export const implemented = {
             user: {
                 email: found.email,
                 isAnonymous: false,
-                emailVerified: emailVerified(email),
-                uid: userUid(email)
+                emailVerified: found.emailVerified,
+                uid: userUid(email),
+                displayName: found.displayName
             },
             credential: {
                 signInMethod: "signInWithEmailAndPassword",
