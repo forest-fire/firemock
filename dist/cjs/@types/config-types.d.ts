@@ -5,6 +5,11 @@ import { Mock } from "..";
 export declare type AsyncMockData = (db: Mock) => Promise<IDictionary>;
 export interface IMockConfigOptions {
     auth?: IMockAuthConfig;
+    /**
+     * Sets the initial state of the mock database, or optionally you can
+     * pass in an async function which will resolve into the state of the
+     * database.
+     */
     db?: IDictionary | AsyncMockData;
 }
 export interface IMockFirebaseUidOnlyPath<T extends object = IDictionary> extends IMockFirebasePathPermission {

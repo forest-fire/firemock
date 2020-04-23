@@ -7,6 +7,11 @@ export type AsyncMockData = (db: Mock) => Promise<IDictionary>;
 
 export interface IMockConfigOptions {
   auth?: IMockAuthConfig;
+  /**
+   * Sets the initial state of the mock database, or optionally you can
+   * pass in an async function which will resolve into the state of the
+   * database.
+   */
   db?: IDictionary | AsyncMockData;
 }
 

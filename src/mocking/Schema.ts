@@ -1,7 +1,7 @@
 import { IRelationship, ISchema, SchemaCallback } from "../@types";
 import { Queue, SchemaHelper } from "../mocking/index";
 import { pluralize, addException } from "../shared";
-import { faker } from "./Mock";
+import { getFakerLibrary } from "./fakerInitialiation";
 
 /**
  * The property that exists on the source scheme as a FK reference
@@ -25,7 +25,7 @@ export class Schema<T = any> {
   public mock(cb: SchemaCallback) {
     this._schemas.enqueue({
       id: this.schemaId,
-      fn: cb(new SchemaHelper({}, faker)), // TODO: pass in support for DB lookups
+      fn: cb(new SchemaHelper({}, getFakerLibrary())), // TODO: pass in support for DB lookups
       path: () => {
         const schema: ISchema = this._schemas.find(this.schemaId);
         return [

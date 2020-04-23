@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("../mocking/index");
 const shared_1 = require("../shared");
-const Mock_1 = require("./Mock");
+const fakerInitialiation_1 = require("./fakerInitialiation");
 class Schema {
     constructor(schemaId, mockFn) {
         this.schemaId = schemaId;
@@ -18,7 +18,7 @@ class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new index_1.SchemaHelper({}, Mock_1.faker)),
+            fn: cb(new index_1.SchemaHelper({}, fakerInitialiation_1.getFakerLibrary())),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [

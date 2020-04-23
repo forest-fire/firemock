@@ -1,2 +1,1 @@
-/// <reference types="firebase-admin" />
-export declare const adminAuthSdk: import("firebase-admin").auth.Auth;
+export declare const adminAuthSdk: import("firebase-admin/lib/auth").admin.auth.Auth;

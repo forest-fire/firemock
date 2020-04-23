@@ -6,7 +6,6 @@ import first from "lodash.first";
 import { IRelationship, ISchema, IQueue } from "../@types";
 import { getRandomInt, dotNotation, pluralize } from "../shared";
 import { Queue } from "../mocking/index";
-import { faker } from "./Mock";
 import { setDB, getDb } from "../rtdb";
 
 export class Deployment {

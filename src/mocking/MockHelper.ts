@@ -1,9 +1,10 @@
 import { IDictionary, createError } from "common-types";
-import { faker } from "../mocking/index";
+import { getFakerLibrary } from "./fakerInitialiation";
 
 export class MockHelper {
   constructor(public context?: IDictionary) {}
   public get faker() {
+    const faker = getFakerLibrary();
     if (!faker) {
       throw createError(
         `firemock/not-ready`,

@@ -1,6 +1,6 @@
 import { Queue, SchemaHelper } from "../mocking/index";
 import { pluralize, addException } from "../shared";
-import { faker } from "./Mock";
+import { getFakerLibrary } from "./fakerInitialiation";
 export class Schema {
     constructor(schemaId, mockFn) {
         this.schemaId = schemaId;
@@ -16,7 +16,7 @@ export class Schema {
     mock(cb) {
         this._schemas.enqueue({
             id: this.schemaId,
-            fn: cb(new SchemaHelper({}, faker)),
+            fn: cb(new SchemaHelper({}, getFakerLibrary())),
             path: () => {
                 const schema = this._schemas.find(this.schemaId);
                 return [
