@@ -2,13 +2,6 @@
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = require("../mocking/index");
 const index_2 = require("../rtdb/index");
@@ -17,6 +10,7 @@ const auth_1 = require("../auth");
 const state_mgmt_1 = require("../auth/state-mgmt");
 const FireMockError_1 = require("../errors/FireMockError");
 const AuthProviders_1 = __importDefault(require("../auth/client-sdk/AuthProviders"));
+const fakerInitialiation_1 = require("./fakerInitialiation");
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(
@@ -30,6 +24,7 @@ class Mock {
         providers: ["anonymous"],
         users: []
     }) {
+        // TODO: should these attributes be removed?
         this._schemas = new index_1.Queue("schemas").clear();
         this._relationships = new index_1.Queue("relationships").clear();
         this._queues = new index_1.Queue("queues").clear();
@@ -57,6 +52,7 @@ class Mock {
      */
     ) {
         const defaultDbConfig = {};
+        await fakerInitialiation_1.importFakerLibrary();
         const obj = new Mock(options.db
             ? typeof options.db === "function"
                 ? {}
@@ -64,12 +60,6 @@ class Mock {
             : defaultDbConfig, options.auth);
         if (typeof options.db === "function") {
             obj.updateDB(await options.db(obj));
-        }
-        try {
-            await obj.importFakerLibrary();
-        }
-        catch (e) {
-            console.info(`the Faker library was unable to be imported; if this is a browser environment (or other runtime) this is probably what you want as Faker is pretty large; however, if you do want or need to Fake things in the runtime then the error was: ${e.message}`);
         }
         return obj;
     }
@@ -113,36 +103,28 @@ class Mock {
     get authProviders() {
         return AuthProviders_1.default;
     }
+    /**
+     * returns an instance static FakerJS libraray
+     */
     get faker() {
-        return exports.faker;
+        return fakerInitialiation_1.getFakerLibrary();
     }
-    /**
-     * **importFakerLibrary**
-     *
-     * The **faker** library is a key part of effective mocking but
-     * it is a large library so we only want to import it when
-     * it's required. Calling this _async_ method will ensure that
-     * before you're mocking with faker available.
-     */
-    async importFakerLibrary() {
-        if (!exports.faker) {
-            exports.faker = await Promise.resolve().then(() => __importStar(require(/* webpackChunkName: "faker-lib" */ "faker")));
-        }
-        return exports.faker;
-    }
-    /**
-     * **getMockHelper**
-     *
-     * returns a MockHelper class which should always contain
-     * access to the faker library off the `faker` property exposed;
-     * you can also set some additional `context` where desirable.
-     */
-    getMockHelper(context) {
-        if (!exports.faker && !exports.faker.address) {
-            throw new FireMockError_1.FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
-        }
-        return new index_1.MockHelper(context);
-    }
+    // /**
+    //  * **getMockHelper**
+    //  *
+    //  * returns a MockHelper class which should always contain
+    //  * access to the faker library off the `faker` property exposed;
+    //  * you can also set some additional `context` where desirable.
+    //  */
+    // public getMockHelper(context?: IDictionary) {
+    //   if (!faker && !faker.address) {
+    //     throw new FireMockError(
+    //       `The Faker library must be loaded before a MockHelper can be returned`,
+    //       "firemock/faker-not-ready"
+    //     );
+    //   }
+    //   return new MockHelper(context);
+    // }
     addSchema(schema, mock) {
         return new index_1.Schema(schema, mock);
     }
@@ -156,7 +138,8 @@ class Mock {
         return d;
     }
     generate() {
-        if (!exports.faker && !exports.faker.address) {
+        const faker = fakerInitialiation_1.getFakerLibrary();
+        if (!faker && !faker.address) {
             throw new FireMockError_1.FireMockError(`The Faker library must be loaded before you can generate mocked data can be returned`, "firemock/faker-not-ready");
         }
         return new index_1.Deployment().generate();

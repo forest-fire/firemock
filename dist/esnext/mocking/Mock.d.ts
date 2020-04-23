@@ -1,12 +1,10 @@
 /// <reference types="faker" />
 import { IDictionary } from "common-types";
-import { Schema, Deployment, MockHelper } from "../mocking/index";
+import { Schema, Deployment } from "../mocking/index";
 import { Reference } from "../rtdb/index";
 import { DelayType } from "../shared";
 import { SchemaCallback, IMockConfigOptions, IMockAuthConfig, IMockSetup } from "../@types";
 import { FirebaseNamespace } from "@firebase/app-types";
-import { FakerStatic } from "../@types/mocking-types";
-export declare let faker: FakerStatic;
 export declare class Mock {
     /**
      * returns a Mock object while also ensuring that the
@@ -56,24 +54,10 @@ export declare class Mock {
     restoreEvents(): void;
     auth(): Promise<import("../@types").IMockAuth>;
     get authProviders(): FirebaseNamespace["auth"];
+    /**
+     * returns an instance static FakerJS libraray
+     */
     get faker(): Faker.FakerStatic;
-    /**
-     * **importFakerLibrary**
-     *
-     * The **faker** library is a key part of effective mocking but
-     * it is a large library so we only want to import it when
-     * it's required. Calling this _async_ method will ensure that
-     * before you're mocking with faker available.
-     */
-    importFakerLibrary(): Promise<Faker.FakerStatic>;
-    /**
-     * **getMockHelper**
-     *
-     * returns a MockHelper class which should always contain
-     * access to the faker library off the `faker` property exposed;
-     * you can also set some additional `context` where desirable.
-     */
-    getMockHelper(context?: IDictionary): MockHelper;
     addSchema<S = any>(schema: string, mock?: SchemaCallback<S>): Schema<S>;
     /** Set the network delay for queries with "once" */
     setDelay(d: DelayType): void;

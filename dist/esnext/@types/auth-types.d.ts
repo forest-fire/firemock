@@ -66,7 +66,9 @@ export interface IMockAuth extends FirebaseAuth {
  * The configuration of the **Auth** mocking service
  */
 export interface IMockAuthConfig {
+    /** the auth providers which have been enabled for this app */
     providers: IAuthProviderName[];
+    /** known users who should be in the mock Auth system to start */
     users?: ISimplifiedMockUser[];
 }
 export declare const enum AuthProviderName {

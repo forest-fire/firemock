@@ -1,11 +1,11 @@
-import { Queue, Schema, Deployment, MockHelper } from "../mocking/index";
+import { Queue, Schema, Deployment } from "../mocking/index";
 import { Reference, clearDatabase, updateDatabase, restoreEvents, silenceEvents, getDb } from "../rtdb/index";
 import { setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
 import { clearAuthUsers, initializeAuth } from "../auth/state-mgmt";
 import { FireMockError } from "../errors/FireMockError";
 import authProviders from "../auth/client-sdk/AuthProviders";
-export let faker;
+import { getFakerLibrary, importFakerLibrary } from "./fakerInitialiation";
 /* tslint:disable:max-classes-per-file */
 export class Mock {
     constructor(
@@ -19,6 +19,7 @@ export class Mock {
         providers: ["anonymous"],
         users: []
     }) {
+        // TODO: should these attributes be removed?
         this._schemas = new Queue("schemas").clear();
         this._relationships = new Queue("relationships").clear();
         this._queues = new Queue("queues").clear();
@@ -46,6 +47,7 @@ export class Mock {
      */
     ) {
         const defaultDbConfig = {};
+        await importFakerLibrary();
         const obj = new Mock(options.db
             ? typeof options.db === "function"
                 ? {}
@@ -53,12 +55,6 @@ export class Mock {
             : defaultDbConfig, options.auth);
         if (typeof options.db === "function") {
             obj.updateDB(await options.db(obj));
-        }
-        try {
-            await obj.importFakerLibrary();
-        }
-        catch (e) {
-            console.info(`the Faker library was unable to be imported; if this is a browser environment (or other runtime) this is probably what you want as Faker is pretty large; however, if you do want or need to Fake things in the runtime then the error was: ${e.message}`);
         }
         return obj;
     }
@@ -102,36 +98,28 @@ export class Mock {
     get authProviders() {
         return authProviders;
     }
+    /**
+     * returns an instance static FakerJS libraray
+     */
     get faker() {
-        return faker;
+        return getFakerLibrary();
     }
-    /**
-     * **importFakerLibrary**
-     *
-     * The **faker** library is a key part of effective mocking but
-     * it is a large library so we only want to import it when
-     * it's required. Calling this _async_ method will ensure that
-     * before you're mocking with faker available.
-     */
-    async importFakerLibrary() {
-        if (!faker) {
-            faker = await import(/* webpackChunkName: "faker-lib" */ "faker");
-        }
-        return faker;
-    }
-    /**
-     * **getMockHelper**
-     *
-     * returns a MockHelper class which should always contain
-     * access to the faker library off the `faker` property exposed;
-     * you can also set some additional `context` where desirable.
-     */
-    getMockHelper(context) {
-        if (!faker && !faker.address) {
-            throw new FireMockError(`The Faker library must be loaded before a MockHelper can be returned`, "firemock/faker-not-ready");
-        }
-        return new MockHelper(context);
-    }
+    // /**
+    //  * **getMockHelper**
+    //  *
+    //  * returns a MockHelper class which should always contain
+    //  * access to the faker library off the `faker` property exposed;
+    //  * you can also set some additional `context` where desirable.
+    //  */
+    // public getMockHelper(context?: IDictionary) {
+    //   if (!faker && !faker.address) {
+    //     throw new FireMockError(
+    //       `The Faker library must be loaded before a MockHelper can be returned`,
+    //       "firemock/faker-not-ready"
+    //     );
+    //   }
+    //   return new MockHelper(context);
+    // }
     addSchema(schema, mock) {
         return new Schema(schema, mock);
     }
@@ -145,6 +133,7 @@ export class Mock {
         return d;
     }
     generate() {
+        const faker = getFakerLibrary();
         if (!faker && !faker.address) {
             throw new FireMockError(`The Faker library must be loaded before you can generate mocked data can be returned`, "firemock/faker-not-ready");
         }

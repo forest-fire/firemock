@@ -62,8 +62,9 @@ exports.implemented = {
             user: {
                 email: found.email,
                 isAnonymous: false,
-                emailVerified: authMockHelpers_1.emailVerified(email),
-                uid: authMockHelpers_1.userUid(email)
+                emailVerified: found.emailVerified,
+                uid: authMockHelpers_1.userUid(email),
+                displayName: found.displayName
             },
             credential: {
                 signInMethod: "signInWithEmailAndPassword",

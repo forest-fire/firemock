@@ -34,7 +34,8 @@ export function initializeAuth(config) {
         uid: getRandomMockUid(),
         providerData: []
     });
-    _users = config.users.map(u => (Object.assign(Object.assign({}, baseUser()), u))) || [];
+    _users =
+        (config.users || []).map(u => (Object.assign(Object.assign({}, baseUser()), u))) || [];
     _providers = config.providers || [];
 }
 function isUser(user) {

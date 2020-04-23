@@ -52,7 +52,8 @@ export function initializeAuth(config: IMockAuthConfig) {
     uid: getRandomMockUid(),
     providerData: []
   });
-  _users = config.users.map(u => ({ ...baseUser(), ...u } as IMockUser)) || [];
+  _users =
+    (config.users || []).map(u => ({ ...baseUser(), ...u } as IMockUser)) || [];
   _providers = config.providers || [];
 }
 
