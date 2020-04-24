@@ -83,6 +83,8 @@ export function setCurrentUser(user: User | UserCredential) {
     _currentUser = user.user.uid;
     _currentUserCredential = user;
   }
+  // It should notify all auth observers on `setCurrentUser` call method
+  getAuthObservers().map(o => o(_currentUserCredential.user));
 }
 
 /**
