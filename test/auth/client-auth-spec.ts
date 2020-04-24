@@ -5,7 +5,8 @@ import { Mock } from "../../src/mocking";
 import {
   authProviders,
   setCurrentUser,
-  setDefaultAnonymousUid
+  setDefaultAnonymousUid,
+  addAuthObserver
 } from "../../src/auth/state-mgmt";
 
 const expect = chai.expect;
@@ -151,6 +152,24 @@ describe("Firebase Auth →", () => {
     const token = await user.user.getIdToken();
 
     expect(token).to.equal(expectedToken);
+  });
+
+  it("signInWithEmailAndPassword should notify authObservers", async () => {
+   const user = { email: "test@test.com", password: "foobar" };;
+    const m = await Mock.prepare({
+      auth: {
+        providers: ["emailPassword"],
+        users: [user]
+      }
+    });
+
+    const auth = await m.auth();
+
+    let hasBeenNotified = false;
+    addAuthObserver(() => hasBeenNotified = true);
+    await auth.signInWithEmailAndPassword(user.email, user.password);
+
+    expect(hasBeenNotified).is.equal(true);
   });
 });
 
