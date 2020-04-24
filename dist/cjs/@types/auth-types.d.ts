@@ -100,8 +100,8 @@ export interface IMockUser extends UserRecord {
     tokenIds?: string[];
     displayName?: string;
     disabled: boolean;
-    phoneNumber?: string | null;
-    photoURL?: string | null;
+    phoneNumber?: string;
+    photoURL?: string;
     email?: string;
     password?: string;
     /**

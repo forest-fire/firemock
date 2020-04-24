@@ -90,7 +90,7 @@ export const enum AuthProviderName {
   yahoo = "yahoo",
   microsoft = "microsoft",
   apple = "apple",
-  anonymous = "anonymous"
+  anonymous = "anonymous",
 }
 
 export type IAuthProviderName = keyof typeof AuthProviderName;
@@ -111,8 +111,8 @@ export interface IMockUser extends UserRecord {
   displayName?: string;
   disabled: boolean;
 
-  phoneNumber?: string | null;
-  photoURL?: string | null;
+  phoneNumber?: string;
+  photoURL?: string;
 
   email?: string;
   password?: string;
