@@ -6,9 +6,6 @@ exports.notImplemented = {
     async delete() {
         throw new Error("the Mock Auth feature for delete() is not yet implemented");
     },
-    async getIdTokenResult(forceRefresh) {
-        throw new Error("the Mock Auth feature for getIdTokenResult() is not yet implemented");
-    },
     async linkAndRetrieveDataWithCredential(credential) {
         throw new Error(`linkAndRetrieveDataWithCredential() is not implemented yet in the client-sdk's mock auth`);
     },

@@ -17,12 +17,6 @@ export const notImplemented: Partial<User> = {
     );
   },
 
-  async getIdTokenResult(forceRefresh?: boolean): Promise<IdTokenResult> {
-    throw new Error(
-      "the Mock Auth feature for getIdTokenResult() is not yet implemented"
-    );
-  },
-
   async linkAndRetrieveDataWithCredential(credential: AuthCredential) {
     throw new Error(
       `linkAndRetrieveDataWithCredential() is not implemented yet in the client-sdk's mock auth`
