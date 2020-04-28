@@ -6,7 +6,7 @@ import {
   updateDatabase,
   restoreEvents,
   silenceEvents,
-  getDb
+  getDb,
 } from "../rtdb/index";
 import { DelayType, setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
@@ -20,12 +20,12 @@ import {
   IMockConfigOptions,
   IMockAuthConfig,
   AsyncMockData,
-  IMockSetup
+  IMockSetup,
 } from "../@types";
 import authProviders from "../auth/client-sdk/AuthProviders";
 import { FirebaseNamespace } from "@firebase/app-types";
-import { FakerStatic } from "../@types/mocking-types";
 import { getFakerLibrary, importFakerLibrary } from "./fakerInitialiation";
+import { adminAuthSdk } from "../auth/admin-sdk";
 
 /* tslint:disable:max-classes-per-file */
 export class Mock {
@@ -83,7 +83,7 @@ export class Mock {
     dataOrMock?: IDictionary | IMockSetup,
     authConfig: IMockAuthConfig = {
       providers: ["anonymous"],
-      users: []
+      users: [],
     }
   ) {
     Queue.clearAll();
@@ -133,6 +133,10 @@ export class Mock {
 
   public async auth() {
     return fireAuth();
+  }
+
+  public async adminSdk() {
+    return adminAuthSdk;
   }
 
   public get authProviders(): FirebaseNamespace["auth"] {
