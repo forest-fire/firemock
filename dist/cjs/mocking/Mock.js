@@ -11,6 +11,7 @@ const state_mgmt_1 = require("../auth/state-mgmt");
 const FireMockError_1 = require("../errors/FireMockError");
 const AuthProviders_1 = __importDefault(require("../auth/client-sdk/AuthProviders"));
 const fakerInitialiation_1 = require("./fakerInitialiation");
+const admin_sdk_1 = require("../auth/admin-sdk");
 /* tslint:disable:max-classes-per-file */
 class Mock {
     constructor(
@@ -22,7 +23,7 @@ class Mock {
      */
     dataOrMock, authConfig = {
         providers: ["anonymous"],
-        users: []
+        users: [],
     }) {
         // TODO: should these attributes be removed?
         this._schemas = new index_1.Queue("schemas").clear();
@@ -99,6 +100,9 @@ class Mock {
     }
     async auth() {
         return auth_1.auth();
+    }
+    async adminSdk() {
+        return admin_sdk_1.adminAuthSdk;
     }
     get authProviders() {
         return AuthProviders_1.default;

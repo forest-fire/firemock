@@ -1,11 +1,12 @@
 import { Queue, Schema, Deployment } from "../mocking/index";
-import { Reference, clearDatabase, updateDatabase, restoreEvents, silenceEvents, getDb } from "../rtdb/index";
+import { Reference, clearDatabase, updateDatabase, restoreEvents, silenceEvents, getDb, } from "../rtdb/index";
 import { setNetworkDelay } from "../shared";
 import { auth as fireAuth } from "../auth";
 import { clearAuthUsers, initializeAuth } from "../auth/state-mgmt";
 import { FireMockError } from "../errors/FireMockError";
 import authProviders from "../auth/client-sdk/AuthProviders";
 import { getFakerLibrary, importFakerLibrary } from "./fakerInitialiation";
+import { adminAuthSdk } from "../auth/admin-sdk";
 /* tslint:disable:max-classes-per-file */
 export class Mock {
     constructor(
@@ -17,7 +18,7 @@ export class Mock {
      */
     dataOrMock, authConfig = {
         providers: ["anonymous"],
-        users: []
+        users: [],
     }) {
         // TODO: should these attributes be removed?
         this._schemas = new Queue("schemas").clear();
@@ -94,6 +95,9 @@ export class Mock {
     }
     async auth() {
         return fireAuth();
+    }
+    async adminSdk() {
+        return adminAuthSdk;
     }
     get authProviders() {
         return authProviders;

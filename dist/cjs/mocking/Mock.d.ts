@@ -53,6 +53,7 @@ export declare class Mock {
      */
     restoreEvents(): void;
     auth(): Promise<import("../@types").IMockAuth>;
+    adminSdk(): Promise<import("firebase-admin/lib/auth").admin.auth.Auth>;
     get authProviders(): FirebaseNamespace["auth"];
     /**
      * returns an instance static FakerJS libraray
