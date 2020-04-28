@@ -109,6 +109,8 @@ export function currentUserCredential() {
 export function clearCurrentUser() {
   _currentUser = undefined;
   _currentUserCredential = undefined;
+  // It should notify all auth observers on `clearCurrentUser` call method
+  getAuthObservers().map(o => o(undefined));
 }
 
 /**
