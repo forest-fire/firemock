@@ -171,6 +171,24 @@ describe("Firebase Auth →", () => {
 
     expect(hasBeenNotified).is.equal(true);
   });
+
+  it("signOut should notify authObservers", async () => {
+    const user = {email: "test@test.com", password: "foobar"};
+    const m = await Mock.prepare({
+      auth: {
+        providers: ["emailPassword"],
+        users: [user]
+      }
+    });
+
+    const auth = await m.auth();
+
+    let hasBeenNotified = false;
+    addAuthObserver(() => hasBeenNotified = true);
+    await auth.signOut();
+
+    expect(hasBeenNotified).is.equal(true);
+  });
 });
 
 async function createUser(mock: Mock, email: string, password: string) {
