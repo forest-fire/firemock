@@ -4,7 +4,7 @@ import {
   RtdbDataSnapshot,
   RtdbEventType,
   QueryValue,
-  IFirebaseEventHandler
+  IFirebaseEventHandler,
 } from "../@types/rtdb-types";
 import { getDb, SnapShot } from "../rtdb/index";
 import { SerializedQuery, QueryOrderType } from "serialized-query";
@@ -144,7 +144,7 @@ export abstract class Query<T = any> implements RtdbQuery {
   public toJSON() {
     return {
       identity: this.toString(),
-      query: this._query.identity as IDictionary
+      query: this._query.identity as IDictionary,
     };
   }
 
@@ -174,11 +174,6 @@ export abstract class Query<T = any> implements RtdbQuery {
     return null;
   }
 
-  // protected abstract getSnapshotConstructor(
-  //   key: string,
-  //   value: any
-  // ): RtdbDataSnapshot;
-
   protected abstract addListener(
     pathOrQuery: string | SerializedQuery<any>,
     eventType: RtdbEventType,
@@ -196,7 +191,6 @@ export abstract class Query<T = any> implements RtdbQuery {
     const data = getDb(path);
     const results = runQuery(this._query, data);
 
-    return new SnapShot(leafNode(this._query.path), results);
-    // return this.getSnapshotConstructor(leafNode(this._query.path), results);
+    return new SnapShot(leafNode(this._query.path), results ? results : null);
   }
 }
