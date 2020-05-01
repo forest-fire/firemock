@@ -96,7 +96,7 @@ class Query {
     toJSON() {
         return {
             identity: this.toString(),
-            query: this._query.identity
+            query: this._query.identity,
         };
     }
     toString() {
@@ -131,7 +131,7 @@ class Query {
         const path = this._query.path || this.path;
         const data = index_1.getDb(path);
         const results = index_3.runQuery(this._query, data);
-        return new index_1.SnapShot(index_2.leafNode(this._query.path), results);
+        return new index_1.SnapShot(index_2.leafNode(this._query.path), results ? results : null);
         // return this.getSnapshotConstructor(leafNode(this._query.path), results);
     }
 }

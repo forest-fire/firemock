@@ -1,9 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { Mock } from "../../src/mocking";
-import { adminAuthSdk } from "../../src";
-import { initializeAuth, clearAuthUsers } from "../../src/auth/state-mgmt";
-import { IDictionary } from "common-types";
 
 describe("multiPathSet() => ", () => {
   it("setting properties shallowly works as expected", async () => {
@@ -11,7 +8,7 @@ describe("multiPathSet() => ", () => {
     m.ref("/").update({
       "/baz": 1,
       "/bar": 2,
-      "/foo/baz": 5
+      "/foo/baz": 5,
     });
     expect(m.db.baz).to.equal(1);
     expect(m.db.bar).to.equal(2);
@@ -24,7 +21,7 @@ describe("multiPathSet() => ", () => {
     m.ref("/").update({
       "/foo/bar/foo": 1,
       "/foo/bar/bar": 2,
-      "/foo/bar/baz": 5
+      "/foo/bar/baz": 5,
     });
     expect(m.db.foo.bar.foo).to.equal(1);
     expect(m.db.foo.bar.bar).to.equal(2);
@@ -39,14 +36,14 @@ describe("multiPathSet() => ", () => {
             white: true,
             brown: true,
             green: false,
-            red: true
-          }
-        }
-      }
+            red: true,
+          },
+        },
+      },
     });
     m.ref("/").update({
       "/foo/bar/added": true,
-      "/foo/bar/white": false
+      "/foo/bar/white": false,
     });
     expect(m.db.foo.bar.added).is.equal(true);
     expect(m.db.foo.bar.white).is.equal(false);
