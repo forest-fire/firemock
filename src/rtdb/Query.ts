@@ -174,11 +174,6 @@ export abstract class Query<T = any> implements RtdbQuery {
     return null;
   }
 
-  // protected abstract getSnapshotConstructor(
-  //   key: string,
-  //   value: any
-  // ): RtdbDataSnapshot;
-
   protected abstract addListener(
     pathOrQuery: string | SerializedQuery<any>,
     eventType: RtdbEventType,
@@ -197,6 +192,5 @@ export abstract class Query<T = any> implements RtdbQuery {
     const results = runQuery(this._query, data);
 
     return new SnapShot(leafNode(this._query.path), results ? results : null);
-    // return this.getSnapshotConstructor(leafNode(this._query.path), results);
   }
 }

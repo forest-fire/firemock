@@ -132,7 +132,6 @@ class Query {
         const data = index_1.getDb(path);
         const results = index_3.runQuery(this._query, data);
         return new index_1.SnapShot(index_2.leafNode(this._query.path), results ? results : null);
-        // return this.getSnapshotConstructor(leafNode(this._query.path), results);
     }
 }
 exports.Query = Query;
